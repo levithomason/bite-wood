@@ -1,5 +1,6 @@
 import { Game, GameImage } from './game.js'
 import objPlayer from './player.js'
+import objRainbowDash from './rainbow-dash.js'
 
 const imgBackground = new GameImage('./background.png')
 
@@ -9,6 +10,7 @@ const imgBackground = new GameImage('./background.png')
 const game = new Game()
 game.setBackgroundImage(imgBackground.image)
 game.addObject(objPlayer)
+game.addObject(objRainbowDash)
 game.start()
 
 window.game = game

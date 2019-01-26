@@ -128,7 +128,10 @@ export class Game {
 
       // step
       if (object.sprite && object.sprite.step) object.sprite.step()
-      if (object.step) object.step()
+
+      if (object.events.step && object.events.step.actions) {
+        object.events.step.actions.forEach(action => action(object))
+      }
     })
   }
 
@@ -232,11 +235,12 @@ export class GameSprite {
 // GameObject
 // ----------------------------------------
 export class GameObject {
-  constructor({ sprite, x = 0, y = 0, speed = 0, events = {} }) {
+  constructor({ sprite, x = 0, y = 0, speed = 0, direction = 0, events = {} }) {
     this.sprite = sprite
     this.x = x
     this.y = y
     this.speed = speed
+    this.direction = direction
     this.events = events
     this.game = null
 
