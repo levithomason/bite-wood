@@ -42,7 +42,7 @@ export const sprPlayerWalkR = new GameSprite({
   scaleY: 2,
   insertionX: 24,
   insertionY: 46,
-  stepsPerFrame: 3,
+  stepsPerFrame: 2,
 })
 export const sprPlayerWalkL = new GameSprite({
   image: imgPlayerL.image,
@@ -55,27 +55,27 @@ export const sprPlayerWalkL = new GameSprite({
   scaleY: 2,
   insertionX: -24,
   insertionY: 46,
-  stepsPerFrame: 3,
+  stepsPerFrame: 2,
 })
 
 const objPlayer = new GameObject({
   sprite: sprPlayerIdleR,
   x: 100,
   y: 573,
-  speed: 3,
+  speed: 4,
   events: {
+    keyDown: {
+      d: {
+        actions: [self => (self.game.debug = !self.game.debug)],
+      },
+    },
+
     keyUp: {
       ArrowRight: {
         actions: [self => self.setSprite(sprPlayerIdleR)],
       },
       ArrowLeft: {
         actions: [self => self.setSprite(sprPlayerIdleL)],
-      },
-    },
-
-    keyDown: {
-      d: {
-        actions: [self => (self.game.debug = !self.game.debug)],
       },
     },
 
