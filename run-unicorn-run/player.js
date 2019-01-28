@@ -62,7 +62,7 @@ const objPlayer = new GameObject({
   sprite: sprPlayerIdleR,
   x: 100,
   y: 573,
-  speed: 4,
+  speed: 0,
   events: {
     keyDown: {
       d: {
@@ -71,31 +71,63 @@ const objPlayer = new GameObject({
     },
 
     keyUp: {
+      ArrowUp: {
+        actions: [self => (self.speed = 0)],
+      },
+      ArrowDown: {
+        actions: [self => (self.speed = 0)],
+      },
       ArrowRight: {
-        actions: [self => self.setSprite(sprPlayerIdleR)],
+        actions: [
+          self => {
+            self.setSprite(sprPlayerIdleR)
+            self.speed = 0
+          },
+        ],
       },
       ArrowLeft: {
-        actions: [self => self.setSprite(sprPlayerIdleL)],
+        actions: [
+          self => {
+            self.setSprite(sprPlayerIdleL)
+            self.speed = 0
+          },
+        ],
       },
     },
 
     keyboard: {
       ArrowUp: {
-        actions: [self => self.move(270, self.speed)],
+        actions: [
+          self => {
+            self.direction = 270
+            self.speed = 4 // Math.min(self.speed + 0.1, 4)
+          },
+        ],
       },
       ArrowDown: {
-        actions: [self => self.move(90, self.speed)],
+        actions: [
+          self => {
+            self.direction = 90
+            self.speed = 4 // Math.min(self.speed + 0.1, 4)
+          },
+        ],
       },
       ArrowRight: {
         actions: [
           self => self.setSprite(sprPlayerWalkR),
-          self => self.move(0, self.speed),
+          self => {
+            self.direction = 0
+            self.speed = 4 // Math.min(self.speed + 0.1, 4)
+          },
         ],
       },
       ArrowLeft: {
         actions: [
           self => self.setSprite(sprPlayerWalkL),
-          self => self.move(180, self.speed),
+          self => {
+            self.direction = 180
+            self.speed = 4 // Math.min(self.speed + 0.1, 4)
+          },
         ],
       },
     },

@@ -1,5 +1,12 @@
 import * as utils from './utils.js'
 
+const physics = {
+  gravity: 0.5,
+  gravityDirection: 90,
+  terminalVelocity: 10,
+  friction: 1,
+}
+
 // ----------------------------------------
 // Game
 // ----------------------------------------
@@ -11,7 +18,7 @@ export class Game {
    * @property keysDown {object}
    */
   constructor() {
-    this.debug = false
+    this.debug = true
 
     this.canvas = document.getElementById('game')
     this.ctx = this.canvas.getContext('2d')
@@ -34,9 +41,6 @@ export class Game {
 
     this.step = this.step.bind(this)
     this.draw = this.draw.bind(this)
-
-    this.stepObject = this.stepObject.bind(this)
-    this.invokeKeyboardEvents = this.invokeKeyboardEvents.bind(this)
 
     document.addEventListener('keydown', this.handleKeyDown)
     document.addEventListener('keyup', this.handleKeyUp)
@@ -71,7 +75,7 @@ export class Game {
 
   start() {
     this.isPlaying = true
-    this.timer = requestAnimationFrame(this.tick)
+    this.tick()
   }
 
   pause() {
@@ -84,76 +88,13 @@ export class Game {
     this.draw()
 
     if (this.isPlaying) {
-      requestAnimationFrame(this.tick)
-    }
-  }
-
-  invokeKeyboardEvents(object) {
-    // keydown events
-    if (object.events.keyDown) {
-      Object.keys(this.keysDown)
-        .filter(key => this.keysDown[key] !== 'handled')
-        .forEach(key => {
-          if (
-            object.events.keyDown[key] &&
-            object.events.keyDown[key].actions
-          ) {
-            object.events.keyDown[key].actions.forEach(action => {
-              action(object)
-            })
-          }
-          // keydown should only register for one step
-          // remember which we've handled so we don't handle them again
-          this.keysDown[key] = 'handled'
-        })
-    }
-
-    // keyboard events
-    if (object.events.keyboard) {
-      Object.keys(this.keys).forEach(key => {
-        if (
-          object.events.keyboard[key] &&
-          object.events.keyboard[key].actions
-        ) {
-          object.events.keyboard[key].actions.forEach(action => {
-            action(object)
-          })
-        }
-      })
-    }
-
-    // keyup events
-    if (object.events.keyUp) {
-      Object.keys(this.keysUp).forEach(key => {
-        // since key events are handled on game step we can only safely remove
-        // keyboard and keydown events after a game step handles the keyup event
-        delete this.keys[key]
-        delete this.keysDown[key]
-
-        if (object.events.keyUp[key] && object.events.keyUp[key].actions) {
-          object.events.keyUp[key].actions.forEach(action => {
-            action(object)
-          })
-        }
-
-        // keyup events should only fire for one step
-        delete this.keysUp[key]
-      })
-    }
-  }
-
-  stepObject(object) {
-    if (object.sprite && object.sprite.step) object.sprite.step()
-
-    if (object.events.step && object.events.step.actions) {
-      object.events.step.actions.forEach(action => action(object))
+      this.timer = requestAnimationFrame(this.tick)
     }
   }
 
   step() {
     this.objects.forEach(object => {
-      this.invokeKeyboardEvents(object)
-      this.stepObject(object)
+      object.step()
     })
   }
 
@@ -161,39 +102,8 @@ export class Game {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
     this.ctx.drawImage(this.background, 0, 0)
 
-    this.objects.forEach(({ x, y, sprite }) => {
-      this.ctx.drawImage(
-        sprite.image,
-        sprite.offsetX + sprite.frameIndex * sprite.frameWidth,
-        sprite.offsetY,
-        sprite.frameWidth,
-        sprite.frameHeight,
-        x - sprite.insertionX * sprite.scaleX,
-        y - sprite.insertionY * sprite.scaleY,
-        sprite.frameWidth * sprite.scaleX,
-        sprite.frameHeight * sprite.scaleY,
-      )
-
-      if (this.debug) {
-        // bounding box
-        this.ctx.setLineDash([3, 3])
-        this.ctx.strokeRect(
-          x - sprite.insertionX * sprite.scaleX,
-          y - sprite.insertionY * sprite.scaleY,
-          sprite.frameWidth * sprite.scaleX,
-          sprite.frameHeight * sprite.scaleY,
-        )
-
-        // insertion point
-        this.ctx.setLineDash([])
-        this.ctx.strokeStyle = 'inverted'
-        this.ctx.beginPath()
-        this.ctx.moveTo(x - 10, y)
-        this.ctx.lineTo(x + 10, y)
-        this.ctx.moveTo(x, y - 10)
-        this.ctx.lineTo(x, y + 10)
-        this.ctx.stroke()
-      }
+    this.objects.forEach(object => {
+      object.draw()
     })
   }
 }
@@ -261,13 +171,168 @@ export class GameObject {
     this.sprite = sprite
     this.x = x
     this.y = y
+    this.xPrev = x
+    this.yPrev = y
     this.speed = speed
     this.direction = direction
     this.events = events
     this.game = null
 
+    this.invokeKeyboardEvents = this.invokeKeyboardEvents.bind(this)
+    this.step = this.step.bind(this)
+    this.draw = this.draw.bind(this)
+
     this.move = this.move.bind(this)
     this.moveTo = this.moveTo.bind(this)
+  }
+
+  get hspeed() {
+    return Math.abs(this.x - this.xPrev)
+  }
+
+  get vspeed() {
+    return Math.abs(this.y - this.yPrev)
+  }
+
+  step() {
+    const xPrev = this.x
+    const yPrev = this.y
+
+    this.invokeKeyboardEvents()
+
+    if (this.sprite && this.sprite.step) {
+      this.sprite.step()
+    }
+
+    if (this.events.step && this.events.step.actions) {
+      this.events.step.actions.forEach(action => {
+        action(this)
+      })
+    }
+
+    if (this.speed !== 0) {
+      this.move(this.direction, this.speed)
+    }
+
+    this.xPrev = xPrev
+    this.yPrev = yPrev
+  }
+
+  draw() {
+    const {
+      sprite,
+      x,
+      y,
+      xPrev,
+      yPrev,
+      speed,
+      hspeed,
+      vspeed,
+      direction,
+    } = this
+
+    this.game.ctx.drawImage(
+      sprite.image,
+      sprite.offsetX + sprite.frameIndex * sprite.frameWidth,
+      sprite.offsetY,
+      sprite.frameWidth,
+      sprite.frameHeight,
+      x - sprite.insertionX * sprite.scaleX,
+      y - sprite.insertionY * sprite.scaleY,
+      sprite.frameWidth * sprite.scaleX,
+      sprite.frameHeight * sprite.scaleY,
+    )
+
+    if (this.game.debug) {
+      // bounding box
+      this.game.ctx.setLineDash([3, 3])
+      this.game.ctx.strokeRect(
+        x - sprite.insertionX * sprite.scaleX,
+        y - sprite.insertionY * sprite.scaleY,
+        sprite.frameWidth * sprite.scaleX,
+        sprite.frameHeight * sprite.scaleY,
+      )
+
+      // insertion point
+      this.game.ctx.setLineDash([])
+      this.game.ctx.strokeStyle = 'inverted'
+      this.game.ctx.beginPath()
+      this.game.ctx.moveTo(x - 10, y)
+      this.game.ctx.lineTo(x + 10, y)
+      this.game.ctx.moveTo(x, y - 10)
+      this.game.ctx.lineTo(x, y + 10)
+      this.game.ctx.stroke()
+
+      // text values
+      this.game.ctx.font = '12px monospace'
+      this.game.ctx.textAlign = 'left'
+      const lines = [
+        `x          = ${x}`,
+        `y          = ${y}`,
+        `xPrev      = ${xPrev}`,
+        `yPrev      = ${yPrev}`,
+        `direction  = ${direction}`,
+        `speed      = ${speed}`,
+        `hspeed     = ${hspeed}`,
+        `vspeed     = ${vspeed}`,
+      ]
+        .reverse()
+        .forEach((text, i) => {
+          this.game.ctx.fillText(
+            text,
+            x - sprite.insertionX,
+            y - sprite.frameHeight - sprite.insertionY - 4 - i * 14,
+          )
+        })
+    }
+  }
+
+  invokeKeyboardEvents() {
+    // KEYDOWN
+    if (this.events.keyDown) {
+      Object.keys(this.game.keysDown)
+        .filter(key => this.game.keysDown[key] !== 'handled')
+        .forEach(key => {
+          if (this.events.keyDown[key] && this.events.keyDown[key].actions) {
+            this.events.keyDown[key].actions.forEach(action => {
+              action(this)
+            })
+          }
+          // keydown should only register for one step
+          // remember which we've handled so we don't handle them again
+          this.game.keysDown[key] = 'handled'
+        })
+    }
+
+    // KEYBOARD
+    if (this.events.keyboard) {
+      Object.keys(this.game.keys).forEach(key => {
+        if (this.events.keyboard[key] && this.events.keyboard[key].actions) {
+          this.events.keyboard[key].actions.forEach(action => {
+            action(this)
+          })
+        }
+      })
+    }
+
+    // KEYUP
+    if (this.events.keyUp) {
+      Object.keys(this.game.keysUp).forEach(key => {
+        // since key events are handled on game step we can only safely remove
+        // keyboard and keydown events after a game step handles the keyup event
+        delete this.game.keys[key]
+        delete this.game.keysDown[key]
+
+        if (this.events.keyUp[key] && this.events.keyUp[key].actions) {
+          this.events.keyUp[key].actions.forEach(action => {
+            action(this)
+          })
+        }
+
+        // keyup events should only fire for one step
+        delete this.game.keysUp[key]
+      })
+    }
   }
 
   move(direction, distance) {
@@ -275,6 +340,10 @@ export class GameObject {
 
     this.x = x
     this.y = y
+  }
+
+  accelerate(direction, speed) {
+
   }
 
   moveTo(x, y) {
