@@ -4,8 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start:run-unicorn-run": "cd run-unicorn-run && live-server",
-    "start:console": "nodemon --quiet  --no-stdin"
+    "start": "cd run-unicorn-run && live-server",
+    "start:console": "cd console && nodemon --quiet --no-stdin"
   },
   "prettier": {
     "semi": false,

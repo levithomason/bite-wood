@@ -1,34 +1,26 @@
+import * as draw from './draw.js'
 import * as utils from './utils.js'
-
-const physics = {
-  gravity: 0.5,
-  gravityDirection: 90,
-  terminalVelocity: 10,
-  friction: 1,
-}
 
 // ----------------------------------------
 // Game
 // ----------------------------------------
 export class Game {
   /**
-   * @property canvas {HTMLCanvasElement}
-   * @property ctx {CanvasRenderingContext2D}
    * @property objects {GameObject[]}
    * @property keysDown {object}
    */
   constructor() {
     this.debug = true
+    this.width = 800
+    this.height = 600
 
-    this.canvas = document.getElementById('game')
-    this.ctx = this.canvas.getContext('2d')
-    this.ctx.imageSmoothingEnabled = false // pixelated
+    const canvas = draw.init(this.width, this.height)
+    document.body.append(canvas)
 
     this.objects = []
     this.keys = {}
     this.keysDown = {}
     this.keysUp = {}
-
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleKeyUp = this.handleKeyUp.bind(this)
 
@@ -94,13 +86,19 @@ export class Game {
 
   step() {
     this.objects.forEach(object => {
-      object.step()
+      if (object.step) {
+        object.step()
+      }
     })
   }
 
   draw() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    this.ctx.drawImage(this.background, 0, 0)
+    draw.erase()
+    draw.image(this.background)
+
+    if (this.debug) {
+      draw.grid()
+    }
 
     this.objects.forEach(object => {
       object.draw()
@@ -171,8 +169,6 @@ export class GameObject {
     this.sprite = sprite
     this.x = x
     this.y = y
-    this.xPrev = x
-    this.yPrev = y
     this.speed = speed
     this.direction = direction
     this.events = events
@@ -186,18 +182,7 @@ export class GameObject {
     this.moveTo = this.moveTo.bind(this)
   }
 
-  get hspeed() {
-    return Math.abs(this.x - this.xPrev)
-  }
-
-  get vspeed() {
-    return Math.abs(this.y - this.yPrev)
-  }
-
   step() {
-    const xPrev = this.x
-    const yPrev = this.y
-
     this.invokeKeyboardEvents()
 
     if (this.sprite && this.sprite.step) {
@@ -213,25 +198,12 @@ export class GameObject {
     if (this.speed !== 0) {
       this.move(this.direction, this.speed)
     }
-
-    this.xPrev = xPrev
-    this.yPrev = yPrev
   }
 
   draw() {
-    const {
-      sprite,
-      x,
-      y,
-      xPrev,
-      yPrev,
-      speed,
-      hspeed,
-      vspeed,
-      direction,
-    } = this
+    const { sprite, x, y } = this
 
-    this.game.ctx.drawImage(
+    draw.image(
       sprite.image,
       sprite.offsetX + sprite.frameIndex * sprite.frameWidth,
       sprite.offsetY,
@@ -244,46 +216,7 @@ export class GameObject {
     )
 
     if (this.game.debug) {
-      // bounding box
-      this.game.ctx.setLineDash([3, 3])
-      this.game.ctx.strokeRect(
-        x - sprite.insertionX * sprite.scaleX,
-        y - sprite.insertionY * sprite.scaleY,
-        sprite.frameWidth * sprite.scaleX,
-        sprite.frameHeight * sprite.scaleY,
-      )
-
-      // insertion point
-      this.game.ctx.setLineDash([])
-      this.game.ctx.strokeStyle = 'inverted'
-      this.game.ctx.beginPath()
-      this.game.ctx.moveTo(x - 10, y)
-      this.game.ctx.lineTo(x + 10, y)
-      this.game.ctx.moveTo(x, y - 10)
-      this.game.ctx.lineTo(x, y + 10)
-      this.game.ctx.stroke()
-
-      // text values
-      this.game.ctx.font = '12px monospace'
-      this.game.ctx.textAlign = 'left'
-      const lines = [
-        `x          = ${x}`,
-        `y          = ${y}`,
-        `xPrev      = ${xPrev}`,
-        `yPrev      = ${yPrev}`,
-        `direction  = ${direction}`,
-        `speed      = ${speed}`,
-        `hspeed     = ${hspeed}`,
-        `vspeed     = ${vspeed}`,
-      ]
-        .reverse()
-        .forEach((text, i) => {
-          this.game.ctx.fillText(
-            text,
-            x - sprite.insertionX,
-            y - sprite.frameHeight - sprite.insertionY - 4 - i * 14,
-          )
-        })
+      draw.objectDebug(this)
     }
   }
 
@@ -342,8 +275,11 @@ export class GameObject {
     this.y = y
   }
 
-  accelerate(direction, speed) {
+  accelerate(direction, speed, maxSpeed) {
+    const addX = speed * Math.cos(direction)
+    const addY = speed * Math.sin(direction)
 
+    this.speed = Math.min(this.speed + speed, maxSpeed)
   }
 
   moveTo(x, y) {
@@ -357,5 +293,107 @@ export class GameObject {
     this.sprite = sprite
     this.sprite.frameIndex = 0
     this.sprite.stepsThisFrame = 0
+  }
+}
+
+export class Vector {
+  constructor() {
+    this.angle = 0
+    this.magnitude = 0
+  }
+
+  get angle() {
+    return utils.toDegrees(this._angle)
+  }
+
+  set angle(angle) {
+    this._angle = utils.toRadians(angle)
+    this._adjacent = this._hypotenuse * Math.cos(this._angle)
+    this._opposite = this._hypotenuse * Math.sin(this._angle)
+  }
+
+  get magnitude() {
+    return this._hypotenuse
+  }
+
+  set magnitude(hypotenuse) {
+    this._hypotenuse = hypotenuse
+    this._adjacent = this._hypotenuse * Math.cos(this._angle)
+    this._opposite = this._hypotenuse * Math.sin(this._angle)
+  }
+
+  get x() {
+    return this._adjacent
+  }
+
+  set x(adjacent) {
+    this._adjacent = adjacent
+    this._angle = Math.atan2(this._opposite, this._adjacent)
+    this._hypotenuse = this._opposite / Math.cos(this._angle)
+  }
+
+  get y() {
+    return this._opposite
+  }
+
+  set y(opposite) {
+    this._opposite = opposite
+    this._angle = Math.atan2(this._opposite, this._adjacent)
+    this._hypotenuse = this._opposite / Math.cos(this._angle)
+  }
+
+  add(angle, speed) {}
+
+  draw() {
+    const originX = 300
+    const originY = 300
+
+    draw.saveSettings()
+
+    // adjacent
+    draw.line(originX, originY, originX + this.x, originY)
+    // opposite
+    draw.line(originX + this.x, originY, originX + this.x, originY + this.y)
+    // hypotenuse
+    draw.setBorderColor('red')
+    draw.setFillColor('red')
+    draw.line(originX, originY, originX + this.x, originY + this.y)
+    draw.rectangle(originX + this.x - 2, originY + this.y - 2, 5, 5)
+
+    draw.setBorderColor('black')
+    draw.setFillColor('transparent')
+    // 90°
+    draw.rectangle(
+      originX + this.x + 10 * -Math.sign(this.x),
+      originY,
+      10 * Math.sign(this.x),
+      10 * Math.sign(this.y),
+    )
+
+    // labels: x, y, angle, magnitude
+    draw.textAlign('center')
+    draw.setFillColor('red')
+    draw.text(
+      Math.round(this.magnitude),
+      originX + this.x / 2 - 20 * Math.sign(this.x),
+      originY + this.y / 2,
+    )
+
+    draw.loadSettings()
+    draw.text(
+      'x ' + Math.round(this.x),
+      originX + this.x / 2,
+      originY + 15 * -Math.sign(this.y),
+    )
+    draw.text(
+      'y ' + Math.round(this.y),
+      originX + this.x + 30 * Math.sign(this.x),
+      originY + this.y / 2,
+    )
+    draw.text(
+      Math.round(this.angle) + '°',
+      originX + this.x / 4,
+      originY + this.y / 10 + 4,
+    )
   }
 }

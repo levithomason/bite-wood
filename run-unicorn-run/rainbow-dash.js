@@ -43,7 +43,7 @@ const objRainbowDash = new GameObject({
     step: {
       actions: [
         self => {
-          if (self.x >= self.game.canvas.width + 300) {
+          if (self.x >= self.game.width + 300) {
             self.direction = 180
             self.y = Math.random() * 250 + 50
             self.speed = Math.random() * 3 + 1

@@ -1,4 +1,10 @@
-import { GameImage, GameSprite, GameObject } from './game.js'
+import { GameImage, GameSprite, GameObject, Vector } from './game.js'
+
+const vector = new Vector()
+// v.angle = 1
+// v.magnitude = 200
+vector.x = -100
+vector.y = -100
 
 // ----------------------------------------
 // Player
@@ -72,10 +78,18 @@ const objPlayer = new GameObject({
 
     keyUp: {
       ArrowUp: {
-        actions: [self => (self.speed = 0)],
+        actions: [
+          self => {
+            self.speed = 0
+          },
+        ],
       },
       ArrowDown: {
-        actions: [self => (self.speed = 0)],
+        actions: [
+          self => {
+            self.speed = 0
+          },
+        ],
       },
       ArrowRight: {
         actions: [
@@ -98,40 +112,52 @@ const objPlayer = new GameObject({
     keyboard: {
       ArrowUp: {
         actions: [
+          () => {
+            vector.magnitude += 2
+          },
           self => {
-            self.direction = 270
-            self.speed = 4 // Math.min(self.speed + 0.1, 4)
+            self.accelerate(270, 0.5, 4)
           },
         ],
       },
       ArrowDown: {
         actions: [
+          () => {
+            vector.magnitude -= 2
+          },
           self => {
-            self.direction = 90
-            self.speed = 4 // Math.min(self.speed + 0.1, 4)
+            self.accelerate(90, 0.5, 4)
           },
         ],
       },
       ArrowRight: {
         actions: [
-          self => self.setSprite(sprPlayerWalkR),
+          () => {
+            vector.angle += 2
+          },
           self => {
-            self.direction = 0
-            self.speed = 4 // Math.min(self.speed + 0.1, 4)
+            self.setSprite(sprPlayerWalkR)
+          },
+          self => {
+            self.accelerate(0, 0.5, 4)
           },
         ],
       },
       ArrowLeft: {
         actions: [
+          () => {
+            vector.angle -= 2
+          },
           self => self.setSprite(sprPlayerWalkL),
           self => {
-            self.direction = 180
-            self.speed = 4 // Math.min(self.speed + 0.1, 4)
+            self.accelerate(180, 0.5, 4)
           },
         ],
       },
     },
   },
 })
+
+export { vector }
 
 export default objPlayer
