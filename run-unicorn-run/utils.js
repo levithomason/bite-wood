@@ -2,7 +2,7 @@ export const toDegrees = radians => (radians * 180) / Math.PI
 
 export const toRadians = degrees => (degrees * Math.PI) / 180
 
-export const distance = (x1, y1, x2, y2) => {
+export const distance = (x1, y1, x2 = 0, y2 = 0) => {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
 }
 

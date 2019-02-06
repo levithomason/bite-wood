@@ -1,4 +1,5 @@
 import * as draw from './draw.js'
+import physics, { Vector } from './physics.js'
 import * as utils from './utils.js'
 
 // ----------------------------------------
@@ -101,7 +102,7 @@ export class Game {
     }
 
     this.objects.forEach(object => {
-      object.draw()
+      if (object.draw) object.draw()
     })
   }
 }
@@ -165,14 +166,33 @@ export class GameSprite {
 // GameObject
 // ----------------------------------------
 export class GameObject {
-  constructor({ sprite, x = 0, y = 0, speed = 0, direction = 0, events = {} }) {
+  constructor({
+    sprite,
+    x = 0,
+    y = 0,
+    acceleration = 0.2,
+    gravity = physics.gravity.magnitude,
+    friction = physics.friction,
+    speed = 0,
+    maxSpeed = 20,
+    direction = 0,
+    events = {},
+    ...rest
+  }) {
     this.sprite = sprite
     this.x = x
     this.y = y
-    this.speed = speed
-    this.direction = direction
+    this.acceleration = acceleration
+    this.friction = friction
+    this.gravity = gravity
+    this.velocity = new Vector(direction, speed)
+    this.maxSpeed = maxSpeed
     this.events = events
     this.game = null
+
+    Object.keys(rest).forEach(key => {
+      this[key] = rest[key]
+    })
 
     this.invokeKeyboardEvents = this.invokeKeyboardEvents.bind(this)
     this.step = this.step.bind(this)
@@ -180,44 +200,63 @@ export class GameObject {
 
     this.move = this.move.bind(this)
     this.moveTo = this.moveTo.bind(this)
+    this.motionAdd = this.motionAdd.bind(this)
   }
 
-  step() {
-    this.invokeKeyboardEvents()
-
-    if (this.sprite && this.sprite.step) {
-      this.sprite.step()
-    }
-
-    if (this.events.step && this.events.step.actions) {
-      this.events.step.actions.forEach(action => {
-        action(this)
-      })
-    }
-
-    if (this.speed !== 0) {
-      this.move(this.direction, this.speed)
-    }
+  get speed() {
+    return this.velocity.magnitude
   }
 
-  draw() {
-    const { sprite, x, y } = this
+  set speed(speed) {
+    this.velocity.magnitude = speed
+  }
 
-    draw.image(
-      sprite.image,
-      sprite.offsetX + sprite.frameIndex * sprite.frameWidth,
-      sprite.offsetY,
-      sprite.frameWidth,
-      sprite.frameHeight,
-      x - sprite.insertionX * sprite.scaleX,
-      y - sprite.insertionY * sprite.scaleY,
-      sprite.frameWidth * sprite.scaleX,
-      sprite.frameHeight * sprite.scaleY,
-    )
+  get hspeed() {
+    return this.velocity.x
+  }
 
-    if (this.game.debug) {
-      draw.objectDebug(this)
-    }
+  set hspeed(hspeed) {
+    this.velocity.x = hspeed
+  }
+
+  get vspeed() {
+    return this.velocity.y
+  }
+
+  set vspeed(vspeed) {
+    this.velocity.y = vspeed
+  }
+
+  get direction() {
+    return this.velocity.direction
+  }
+
+  set direction(direction) {
+    this.velocity.direction = direction
+  }
+
+  moveTo(x, y) {
+    this.x = x
+    this.y = y
+  }
+
+  move(direction, distance) {
+    const { x, y } = utils.move(this.x, this.y, direction, distance)
+
+    this.x = x
+    this.y = y
+  }
+
+  motionAdd(direction, speed) {
+    this.velocity.add(direction, speed)
+  }
+
+  setSprite(sprite) {
+    if (sprite === this.sprite) return
+
+    this.sprite = sprite
+    this.sprite.frameIndex = 0
+    this.sprite.stepsThisFrame = 0
   }
 
   invokeKeyboardEvents() {
@@ -268,132 +307,74 @@ export class GameObject {
     }
   }
 
-  move(direction, distance) {
-    const { x, y } = utils.move(this.x, this.y, direction, distance)
+  step() {
+    this.invokeKeyboardEvents()
 
-    this.x = x
-    this.y = y
+    if (this.sprite && this.sprite.step) {
+      this.sprite.step()
+    }
+
+    if (this.events.step && this.events.step.actions) {
+      this.events.step.actions.forEach(action => {
+        action(this)
+      })
+    }
+
+    // apply movement
+    this.move(this.direction, this.speed)
+
+    // apply friction
+    this.hspeed = this.hspeed * (1 - this.friction)
+
+    // apply max speed
+    this.hspeed =
+      this.hspeed > 0
+        ? Math.min(this.hspeed, this.maxSpeed)
+        : Math.max(this.hspeed, -this.maxSpeed)
+
+    // apply gravity
+    if (this.y < this.game.height) {
+      this.motionAdd(this.gravity.direction, this.gravity.magnitude)
+    }
+
+    // terminal velocity
+    this.vspeed = Math.min(this.vspeed, physics.terminalVelocity)
+
+    // keep in room
+    if (this.x < 0) {
+      this.hspeed = 0
+      this.x = 0
+    } else if (this.x > this.game.width) {
+      this.hspeed = 0
+      this.x = this.game.width
+    }
+
+    if (this.y < 0) {
+      this.vspeed = 0
+      this.y = 0
+    } else if (this.y > this.game.height) {
+      this.vspeed = 0
+      this.y = this.game.height
+    }
   }
-
-  accelerate(direction, speed, maxSpeed) {
-    const addX = speed * Math.cos(direction)
-    const addY = speed * Math.sin(direction)
-
-    this.speed = Math.min(this.speed + speed, maxSpeed)
-  }
-
-  moveTo(x, y) {
-    this.x = x
-    this.y = y
-  }
-
-  setSprite(sprite) {
-    if (sprite === this.sprite) return
-
-    this.sprite = sprite
-    this.sprite.frameIndex = 0
-    this.sprite.stepsThisFrame = 0
-  }
-}
-
-export class Vector {
-  constructor() {
-    this.angle = 0
-    this.magnitude = 0
-  }
-
-  get angle() {
-    return utils.toDegrees(this._angle)
-  }
-
-  set angle(angle) {
-    this._angle = utils.toRadians(angle)
-    this._adjacent = this._hypotenuse * Math.cos(this._angle)
-    this._opposite = this._hypotenuse * Math.sin(this._angle)
-  }
-
-  get magnitude() {
-    return this._hypotenuse
-  }
-
-  set magnitude(hypotenuse) {
-    this._hypotenuse = hypotenuse
-    this._adjacent = this._hypotenuse * Math.cos(this._angle)
-    this._opposite = this._hypotenuse * Math.sin(this._angle)
-  }
-
-  get x() {
-    return this._adjacent
-  }
-
-  set x(adjacent) {
-    this._adjacent = adjacent
-    this._angle = Math.atan2(this._opposite, this._adjacent)
-    this._hypotenuse = this._opposite / Math.cos(this._angle)
-  }
-
-  get y() {
-    return this._opposite
-  }
-
-  set y(opposite) {
-    this._opposite = opposite
-    this._angle = Math.atan2(this._opposite, this._adjacent)
-    this._hypotenuse = this._opposite / Math.cos(this._angle)
-  }
-
-  add(angle, speed) {}
 
   draw() {
-    const originX = 300
-    const originY = 300
+    const { sprite, x, y } = this
 
-    draw.saveSettings()
-
-    // adjacent
-    draw.line(originX, originY, originX + this.x, originY)
-    // opposite
-    draw.line(originX + this.x, originY, originX + this.x, originY + this.y)
-    // hypotenuse
-    draw.setBorderColor('red')
-    draw.setFillColor('red')
-    draw.line(originX, originY, originX + this.x, originY + this.y)
-    draw.rectangle(originX + this.x - 2, originY + this.y - 2, 5, 5)
-
-    draw.setBorderColor('black')
-    draw.setFillColor('transparent')
-    // 90°
-    draw.rectangle(
-      originX + this.x + 10 * -Math.sign(this.x),
-      originY,
-      10 * Math.sign(this.x),
-      10 * Math.sign(this.y),
+    draw.image(
+      sprite.image,
+      sprite.offsetX + sprite.frameIndex * sprite.frameWidth,
+      sprite.offsetY,
+      sprite.frameWidth,
+      sprite.frameHeight,
+      x - sprite.insertionX * sprite.scaleX,
+      y - sprite.insertionY * sprite.scaleY,
+      sprite.frameWidth * sprite.scaleX,
+      sprite.frameHeight * sprite.scaleY,
     )
 
-    // labels: x, y, angle, magnitude
-    draw.textAlign('center')
-    draw.setFillColor('red')
-    draw.text(
-      Math.round(this.magnitude),
-      originX + this.x / 2 - 20 * Math.sign(this.x),
-      originY + this.y / 2,
-    )
-
-    draw.loadSettings()
-    draw.text(
-      'x ' + Math.round(this.x),
-      originX + this.x / 2,
-      originY + 15 * -Math.sign(this.y),
-    )
-    draw.text(
-      'y ' + Math.round(this.y),
-      originX + this.x + 30 * Math.sign(this.x),
-      originY + this.y / 2,
-    )
-    draw.text(
-      Math.round(this.angle) + '°',
-      originX + this.x / 4,
-      originY + this.y / 10 + 4,
-    )
+    if (this.game.debug) {
+      draw.objectDebug(this)
+    }
   }
 }

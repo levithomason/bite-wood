@@ -1,3 +1,5 @@
+import * as utils from './utils.js'
+
 let _ctx
 
 ///////////////////////////////////////////
@@ -28,6 +30,11 @@ export const loadSettings = () => {
 //
 // Color
 //
+export const setColor = color => {
+  setBorderColor(color)
+  setFillColor(color)
+}
+
 export const setBorderColor = color => {
   _ctx.strokeStyle = color
 }
@@ -71,6 +78,28 @@ export const line = (x1, y1, x2, y2) => {
   _ctx.moveTo(x1, y1)
   _ctx.lineTo(x2, y2)
   _ctx.stroke()
+}
+
+export const arrow = (x1, y1, x2, y2) => {
+  const size = 6 + _ctx.lineWidth // length of head in pixels
+  const angle = Math.atan2(y2 - y1, x2 - x1)
+
+  // line
+  line(x1, y1, x2, y2)
+
+  // arrow head
+  _ctx.beginPath()
+  _ctx.moveTo(x2, y2)
+  _ctx.lineTo(
+    x2 - size * Math.cos(angle - Math.PI / 6),
+    y2 - size * Math.sin(angle - Math.PI / 6),
+  )
+  _ctx.lineTo(
+    x2 - size * Math.cos(angle + Math.PI / 6),
+    y2 - size * Math.sin(angle + Math.PI / 6),
+  )
+  _ctx.lineTo(x2, y2)
+  _ctx.fill()
 }
 
 export const rectangle = (x, y, w, h) => {
@@ -131,10 +160,12 @@ export const grid = (
 }
 
 export const objectDebug = object => {
-  const { sprite, x, y, hspeed, vspeed, speed, direction } = object
+  const { sprite, x, y, hspeed, vspeed, speed, direction, gravity, friction } = object
 
+  saveSettings()
   // bounding box
-  _ctx.setLineDash([3, 3])
+  // setBorderColor('rgba(255, 255, 255, 0.75)')
+  setBorderColor('#FF0')
   _ctx.strokeRect(
     x - sprite.insertionX * sprite.scaleX,
     y - sprite.insertionY * sprite.scaleY,
@@ -143,30 +174,87 @@ export const objectDebug = object => {
   )
 
   // insertion point
-  _ctx.setLineDash([])
-  _ctx.beginPath()
-  _ctx.moveTo(x - 10, y)
-  _ctx.lineTo(x + 10, y)
-  _ctx.moveTo(x, y - 10)
-  _ctx.lineTo(x, y + 10)
-  _ctx.stroke()
+  _ctx.lineWidth = 3
+  setColor('#F0F')
+  line(x - 10, y, x + 10, y)
+  line(x, y - 10, x, y + 10)
 
+  // vector
+  if (object.speed) {
+    setColor('#0F0')
+    arrow(x, y, x + object.hspeed * 10, y + object.vspeed * 10)
+  }
+
+  setColor('#000')
   // text values
   _ctx.font = '12px monospace'
   _ctx.textAlign = 'left'
   const lines = [
-    `x          = ${x}`,
-    `y          = ${y}`,
-    `direction  = ${direction}`,
-    `speed      = ${speed}`,
-    `hspeed     = ${hspeed}`,
-    `vspeed     = ${vspeed}`,
+    `x          = ${x.toFixed(2)}`,
+    `y          = ${y.toFixed(2)}`,
+    `direction  = ${direction.toFixed(2)}`,
+    `speed      = ${speed.toFixed(2)}`,
+    `hspeed     = ${hspeed.toFixed(2)}`,
+    `vspeed     = ${vspeed.toFixed(2)}`,
+    `gravity    = ${gravity.toFixed(2)}`,
+    `friction   = ${friction.toFixed(2)}`,
   ]
-  lines.reverse().forEach((text, i) => {
-    _ctx.fillText(
-      text,
+  lines.reverse().forEach((line, i) => {
+    text(
+      line,
       x - sprite.insertionX,
       y - sprite.frameHeight - sprite.insertionY - 4 - i * 14,
     )
   })
+  loadSettings()
+}
+
+export const vectorDebug = (x, y, vector) => {
+  saveSettings()
+
+  // adjacent
+  line(x, y, x + vector.x, y)
+  // opposite
+  line(x + vector.x, y, x + vector.x, y + vector.y)
+  // hypotenuse
+  setColor('red')
+  arrow(x, y, x + vector.x, y + vector.y)
+
+  // 90° box
+  setBorderColor('black')
+  setFillColor('transparent')
+  rectangle(
+    x + vector.x + 10 * -Math.sign(vector.x),
+    y,
+    10 * Math.sign(vector.x),
+    10 * Math.sign(vector.y),
+  )
+
+  // labels: x, y, angle, magnitude
+  textAlign('center')
+  setFillColor('red')
+  text(
+    Math.round(vector.magnitude),
+    x + vector.x / 2 - 20 * Math.sign(vector.x),
+    y + vector.y / 2,
+  )
+
+  setColor('black')
+  text(
+    'x ' + Math.round(vector.x),
+    x + vector.x / 2,
+    y + 15 * -Math.sign(vector.y),
+  )
+  text(
+    'y ' + Math.round(vector.y),
+    x + vector.x + 30 * Math.sign(vector.x),
+    y + vector.y / 2,
+  )
+  text(
+    Math.round(vector.direction) + '°',
+    x + vector.x / 4,
+    y + vector.y / 10 + 4,
+  )
+
+  loadSettings()
 }

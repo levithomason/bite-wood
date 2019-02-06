@@ -1,10 +1,5 @@
-import { GameImage, GameSprite, GameObject, Vector } from './game.js'
-
-const vector = new Vector()
-// v.angle = 1
-// v.magnitude = 200
-vector.x = -100
-vector.y = -100
+import { GameImage, GameSprite, GameObject } from './game.js'
+import physics from './physics.js'
 
 // ----------------------------------------
 // Player
@@ -68,34 +63,31 @@ const objPlayer = new GameObject({
   sprite: sprPlayerIdleR,
   x: 100,
   y: 573,
-  speed: 0,
+  jump: 10,
+  maxSpeed: 4,
+  acceleration: 0.5,
   events: {
     keyDown: {
+      ArrowUp: {
+        actions: [
+          self => {
+            if (self.y >= self.game.height) {
+              self.motionAdd(physics.DIRECTION_UP, self.jump)
+            }
+          },
+        ],
+      },
       d: {
         actions: [self => (self.game.debug = !self.game.debug)],
       },
     },
 
     keyUp: {
-      ArrowUp: {
-        actions: [
-          self => {
-            self.speed = 0
-          },
-        ],
-      },
-      ArrowDown: {
-        actions: [
-          self => {
-            self.speed = 0
-          },
-        ],
-      },
       ArrowRight: {
         actions: [
           self => {
             self.setSprite(sprPlayerIdleR)
-            self.speed = 0
+            self.friction = physics.friction
           },
         ],
       },
@@ -103,61 +95,33 @@ const objPlayer = new GameObject({
         actions: [
           self => {
             self.setSprite(sprPlayerIdleL)
-            self.speed = 0
+            self.friction = physics.friction
           },
         ],
       },
     },
 
     keyboard: {
-      ArrowUp: {
-        actions: [
-          () => {
-            vector.magnitude += 2
-          },
-          self => {
-            self.accelerate(270, 0.5, 4)
-          },
-        ],
-      },
-      ArrowDown: {
-        actions: [
-          () => {
-            vector.magnitude -= 2
-          },
-          self => {
-            self.accelerate(90, 0.5, 4)
-          },
-        ],
-      },
       ArrowRight: {
         actions: [
-          () => {
-            vector.angle += 2
-          },
           self => {
             self.setSprite(sprPlayerWalkR)
-          },
-          self => {
-            self.accelerate(0, 0.5, 4)
+            self.friction = 0
+            self.motionAdd(physics.DIRECTION_RIGHT, self.acceleration)
           },
         ],
       },
       ArrowLeft: {
         actions: [
-          () => {
-            vector.angle -= 2
-          },
-          self => self.setSprite(sprPlayerWalkL),
           self => {
-            self.accelerate(180, 0.5, 4)
+            self.setSprite(sprPlayerWalkL)
+            self.friction = 0
+            self.motionAdd(physics.DIRECTION_LEFT, self.acceleration)
           },
         ],
       },
     },
   },
 })
-
-export { vector }
 
 export default objPlayer

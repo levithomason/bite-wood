@@ -1,7 +1,8 @@
 import { Game, GameImage } from './game.js'
-import objPlayer, { vector } from './player.js'
+import objPlayer from './player.js'
 import objRainbowDash from './rainbow-dash.js'
 import * as draw from './draw.js'
+import physics from './physics.js'
 
 const imgBackground = new GameImage('./background.png')
 
@@ -10,14 +11,15 @@ const imgBackground = new GameImage('./background.png')
 // ----------------------------------------
 const game = new Game()
 game.setBackgroundImage(imgBackground.image)
-game.addObject(vector)
 game.addObject(objPlayer)
 game.addObject(objRainbowDash)
 game.start()
 
-window.v = vector
 window.game = game
+window.objPlayer = objPlayer
+window.objRainbowDash = objRainbowDash
 window.draw = draw
+window.physics = physics
 
 // ----------------------------------------
 // AUDIO

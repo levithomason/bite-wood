@@ -39,23 +39,21 @@ const objRainbowDash = new GameObject({
   y: 200,
   speed: 4,
   direction: 180,
+  friction: 0,
+  gravity: 0,
   events: {
     step: {
       actions: [
         self => {
-          if (self.x >= self.game.width + 300) {
-            self.direction = 180
-            self.y = Math.random() * 250 + 50
-            self.speed = Math.random() * 3 + 1
+          if (self.x >= self.game.width) {
             self.setSprite(sprRainbowDashFlyL)
-          } else if (self.x <= -300) {
-            self.direction = 0
             self.y = Math.random() * 250 + 50
-            self.speed = Math.random() * 3 + 1
+            self.hspeed = -Math.random() * 3 + 2
+          } else if (self.x <= 0) {
             self.setSprite(sprRainbowDashFlyR)
+            self.y = Math.random() * 250 + 50
+            self.hspeed = Math.random() * 3 + 2
           }
-
-          self.move(self.direction, self.speed)
         },
       ],
     },
