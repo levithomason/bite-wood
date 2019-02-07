@@ -172,6 +172,7 @@ export class GameObject {
     y = 0,
     acceleration = 0.2,
     gravity = physics.gravity.magnitude,
+    gravityDirection = physics.gravity.direction,
     friction = physics.friction,
     speed = 0,
     maxSpeed = 20,
@@ -185,6 +186,7 @@ export class GameObject {
     this.acceleration = acceleration
     this.friction = friction
     this.gravity = gravity
+    this.gravityDirection = gravityDirection
     this.velocity = new Vector(direction, speed)
     this.maxSpeed = maxSpeed
     this.events = events
@@ -194,6 +196,7 @@ export class GameObject {
       this[key] = rest[key]
     })
 
+    this.setSprite = this.setSprite.bind(this)
     this.invokeKeyboardEvents = this.invokeKeyboardEvents.bind(this)
     this.step = this.step.bind(this)
     this.draw = this.draw.bind(this)
@@ -320,25 +323,23 @@ export class GameObject {
       })
     }
 
-    // apply movement
-    this.move(this.direction, this.speed)
+    // apply gravity
+    if (this.y < this.game.height) {
+      this.motionAdd(this.gravityDirection, this.gravity)
+    }
+
+    // terminal velocity
+    this.vspeed = Math.min(this.vspeed, physics.terminalVelocity)
 
     // apply friction
     this.hspeed = this.hspeed * (1 - this.friction)
 
     // apply max speed
     this.hspeed =
-      this.hspeed > 0
-        ? Math.min(this.hspeed, this.maxSpeed)
-        : Math.max(this.hspeed, -this.maxSpeed)
+      Math.sign(this.hspeed) * Math.min(Math.abs(this.hspeed), this.maxSpeed)
 
-    // apply gravity
-    if (this.y < this.game.height) {
-      this.motionAdd(this.gravity.direction, this.gravity.magnitude)
-    }
-
-    // terminal velocity
-    this.vspeed = Math.min(this.vspeed, physics.terminalVelocity)
+    // apply final calculated movement values
+    this.move(this.direction, this.speed)
 
     // keep in room
     if (this.x < 0) {
@@ -349,10 +350,10 @@ export class GameObject {
       this.x = this.game.width
     }
 
-    if (this.y < 0) {
+    if (this.y < 0 && this.vspeed < 0) {
       this.vspeed = 0
       this.y = 0
-    } else if (this.y > this.game.height) {
+    } else if (this.y > this.game.height && this.vspeed > 0) {
       this.vspeed = 0
       this.y = this.game.height
     }

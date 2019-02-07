@@ -71,7 +71,7 @@ const objPlayer = new GameObject({
       ArrowUp: {
         actions: [
           self => {
-            if (self.y >= self.game.height) {
+            if (self.y + self.sprite.insertionY >= self.game.height) {
               self.motionAdd(physics.DIRECTION_UP, self.jump)
             }
           },

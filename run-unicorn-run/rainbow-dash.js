@@ -47,12 +47,12 @@ const objRainbowDash = new GameObject({
         self => {
           if (self.x >= self.game.width) {
             self.setSprite(sprRainbowDashFlyL)
-            self.y = Math.random() * 250 + 50
-            self.hspeed = -Math.random() * 3 + 2
+            self.y = Math.random() * 100 + 200
+            self.hspeed = -(Math.random() * 4 + 1)
           } else if (self.x <= 0) {
             self.setSprite(sprRainbowDashFlyR)
-            self.y = Math.random() * 250 + 50
-            self.hspeed = Math.random() * 3 + 2
+            self.y = Math.random() * 100 + 200
+            self.hspeed = Math.random() * 4 + 1
           }
         },
       ],
