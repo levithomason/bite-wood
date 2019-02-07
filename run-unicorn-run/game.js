@@ -16,15 +16,22 @@ export class Game {
     this.width = 800
     this.height = 600
 
-    const canvas = draw.init(this.width, this.height)
+    const canvas = document.createElement('canvas')
+    canvas.setAttribute('width', this.width)
+    canvas.setAttribute('height', this.height)
     document.body.append(canvas)
 
-    this.objects = []
+    draw.init(canvas.getContext('2d'))
+
     this.keys = {}
     this.keysDown = {}
     this.keysUp = {}
+    this.mouse = { x: 0, y: 0 }
+    this.objects = []
+
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleKeyUp = this.handleKeyUp.bind(this)
+    this.handleMouseMove = this.handleMouseMove.bind(this)
 
     this.addObject = this.addObject.bind(this)
     this.setBackgroundImage = this.setBackgroundImage.bind(this)
@@ -38,6 +45,8 @@ export class Game {
 
     document.addEventListener('keydown', this.handleKeyDown)
     document.addEventListener('keyup', this.handleKeyUp)
+    canvas.addEventListener('mousemove', this.handleMouseMove)
+    canvas.addEventListener('mouseenter', this.handleMouseMove)
   }
 
   /** @param e {KeyboardEvent} */
@@ -54,6 +63,11 @@ export class Game {
   /** @param e {KeyboardEvent} */
   handleKeyUp(e) {
     this.keysUp[e.key] = true
+  }
+
+  handleMouseMove(e) {
+    this.mouse.x = e.offsetX
+    this.mouse.y = e.offsetY
   }
 
   /** @param object {GameObject} */
@@ -111,6 +125,14 @@ export class Game {
         })
       }
     })
+
+    if (this.debug) {
+      draw.text(
+        `${this.mouse.x}, ${this.mouse.y}`,
+        this.mouse.x + 10,
+        this.mouse.y - 10,
+      )
+    }
   }
 }
 
@@ -153,7 +175,7 @@ export class GameSprite {
     frameCount = 1,
     frameIndex = 0,
     stepsPerFrame = 1,
-    rtl = false
+    rtl = false,
   }) {
     this.image = image
     this.scaleX = scaleX
@@ -263,6 +285,34 @@ export class GameObject {
 
   set direction(direction) {
     this.velocity.direction = direction
+  }
+
+  get boundingBoxTop() {
+    return (
+      this.y -
+      this.sprite.insertionY * this.sprite.scaleY +
+      this.sprite.boundingBoxTop * this.sprite.scaleY
+    )
+  }
+
+  get boundingBoxLeft() {
+    return (
+      this.x -
+      this.sprite.insertionX * this.sprite.scaleX +
+      this.sprite.boundingBoxLeft * this.sprite.scaleX
+    )
+  }
+
+  get boundingBoxRight() {
+    return (
+      this.boundingBoxLeft + this.sprite.boundingBoxWidth * this.sprite.scaleX
+    )
+  }
+
+  get boundingBoxBottom() {
+    return (
+      this.boundingBoxTop + this.sprite.boundingBoxHeight * this.sprite.scaleY
+    )
   }
 
   moveTo(x, y) {

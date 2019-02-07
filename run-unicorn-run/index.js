@@ -12,9 +12,9 @@ const imgBackground = new GameImage('./background.png')
 // ----------------------------------------
 const game = new Game()
 game.setBackgroundImage(imgBackground)
-game.addObject(objPlayer)
-game.addObject(objRainbowDash)
 game.addObject(objSolid)
+game.addObject(objRainbowDash)
+game.addObject(objPlayer)
 game.start()
 
 window.game = game

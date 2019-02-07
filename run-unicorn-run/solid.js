@@ -1,30 +1,51 @@
-import { GameObject } from './game.js'
-import physics from './physics.js'
-import * as draw from './draw.js'
+import * as collision from './collision.js'
+import { GameImage, GameObject, GameSprite } from './game.js'
+import objPlayer from './player.js'
 
 // ----------------------------------------
 // Player
 // ----------------------------------------
+const width = Math.round(Math.random() * 80) + 20
+const height = Math.round(Math.random() * 80) + 20
+const spriteConfig = {
+  frameCount: 1,
+  frameWidth: width,
+  frameHeight: height,
+  insertionX: width / 2,
+  insertionY: height / 2,
+}
+const sprSolid = new GameSprite({
+  image: new GameImage(`https://placehold.it/${width}x${height}/444`),
+  ...spriteConfig,
+})
+
+const sprSolidColliding = new GameSprite({
+  image: new GameImage(`https://placehold.it/${width}x${height}/F00`),
+  ...spriteConfig,
+})
+
 const objSolid = new GameObject({
+  sprite: sprSolid,
   solid: true,
   x: 300,
-  y: 535,
-  width: 50,
-  height: 50,
+  y: 600 - Math.random() * height * 2,
   maxSpeed: 0,
   acceleration: 0,
   gravity: 0,
   friction: 0,
   events: {
-    draw: {
+    step: {
       actions: [
         self => {
-          draw.saveSettings()
-          draw.setBorderColor('orange')
-          draw.setLineWidth(10)
-          draw.setFillColor('transparent')
-          draw.rectangle(self.x, self.y, self.width, self.height)
-          draw.loadSettings()
+          self.moveTo(self.game.mouse.x, self.game.mouse.y)
+
+          if (collision.objects(self, objPlayer)) {
+            // TODO: stop the player, crude bounce for now
+            objPlayer.direction += 180
+            self.setSprite(sprSolidColliding)
+          } else {
+            self.setSprite(sprSolid)
+          }
         },
       ],
     },

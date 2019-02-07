@@ -1,22 +1,14 @@
-import * as utils from './utils.js'
-
 let _ctx
 
 ///////////////////////////////////////////
 
-export const init = (width = '800', height = '600') => {
-  const canvas = document.createElement('canvas')
-  canvas.setAttribute('width', width)
-  canvas.setAttribute('height', height)
-
-  _ctx = canvas.getContext('2d')
+export const init = ctx => {
+  _ctx = ctx
   // render pixelated images
   _ctx.imageSmoothingEnabled = false
 
   // align coordinates to pixel centers instead of pixel grid lines (between pixels)
   _ctx.translate(0.5, 0.5)
-
-  return canvas
 }
 
 export const saveSettings = () => {
@@ -251,10 +243,10 @@ export const objectDebug = object => {
     `vspeed     = ${vspeed.toFixed(2)}`,
     `gravity    = ${gravity.toFixed(2)}`,
     `friction   = ${friction.toFixed(2)}`,
-    `sprite.boundingBoxLeft   = ${sprite.boundingBoxLeft}`,
-    `sprite.boundingBoxTop    = ${sprite.boundingBoxTop}`,
-    `sprite.boundingBoxWidth  = ${sprite.boundingBoxWidth}`,
-    `sprite.boundingBoxHeight = ${sprite.boundingBoxHeight}`,
+    `boundingBoxTop    = ${object.boundingBoxTop.toFixed(2)}`,
+    `boundingBoxLeft   = ${object.boundingBoxLeft.toFixed(2)}`,
+    `boundingBoxBottom = ${object.boundingBoxBottom.toFixed(2)}`,
+    `boundingBoxRight  = ${object.boundingBoxRight.toFixed(2)}`,
   ]
   lines.reverse().forEach((line, i) => {
     text(
