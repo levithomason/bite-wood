@@ -6,7 +6,7 @@ import { GameImage, GameSprite, GameObject } from './game.js'
 export const imgRainbowDashR = new GameImage('./my-littlepony-right.png')
 export const imgRainbowDashL = new GameImage('./my-littlepony-left.png')
 export const sprRainbowDashFlyR = new GameSprite({
-  image: imgRainbowDashR.image,
+  image: imgRainbowDashR,
   frameCount: 6,
   frameWidth: 95,
   frameHeight: 40,
@@ -16,20 +16,30 @@ export const sprRainbowDashFlyR = new GameSprite({
   scaleY: 2,
   insertionX: 48,
   insertionY: 18,
+  boundingBoxTop: 12,
+  boundingBoxLeft: 27,
+  boundingBoxHeight: 14,
+  boundingBoxWidth: 67,
   stepsPerFrame: 4,
 })
 export const sprRainbowDashFlyL = new GameSprite({
-  image: imgRainbowDashL.image,
+  image: imgRainbowDashL,
   frameCount: 6,
-  // TODO keep positive frame width values, add reverse flag instead
-  frameWidth: -95,
+  // TODO: do away with RTL once we have sprite edit ability
+  // or we need to mirror frames
+  rtl: true,
+  frameWidth: 95,
   frameHeight: 40,
   offsetX: 1108,
   offsetY: 1057,
   scaleX: 2,
   scaleY: 2,
-  insertionX: -48,
+  insertionX: 48,
   insertionY: 18,
+  boundingBoxTop: 12,
+  boundingBoxLeft: 2,
+  boundingBoxHeight: 14,
+  boundingBoxWidth: 67,
   stepsPerFrame: 4,
 })
 
@@ -47,12 +57,10 @@ const objRainbowDash = new GameObject({
         self => {
           if (self.x >= self.game.width) {
             self.setSprite(sprRainbowDashFlyL)
-            self.y = Math.random() * 100 + 200
-            self.hspeed = -(Math.random() * 4 + 1)
+            self.hspeed = -self.hspeed
           } else if (self.x <= 0) {
             self.setSprite(sprRainbowDashFlyR)
-            self.y = Math.random() * 100 + 200
-            self.hspeed = Math.random() * 4 + 1
+            self.hspeed = -self.hspeed
           }
         },
       ],

@@ -34,7 +34,6 @@ export const setColor = color => {
   setBorderColor(color)
   setFillColor(color)
 }
-
 export const setBorderColor = color => {
   _ctx.strokeStyle = color
 }
@@ -44,26 +43,53 @@ export const setFillColor = color => {
 }
 
 //
+// Line
+//
+export const setLineWidth = width => {
+  _ctx.lineWidth = width
+}
+
+//
 // Erase
 //
 export const erase = () => {
   _ctx.clearRect(0, 0, _ctx.canvas.width, _ctx.canvas.height)
 }
 
-export const image = (
-  img,
-  sx = 0,
-  sy = 0,
-  // TODO: simplify, args after this point only exist to drawing sprite frames
-  // TODO: offload sprite frames to another func
-  sw = img.width,
-  sh = img.height,
-  dx = 0,
-  dy = 0,
-  dw = img.width,
-  dh = img.height,
-) => {
-  _ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)
+//
+// Images
+//
+
+/**
+ * @param {GameImage} image
+ * @param {number} x
+ * @param {number} y
+ */
+export const image = (image, x = 0, y = 0) => {
+  _ctx.drawImage(image.element, x, y)
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {GameSprite} sprite
+ */
+export const sprite = (sprite, x, y) => {
+  const direction = sprite.rtl ? -1 : 1
+  const rtlWidth = sprite.frameWidth * direction
+  const rtlInsertionX = sprite.insertionX * direction
+
+  _ctx.drawImage(
+    sprite.image.element,
+    sprite.offsetX + sprite.frameIndex * rtlWidth,
+    sprite.offsetY,
+    rtlWidth,
+    sprite.frameHeight,
+    x - rtlInsertionX * sprite.scaleX,
+    y - sprite.insertionY * sprite.scaleY,
+    rtlWidth * sprite.scaleX,
+    sprite.frameHeight * sprite.scaleY,
+  )
 }
 
 //
@@ -160,22 +186,49 @@ export const grid = (
 }
 
 export const objectDebug = object => {
-  const { sprite, x, y, hspeed, vspeed, speed, direction, gravity, friction } = object
+  const {
+    sprite,
+    x,
+    y,
+    hspeed,
+    vspeed,
+    speed,
+    direction,
+    gravity,
+    friction,
+  } = object
 
   saveSettings()
+
   // bounding box
   // setBorderColor('rgba(255, 255, 255, 0.75)')
   setBorderColor('#FF0')
-  _ctx.strokeRect(
+  setFillColor('transparent')
+  rectangle(
+    x -
+      sprite.insertionX * sprite.scaleX +
+      sprite.boundingBoxLeft * sprite.scaleX,
+    y -
+      sprite.insertionY * sprite.scaleY +
+      sprite.boundingBoxTop * sprite.scaleY,
+    sprite.boundingBoxWidth * sprite.scaleX,
+    sprite.boundingBoxHeight * sprite.scaleY,
+  )
+
+  // sprite frame
+  setBorderColor('#555')
+  _ctx.setLineDash([2, 2])
+  rectangle(
     x - sprite.insertionX * sprite.scaleX,
     y - sprite.insertionY * sprite.scaleY,
     sprite.frameWidth * sprite.scaleX,
     sprite.frameHeight * sprite.scaleY,
   )
+  _ctx.setLineDash([])
 
   // insertion point
-  _ctx.lineWidth = 3
-  setColor('#F0F')
+  setLineWidth(3)
+  setBorderColor('#F00')
   line(x - 10, y, x + 10, y)
   line(x, y - 10, x, y + 10)
 
@@ -198,6 +251,10 @@ export const objectDebug = object => {
     `vspeed     = ${vspeed.toFixed(2)}`,
     `gravity    = ${gravity.toFixed(2)}`,
     `friction   = ${friction.toFixed(2)}`,
+    `sprite.boundingBoxLeft   = ${sprite.boundingBoxLeft}`,
+    `sprite.boundingBoxTop    = ${sprite.boundingBoxTop}`,
+    `sprite.boundingBoxWidth  = ${sprite.boundingBoxWidth}`,
+    `sprite.boundingBoxHeight = ${sprite.boundingBoxHeight}`,
   ]
   lines.reverse().forEach((line, i) => {
     text(

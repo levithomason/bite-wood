@@ -7,8 +7,9 @@ import * as utils from './utils.js'
 // ----------------------------------------
 export class Game {
   /**
-   * @property objects {GameObject[]}
-   * @property keysDown {object}
+   * @property {GameObject[]} objects
+   * @property {GameImage} background
+   * @property {object} keysDown
    */
   constructor() {
     this.debug = true
@@ -61,9 +62,9 @@ export class Game {
     this.objects.push(object)
   }
 
-  /** @param image {HTMLImageElement} */
+  /** @param image {GameImage} */
   setBackgroundImage(image) {
-    this.background = image
+    this.backgroundImage = image
   }
 
   start() {
@@ -95,7 +96,7 @@ export class Game {
 
   draw() {
     draw.erase()
-    draw.image(this.background)
+    draw.image(this.backgroundImage)
 
     if (this.debug) {
       draw.grid()
@@ -103,6 +104,12 @@ export class Game {
 
     this.objects.forEach(object => {
       if (object.draw) object.draw()
+
+      if (object.events && object.events.draw && object.events.draw.actions) {
+        object.events.draw.actions.forEach(action => {
+          action(object)
+        })
+      }
     })
   }
 }
@@ -112,8 +119,16 @@ export class Game {
 // ----------------------------------------
 export class GameImage {
   constructor(src) {
-    this.image = new Image()
-    this.image.src = src
+    this.element = new Image()
+    this.element.src = src
+  }
+
+  get width() {
+    return this.element.clientWidth
+  }
+
+  get height() {
+    return this.element.clientHeight
   }
 }
 
@@ -129,11 +144,16 @@ export class GameSprite {
     insertionY = 0,
     offsetX = 0,
     offsetY = 0,
+    boundingBoxTop = 0,
+    boundingBoxLeft = 0,
+    boundingBoxWidth,
+    boundingBoxHeight,
     frameWidth,
     frameHeight,
     frameCount = 1,
     frameIndex = 0,
     stepsPerFrame = 1,
+    rtl = false
   }) {
     this.image = image
     this.scaleX = scaleX
@@ -142,11 +162,18 @@ export class GameSprite {
     this.insertionY = insertionY
     this.offsetX = offsetX
     this.offsetY = offsetY
+    this.boundingBoxTop = boundingBoxTop
+    this.boundingBoxLeft = boundingBoxLeft
+    this.boundingBoxHeight =
+      typeof boundingBoxHeight === 'undefined' ? frameHeight : boundingBoxHeight
+    this.boundingBoxWidth =
+      typeof boundingBoxWidth === 'undefined' ? frameWidth : boundingBoxWidth
     this.frameWidth = frameWidth
     this.frameHeight = frameHeight
     this.frameCount = frameCount
     this.frameIndex = frameIndex
     this.stepsPerFrame = stepsPerFrame
+    this.rtl = rtl
 
     this.stepsThisFrame = 0
     this.step = this.step.bind(this)
@@ -360,22 +387,12 @@ export class GameObject {
   }
 
   draw() {
-    const { sprite, x, y } = this
+    if (this.sprite) {
+      draw.sprite(this.sprite, this.x, this.y)
 
-    draw.image(
-      sprite.image,
-      sprite.offsetX + sprite.frameIndex * sprite.frameWidth,
-      sprite.offsetY,
-      sprite.frameWidth,
-      sprite.frameHeight,
-      x - sprite.insertionX * sprite.scaleX,
-      y - sprite.insertionY * sprite.scaleY,
-      sprite.frameWidth * sprite.scaleX,
-      sprite.frameHeight * sprite.scaleY,
-    )
-
-    if (this.game.debug) {
-      draw.objectDebug(this)
+      if (this.game.debug) {
+        draw.objectDebug(this)
+      }
     }
   }
 }
