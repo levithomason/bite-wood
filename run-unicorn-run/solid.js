@@ -1,6 +1,7 @@
 import * as collision from './collision.js'
-import { GameImage, GameObject, GameSprite } from './game.js'
+import { GameImage, GameObject, GameSprite } from './game/index.js'
 import objPlayer from './player.js'
+import state from './state.js'
 
 // ----------------------------------------
 // Player
@@ -37,7 +38,7 @@ const objSolid = new GameObject({
     step: {
       actions: [
         self => {
-          self.moveTo(self.game.mouse.x, self.game.mouse.y)
+          self.moveTo(state.mouse.x, state.mouse.y)
 
           if (collision.objects(self, objPlayer)) {
             // TODO: stop the player, crude bounce for now

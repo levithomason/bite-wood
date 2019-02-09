@@ -1,4 +1,5 @@
-import { GameImage, GameSprite, GameObject } from './game.js'
+import { GameImage, GameSprite, GameObject } from './game/index.js'
+import state from './state.js'
 
 // ----------------------------------------
 // RainbowDash
@@ -55,7 +56,7 @@ const objRainbowDash = new GameObject({
     step: {
       actions: [
         self => {
-          if (self.x >= self.game.width) {
+          if (self.x >= state.width) {
             self.setSprite(sprRainbowDashFlyL)
             self.hspeed = -self.hspeed
           } else if (self.x <= 0) {

@@ -1,5 +1,6 @@
-import { GameImage, GameSprite, GameObject } from './game.js'
+import { GameImage, GameSprite, GameObject } from './game/index.js'
 import physics from './physics.js'
+import state from './state.js'
 
 // ----------------------------------------
 // Player
@@ -89,14 +90,14 @@ const objPlayer = new GameObject({
       ArrowUp: {
         actions: [
           self => {
-            if (self.y + self.sprite.insertionY >= self.game.height) {
+            if (self.y + self.sprite.insertionY >= state.height) {
               self.motionAdd(physics.DIRECTION_UP, self.jump)
             }
           },
         ],
       },
       d: {
-        actions: [self => (self.game.debug = !self.game.debug)],
+        actions: [self => (state.debug = !state.debug)],
       },
     },
 
