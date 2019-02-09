@@ -1,11 +1,18 @@
+import * as collision from '../core/collision.js'
 import { GameImage, GameSprite, GameObject } from '../core/game/index.js'
 import state from '../core/state.js'
+import objPlayer from './player.js'
+import objSolid from './solid.js'
 
 // ----------------------------------------
 // RainbowDash
 // ----------------------------------------
-export const imgRainbowDashR = new GameImage('./../images/my-littlepony-right.png')
-export const imgRainbowDashL = new GameImage('./../images/my-littlepony-left.png')
+export const imgRainbowDashR = new GameImage(
+  './../images/my-littlepony-right.png',
+)
+export const imgRainbowDashL = new GameImage(
+  './../images/my-littlepony-left.png',
+)
 export const sprRainbowDashFlyR = new GameSprite({
   image: imgRainbowDashR,
   frameCount: 6,

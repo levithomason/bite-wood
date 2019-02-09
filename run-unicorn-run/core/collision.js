@@ -1,4 +1,7 @@
+import state from './state.js'
+
 /**
+ * Checks if a point is colliding with an object.
  * @param {number} x
  * @param {number} y
  * @param {GameObject} object
@@ -6,26 +9,32 @@
  */
 export const point = (x, y, object) => {
   return (
-    x > object.boundingBoxLeft &&
-    x < object.boundingBoxRight &&
-    y > object.boundingBoxTop &&
-    y < object.boundingBoxBottom
+    x >= object.boundingBoxLeft &&
+    x <= object.boundingBoxRight &&
+    y >= object.boundingBoxTop &&
+    y <= object.boundingBoxBottom
   )
 }
 
 /**
- * @param {GameObject} a
- * @param {GameObject} b
+ * Checks if an object is colliding with some other object.
+ * @param {GameObject} object
+ * @param {GameObject} other
  * @returns {boolean}
  */
-export const objects = (a, b) => {
-  const hasXIntersection =
-    a.boundingBoxRight > b.boundingBoxLeft &&
-    a.boundingBoxLeft < b.boundingBoxRight
+export const objects = (object, other = null) => {
+  return state.room.objects.some(b => {
+    if (object === b) return false
+    if (other && other.constructor === b.constructor) return false
 
-  const hasYIntersection =
-    a.boundingBoxBottom > b.boundingBoxTop &&
-    a.boundingBoxTop < b.boundingBoxBottom
+    const hasXIntersection =
+      object.boundingBoxRight >= b.boundingBoxLeft &&
+      object.boundingBoxLeft <= b.boundingBoxRight
 
-  return hasXIntersection && hasYIntersection
+    const hasYIntersection =
+      object.boundingBoxBottom >= b.boundingBoxTop &&
+      object.boundingBoxTop <= b.boundingBoxBottom
+
+    return hasXIntersection && hasYIntersection
+  })
 }

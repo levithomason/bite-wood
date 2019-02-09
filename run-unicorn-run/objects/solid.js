@@ -1,6 +1,5 @@
 import * as collision from '../core/collision.js'
 import { GameImage, GameObject, GameSprite } from '../core/game/index.js'
-import objPlayer from './player.js'
 import state from '../core/state.js'
 
 // ----------------------------------------
@@ -40,13 +39,10 @@ const objSolid = new GameObject({
         self => {
           self.moveTo(state.mouse.x, state.mouse.y)
 
-          if (collision.objects(self, objPlayer)) {
-            // TODO: stop the player, crude bounce for now
-            objPlayer.motionAdd(270, 0.4)
+          if (collision.objects(self)) {
             self.setSprite(sprSolidColliding)
           } else {
             self.setSprite(sprSolid)
-            // objPlayer.gravity = 0.4
           }
         },
       ],

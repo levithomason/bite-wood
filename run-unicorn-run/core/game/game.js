@@ -29,13 +29,19 @@ export default class Game {
     document.addEventListener('keydown', this.handleKeyDown)
   }
 
+  /** @param {KeyboardEvent} e */
   handleKeyDown(e) {
-    if (e.key === 'p') {
-      if (state.isPlaying) {
-        this.pause()
-      } else {
-        this.play()
-      }
+    switch (e.key) {
+      case 'p':
+        if (state.isPlaying) {
+          this.pause()
+        } else {
+          this.play()
+        }
+        break
+      case 'd':
+        state.debug = !state.debug
+        break
     }
   }
 

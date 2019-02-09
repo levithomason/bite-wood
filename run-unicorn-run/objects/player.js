@@ -84,26 +84,24 @@ const objPlayer = new GameObject({
   sprite: sprPlayerIdleR,
   x: 100,
   y: 573,
-  jump: 10,
+  jump: 12,
   maxSpeed: 4,
   acceleration: 0.5,
   events: {
     step: {
       actions: [
         self => {
-          if (state.mouse.down) {
-            const speed = Math.pow(
-              utils.distance(self.x, self.y, state.mouse.x, state.mouse.y) /
-                300,
-              2,
-            )
-            self.friction = 0
-            self.motionAdd(
-              utils.direction(self.x, self.y, state.mouse.x, state.mouse.y),
-              Math.max(0, speed),
-            )
-          } else if (self.y >= state.room.height) {
+          if (self.y >= state.room.height) {
             self.friction = physics.friction
+          } else {
+            self.friction = 0
+          }
+
+          if (state.keys.active.ArrowRight || state.keys.active.ArrowLeft) {
+            self.friction = 0
+            self.hspeed =
+              Math.sign(self.hspeed) *
+              Math.min(Math.abs(self.hspeed), self.maxSpeed)
           }
         },
       ],
@@ -112,7 +110,7 @@ const objPlayer = new GameObject({
     draw: {
       actions: [
         self => {
-          if (state.mouse.down) {
+          if (state.mouse.down.left) {
             draw.setLineWidth(2)
             draw.setColor('brown')
             draw.arrow(self.x, self.y, state.mouse.x, state.mouse.y)
@@ -121,18 +119,31 @@ const objPlayer = new GameObject({
       ],
     },
 
+    mouseActive: {
+      left: {
+        actions: [
+          self => {
+            const speed =
+              utils.distance(self.x, self.y, state.mouse.x, state.mouse.y) / 500
+
+            self.motionAdd(
+              utils.direction(self.x, self.y, state.mouse.x, state.mouse.y),
+              Math.min(1, speed),
+            )
+          },
+        ],
+      },
+    },
+
     keyDown: {
       ArrowUp: {
         actions: [
           self => {
-            if (self.y + self.sprite.insertionY >= state.room.height) {
+            if (self.y >= state.room.height) {
               self.motionAdd(physics.DIRECTION_UP, self.jump)
             }
           },
         ],
-      },
-      d: {
-        actions: [self => (state.debug = !state.debug)],
       },
     },
 
@@ -141,7 +152,6 @@ const objPlayer = new GameObject({
         actions: [
           self => {
             self.setSprite(sprPlayerIdleR)
-            self.friction = physics.friction
           },
         ],
       },
@@ -149,27 +159,25 @@ const objPlayer = new GameObject({
         actions: [
           self => {
             self.setSprite(sprPlayerIdleL)
-            self.friction = physics.friction
           },
         ],
       },
     },
 
-    keyboard: {
+    keyActive: {
       ArrowRight: {
         actions: [
           self => {
             self.setSprite(sprPlayerWalkR)
-            self.friction = 0
             self.motionAdd(physics.DIRECTION_RIGHT, self.acceleration)
           },
         ],
       },
+
       ArrowLeft: {
         actions: [
           self => {
             self.setSprite(sprPlayerWalkL)
-            self.friction = 0
             self.motionAdd(physics.DIRECTION_LEFT, self.acceleration)
           },
         ],

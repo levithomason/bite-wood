@@ -6,6 +6,7 @@ import * as utils from '../utils.js'
 export default class GameObject {
   constructor({
     sprite,
+    solid = true,
     x = 0,
     y = 0,
     acceleration = 0.2,
@@ -13,12 +14,12 @@ export default class GameObject {
     gravityDirection = physics.gravity.direction,
     friction = physics.friction,
     speed = 0,
-    maxSpeed = 20,
     direction = 0,
     events = {},
     ...rest
   }) {
     this.sprite = sprite
+    this.solid = solid
     this.x = x
     this.y = y
     this.acceleration = acceleration
@@ -26,7 +27,6 @@ export default class GameObject {
     this.gravity = gravity
     this.gravityDirection = gravityDirection
     this.velocity = new Vector(direction, speed)
-    this.maxSpeed = maxSpeed
     this.events = events
 
     Object.keys(rest).forEach(key => {
@@ -34,7 +34,7 @@ export default class GameObject {
     })
 
     this.setSprite = this.setSprite.bind(this)
-    this.invokeKeyboardEvents = this.invokeKeyboardEvents.bind(this)
+    this.invokeInputEvents = this.invokeInputEvents.bind(this)
     this.step = this.step.bind(this)
     this.draw = this.draw.bind(this)
 
@@ -127,11 +127,11 @@ export default class GameObject {
     this.sprite.stepsThisFrame = 0
   }
 
-  invokeKeyboardEvents() {
+  invokeInputEvents() {
     // KEYDOWN
     if (this.events.keyDown) {
-      Object.keys(state.keysDown)
-        .filter(key => state.keysDown[key] !== 'handled')
+      Object.keys(state.keys.down)
+        .filter(key => state.keys.down[key] !== null)
         .forEach(key => {
           if (this.events.keyDown[key] && this.events.keyDown[key].actions) {
             this.events.keyDown[key].actions.forEach(action => {
@@ -140,15 +140,15 @@ export default class GameObject {
           }
           // keydown should only register for one step
           // remember which we've handled so we don't handle them again
-          state.keysDown[key] = 'handled'
+          state.keys.down[key] = null
         })
     }
 
-    // KEYBOARD
-    if (this.events.keyboard) {
-      Object.keys(state.keys).forEach(key => {
-        if (this.events.keyboard[key] && this.events.keyboard[key].actions) {
-          this.events.keyboard[key].actions.forEach(action => {
+    // KEYACTIVE
+    if (this.events.keyActive) {
+      Object.keys(state.keys.active).forEach(key => {
+        if (this.events.keyActive[key] && this.events.keyActive[key].actions) {
+          this.events.keyActive[key].actions.forEach(action => {
             action(this)
           })
         }
@@ -157,12 +157,7 @@ export default class GameObject {
 
     // KEYUP
     if (this.events.keyUp) {
-      Object.keys(state.keysUp).forEach(key => {
-        // since key events are handled on game step we can only safely remove
-        // keyboard and keydown events after a game step handles the keyup event
-        delete state.keys[key]
-        delete state.keysDown[key]
-
+      Object.keys(state.keys.up).forEach(key => {
         if (this.events.keyUp[key] && this.events.keyUp[key].actions) {
           this.events.keyUp[key].actions.forEach(action => {
             action(this)
@@ -170,13 +165,63 @@ export default class GameObject {
         }
 
         // keyup events should only fire for one step
-        delete state.keysUp[key]
+        delete state.keys.up[key]
+      })
+    }
+
+    // MOUSEDOWN
+    if (this.events.mouseDown) {
+      Object.keys(state.mouse.down)
+        .filter(button => state.mouse.down[button] !== null)
+        .forEach(key => {
+          if (
+            this.events.mouseDown[key] &&
+            this.events.mouseDown[key].actions
+          ) {
+            this.events.mouseDown[key].actions.forEach(action => {
+              action(this)
+            })
+          }
+          // keydown should only register for one step
+          // remember which we've handled so we don't handle them again
+          state.mouse.down[key] = null
+        })
+    }
+
+    // MOUSEACTIVE
+    if (this.events.mouseActive) {
+      Object.keys(state.mouse.active).forEach(button => {
+        if (
+          this.events.mouseActive[button] &&
+          this.events.mouseActive[button].actions
+        ) {
+          this.events.mouseActive[button].actions.forEach(action => {
+            action(this)
+          })
+        }
+      })
+    }
+
+    // MOUSEUP
+    if (this.events.mouseUp) {
+      Object.keys(state.mouse.up).forEach(button => {
+        if (
+          this.events.mouseUp[button] &&
+          this.events.mouseUp[button].actions
+        ) {
+          this.events.mouseUp[button].actions.forEach(action => {
+            action(this)
+          })
+        }
+
+        // keyup events should only fire for one step
+        delete state.mouse.up[button]
       })
     }
   }
 
   step() {
-    this.invokeKeyboardEvents()
+    this.invokeInputEvents()
 
     if (this.sprite && this.sprite.step) {
       this.sprite.step()
@@ -192,10 +237,6 @@ export default class GameObject {
 
     // apply friction
     this.hspeed = this.hspeed * (1 - this.friction)
-
-    // apply max speed
-    this.hspeed =
-      Math.sign(this.hspeed) * Math.min(Math.abs(this.hspeed), this.maxSpeed)
 
     if (this.events.step && this.events.step.actions) {
       this.events.step.actions.forEach(action => {
