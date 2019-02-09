@@ -182,14 +182,8 @@ export default class GameObject {
       this.sprite.step()
     }
 
-    if (this.events.step && this.events.step.actions) {
-      this.events.step.actions.forEach(action => {
-        action(this)
-      })
-    }
-
     // apply gravity
-    if (this.y < state.height) {
+    if (this.y < state.room.height) {
       this.motionAdd(this.gravityDirection, this.gravity)
     }
 
@@ -203,24 +197,35 @@ export default class GameObject {
     this.hspeed =
       Math.sign(this.hspeed) * Math.min(Math.abs(this.hspeed), this.maxSpeed)
 
+    if (this.events.step && this.events.step.actions) {
+      this.events.step.actions.forEach(action => {
+        action(this)
+      })
+    }
+
     // apply final calculated movement values
     this.move(this.direction, this.speed)
+
+    // if ! solid collision below:
+    // moveToCollisionPoint()
+    // keep outside solid objects!
+    // this is the same as moving outside the room and stopping / moving back to room edge
 
     // keep in room
     if (this.x < 0) {
       this.hspeed = 0
       this.x = 0
-    } else if (this.x > state.width) {
+    } else if (this.x > state.room.width) {
       this.hspeed = 0
-      this.x = state.width
+      this.x = state.room.width
     }
 
     if (this.y < 0 && this.vspeed < 0) {
       this.vspeed = 0
       this.y = 0
-    } else if (this.y > state.height && this.vspeed > 0) {
+    } else if (this.y > state.room.height && this.vspeed > 0) {
       this.vspeed = 0
-      this.y = state.height
+      this.y = state.room.height
     }
   }
 

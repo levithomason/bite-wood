@@ -42,10 +42,11 @@ const objSolid = new GameObject({
 
           if (collision.objects(self, objPlayer)) {
             // TODO: stop the player, crude bounce for now
-            objPlayer.direction += 180
+            objPlayer.motionAdd(270, 0.4)
             self.setSprite(sprSolidColliding)
           } else {
             self.setSprite(sprSolid)
+            // objPlayer.gravity = 0.4
           }
         },
       ],

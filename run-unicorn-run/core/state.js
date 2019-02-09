@@ -1,36 +1,48 @@
 /**
- * @property {GameObject[]} objects
- * @property {GameImage} background
+ * @property {GameObject[]} room.objects
+ * @property {GameImage} room.background
+ * @property {object} keys
  * @property {object} keysDown
+ * @property {object} keysUp
+ * @property {object} mouse
+ * @property {number} mouse.x
+ * @property {number} mouse.y
  */
 const state = {
-  debug: true,
-  width: 800,
-  height: 600,
+  debug: false,
+  isPlaying: true,
+
+  room: {
+    width: 800,
+    height: 600,
+    objects: [],
+  },
 
   keys: {},
   keysDown: {},
   keysUp: {},
   mouse: { x: 0, y: 0 },
-
-  objects: [],
-  isPlaying: false,
 }
 
 //
-// Objects
+// Room
 //
 
-/** @param object {GameObject} */
+/** @param {GameObject} room */
+export const setRoom = room => {
+  state.room = room
+}
+
+/** @param {GameObject} object */
 export const addObject = object => {
-  state.objects.push(object)
+  state.room.objects.push(object)
 }
 
 //
 // Keyboard
 //
 
-/** @param e {KeyboardEvent} */
+/** @param {KeyboardEvent} e */
 const handleKeyDown = e => {
   state.keys[e.key] = true
 
@@ -41,7 +53,7 @@ const handleKeyDown = e => {
   }
 }
 
-/** @param e {KeyboardEvent} */
+/** @param {KeyboardEvent} e */
 const handleKeyUp = e => {
   state.keysUp[e.key] = true
 }
@@ -53,7 +65,7 @@ document.addEventListener('keyup', handleKeyUp)
 // Mouse
 //
 
-/** @param e {MouseEvent} */
+/** @param {MouseEvent} e */
 const handleMouseMove = e => {
   let canvasX = 0
   let canvasY = 0
@@ -68,9 +80,17 @@ const handleMouseMove = e => {
   state.mouse.x = Math.min(e.pageX - canvasX, canvas.width)
   state.mouse.y = e.pageY - canvasY < canvasY ? canvasY : e.pageY - canvasY
 }
-document.addEventListener('mousemove', handleMouseMove)
+/** @param {MouseEvent} e */
+const handleMouseDown = e => {
+  state.mouse.down = true
+}
 
-/** @param element {HTMLElement} */
-export const trackMouseState = element => {}
+/** @param {MouseEvent} e */
+const handleMouseUp = e => {
+  state.mouse.down = false
+}
+document.addEventListener('mousemove', handleMouseMove)
+document.addEventListener('mousedown', handleMouseDown)
+document.addEventListener('mouseup', handleMouseUp)
 
 export default state

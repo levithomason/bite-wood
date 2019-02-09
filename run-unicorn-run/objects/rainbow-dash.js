@@ -56,7 +56,7 @@ const objRainbowDash = new GameObject({
     step: {
       actions: [
         self => {
-          if (self.x >= state.width) {
+          if (self.x >= state.room.width) {
             self.setSprite(sprRainbowDashFlyL)
             self.hspeed = -self.hspeed
           } else if (self.x <= 0) {

@@ -1,5 +1,5 @@
 import * as draw from '../draw.js'
-import state, { trackMouseState } from '../state.js'
+import state from '../state.js'
 
 export default class Game {
   /**
@@ -9,22 +9,34 @@ export default class Game {
    */
   constructor() {
     const canvas = document.createElement('canvas')
-    canvas.setAttribute('width', state.width)
-    canvas.setAttribute('height', state.height)
+    canvas.setAttribute('width', state.room.width)
+    canvas.setAttribute('height', state.room.height)
     canvas.setAttribute('data-game', 'true')
     document.body.append(canvas)
 
     draw.init(canvas.getContext('2d'))
-    trackMouseState(canvas)
 
     this.setBackgroundImage = this.setBackgroundImage.bind(this)
 
-    this.start = this.start.bind(this)
+    this.play = this.play.bind(this)
     this.pause = this.pause.bind(this)
     this.tick = this.tick.bind(this)
 
     this.step = this.step.bind(this)
     this.draw = this.draw.bind(this)
+    this.handleKeyDown = this.handleKeyDown.bind(this)
+
+    document.addEventListener('keydown', this.handleKeyDown)
+  }
+
+  handleKeyDown(e) {
+    if (e.key === 'p') {
+      if (state.isPlaying) {
+        this.pause()
+      } else {
+        this.play()
+      }
+    }
   }
 
   /** @param image {GameImage} */
@@ -33,26 +45,29 @@ export default class Game {
   }
 
   start() {
-    state.isPlaying = true
     this.tick()
+  }
+
+  play() {
+    state.isPlaying = true
   }
 
   pause() {
     state.isPlaying = false
-    cancelAnimationFrame(this.timer)
   }
 
   tick() {
-    this.step()
+    if (state.isPlaying) {
+      this.step()
+    }
+
     this.draw()
 
-    if (state.isPlaying) {
-      this.timer = requestAnimationFrame(this.tick)
-    }
+    requestAnimationFrame(this.tick)
   }
 
   step() {
-    state.objects.forEach(object => {
+    state.room.objects.forEach(object => {
       if (object.step) {
         object.step(object, state)
       }
@@ -67,7 +82,7 @@ export default class Game {
       draw.grid()
     }
 
-    state.objects.forEach(object => {
+    state.room.objects.forEach(object => {
       if (object.draw) object.draw()
 
       if (object.events && object.events.draw && object.events.draw.actions) {
@@ -83,6 +98,13 @@ export default class Game {
         state.mouse.x + 10,
         state.mouse.y - 10,
       )
+    }
+
+    if (!state.isPlaying) {
+      draw.setColor('rgba(0, 0, 0, 0.5)')
+      draw.rectangle(0, 0, state.room.width, state.room.height)
+      draw.setColor('#fff')
+      draw.text(`PAUSED`, state.room.width / 2, state.room.height / 2)
     }
   }
 }

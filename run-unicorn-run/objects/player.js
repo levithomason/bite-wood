@@ -1,6 +1,8 @@
 import { GameImage, GameSprite, GameObject } from '../core/game/index.js'
+import * as draw from '../core/draw.js'
 import physics from '../core/physics.js'
 import state from '../core/state.js'
+import * as utils from '../core/utils.js'
 
 // ----------------------------------------
 // Player
@@ -86,11 +88,44 @@ const objPlayer = new GameObject({
   maxSpeed: 4,
   acceleration: 0.5,
   events: {
+    step: {
+      actions: [
+        self => {
+          if (state.mouse.down) {
+            const speed = Math.pow(
+              utils.distance(self.x, self.y, state.mouse.x, state.mouse.y) /
+                300,
+              2,
+            )
+            self.friction = 0
+            self.motionAdd(
+              utils.direction(self.x, self.y, state.mouse.x, state.mouse.y),
+              Math.max(0, speed),
+            )
+          } else if (self.y >= state.room.height) {
+            self.friction = physics.friction
+          }
+        },
+      ],
+    },
+
+    draw: {
+      actions: [
+        self => {
+          if (state.mouse.down) {
+            draw.setLineWidth(2)
+            draw.setColor('brown')
+            draw.arrow(self.x, self.y, state.mouse.x, state.mouse.y)
+          }
+        },
+      ],
+    },
+
     keyDown: {
       ArrowUp: {
         actions: [
           self => {
-            if (self.y + self.sprite.insertionY >= state.height) {
+            if (self.y + self.sprite.insertionY >= state.room.height) {
               self.motionAdd(physics.DIRECTION_UP, self.jump)
             }
           },
