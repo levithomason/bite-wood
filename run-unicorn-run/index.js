@@ -1,18 +1,18 @@
-import { Game, GameImage } from './game/index.js'
+import { Game, GameImage } from './core/game/index.js'
 
-import * as draw from './draw.js'
-import physics from './physics.js'
-import state, { addObject } from './state.js'
+import * as draw from './core/draw.js'
+import physics from './core/physics.js'
+import state, { addObject } from './core/state.js'
 
-import objPlayer from './player.js'
-import objRainbowDash from './rainbow-dash.js'
-import objSolid from './solid.js'
+import objPlayer from './objects/player.js'
+import objRainbowDash from './objects/rainbow-dash.js'
+import objSolid from './objects/solid.js'
 
 // ----------------------------------------
 // GAME
 // ----------------------------------------
 const game = new Game()
-game.setBackgroundImage(new GameImage('./background.png'))
+game.setBackgroundImage(new GameImage('./images/background.png'))
 
 addObject(objSolid)
 addObject(objRainbowDash)

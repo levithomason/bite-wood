@@ -1,7 +1,7 @@
-import * as collision from './collision.js'
-import { GameImage, GameObject, GameSprite } from './game/index.js'
+import * as collision from '../core/collision.js'
+import { GameImage, GameObject, GameSprite } from '../core/game/index.js'
 import objPlayer from './player.js'
-import state from './state.js'
+import state from '../core/state.js'
 
 // ----------------------------------------
 // Player

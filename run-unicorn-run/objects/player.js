@@ -1,6 +1,6 @@
-import { GameImage, GameSprite, GameObject } from './game/index.js'
-import physics from './physics.js'
-import state from './state.js'
+import { GameImage, GameSprite, GameObject } from '../core/game/index.js'
+import physics from '../core/physics.js'
+import state from '../core/state.js'
 
 // ----------------------------------------
 // Player
@@ -17,8 +17,8 @@ const boundingBoxR = {
   boundingBoxWidth: 28,
   boundingBoxHeight: 41,
 }
-export const imgPlayerR = new GameImage('./my-littlepony-right.png')
-export const imgPlayerL = new GameImage('./my-littlepony-left.png')
+export const imgPlayerR = new GameImage('../images/my-littlepony-right.png')
+export const imgPlayerL = new GameImage('../images/my-littlepony-left.png')
 export const sprPlayerIdleR = new GameSprite({
   image: imgPlayerR,
   frameCount: 16,
