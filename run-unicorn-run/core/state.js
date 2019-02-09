@@ -77,8 +77,20 @@ const handleMouseMove = e => {
     canvasY = y
   }
 
-  state.mouse.x = Math.min(e.pageX - canvasX, canvas.width)
-  state.mouse.y = e.pageY - canvasY < canvasY ? canvasY : e.pageY - canvasY
+  // TODO: utils.clamp() mouse to screen size
+  state.mouse.x =
+    e.pageX < canvasX
+      ? 0
+      : e.pageX - canvasX > state.room.width
+      ? state.room.width
+      : e.pageX - canvasX
+
+  state.mouse.y =
+    e.pageY < canvasY
+      ? 0
+      : e.pageY - canvasY > state.room.height
+      ? state.room.height
+      : e.pageY - canvasY
 }
 /** @param {MouseEvent} e */
 const handleMouseDown = e => {
