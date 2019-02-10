@@ -1,41 +1,14 @@
-import { Game, GameImage } from './core/game/index.js'
-
+import { gameLoop } from './core/game/index.js'
+import room0 from './rooms/room0.js'
+import room1 from './rooms/room1.js'
 import * as draw from './core/draw.js'
-import physics from './core/physics.js'
-import state, { addObject } from './core/state.js'
-
-import objPlayer from './objects/player.js'
-import objRainbowDash from './objects/rainbow-dash.js'
-import objSolid from './objects/solid.js'
-
-// // ----------------------------------------
-// // AUDIO
-// // ----------------------------------------
-// const sndBackground = new Audio(
-//   'http://soundimage.org/wp-content/uploads/2017/05/Hypnotic-Puzzle.mp3',
-// )
-// sndBackground.loop = true
-// sndBackground.volume = 0.3
-// sndBackground.play()
+import state from './core/state.js'
 
 // ----------------------------------------
 // GAME
 // ----------------------------------------
-const game = new Game()
-game.setBackgroundImage(new GameImage('./images/background.png'))
+state.addRoom(room0)
+state.addRoom(room1)
 
-addObject(objSolid)
-addObject(objRainbowDash)
-addObject(objPlayer)
-
-game.start()
-
-window.game = game
-window.objPlayer = objPlayer
-window.objRainbowDash = objRainbowDash
-window.objSolid = objSolid
-// window.sndBackground = sndBackground
-window.draw = draw
-window.state = state
-window.physics = physics
-
+draw.init()
+gameLoop.start()

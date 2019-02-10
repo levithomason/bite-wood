@@ -1,4 +1,5 @@
 import * as utils from './utils.js'
+
 /**
  * @property {GameObject[]} room.objects
  * @property {GameImage} room.background
@@ -13,10 +14,66 @@ const state = {
   debug: false,
   isPlaying: true,
 
-  room: {
-    width: 800,
-    height: 600,
-    objects: [],
+  rooms: [],
+  roomIndex: -1,
+  get room() {
+    return state.rooms[state.roomIndex] || {}
+  },
+
+  /** @param {GameRoom} room */
+  addRoom(room) {
+    state.rooms.push(room)
+
+    if (state.rooms.length === 1) {
+      state.setRoom(0)
+    }
+  },
+
+  /**
+   * Returns true if the room changed.
+   * @param {number} index
+   * @returns {boolean}
+   */
+  setRoom(index) {
+    const currIndex = state.roomIndex
+    const nextIndex = utils.clamp(index, 0, state.rooms.length - 1)
+    const willChange = nextIndex !== currIndex
+
+    if (willChange) {
+      if (state.room.backgroundMusic) state.room.backgroundMusic.pause()
+      state.roomIndex = nextIndex
+      if (state.room.backgroundMusic) state.room.backgroundMusic.play()
+    }
+
+    return willChange
+  },
+
+  /**
+   * Returns true if the room changed.
+   * @returns {boolean}
+   */
+  nextRoom() {
+    const newIndex = state.rooms.findIndex(room => room === state.room) + 1
+    return state.setRoom(newIndex)
+  },
+
+  /**
+   * Returns true if the room changed.
+   * @returns {boolean}
+   */
+  prevRoom() {
+    const newIndex = state.rooms.findIndex(room => room === state.room) - 1
+    return state.setRoom(newIndex)
+  },
+
+  /** @returns {boolean} */
+  isFirstRoom() {
+    return state.roomIndex === 0
+  },
+
+  /** @returns {boolean} */
+  isLastRoom() {
+    return state.roomIndex === state.rooms.length - 1
   },
 
   keys: {
@@ -35,17 +92,23 @@ const state = {
 }
 
 //
-// Room
+// Play/Pause
 //
 
-/** @param {GameObject} room */
-export const setRoom = room => {
-  state.room = room
+export const play = () => {
+  state.isPlaying = true
+
+  if (state.room.backgroundMusic) {
+    state.room.backgroundMusic.play()
+  }
 }
 
-/** @param {GameObject} object */
-export const addObject = object => {
-  state.room.objects.push(object)
+export const pause = () => {
+  state.isPlaying = false
+
+  if (state.room.backgroundMusic) {
+    state.room.backgroundMusic.pause()
+  }
 }
 
 //
@@ -64,6 +127,19 @@ const handleKeyDown = e => {
   // once removed, we know if is safe to mark it true again
   if (!state.keys.down.hasOwnProperty(e.key)) {
     state.keys.down[e.key] = true
+  }
+
+  switch (e.key) {
+    case 'p':
+      if (state.isPlaying) {
+        pause()
+      } else {
+        play()
+      }
+      break
+    case 'd':
+      state.debug = !state.debug
+      break
   }
 }
 
@@ -94,7 +170,7 @@ const MOUSE_BUTTON = {
 }
 
 /** @param {MouseEvent} e */
-const handleMouseMove = e => {
+const setMousePosition = e => {
   let canvasX = 0
   let canvasY = 0
 
@@ -105,14 +181,22 @@ const handleMouseMove = e => {
     canvasY = y
   }
 
-  state.mouse.x = utils.clamp(e.pageX - canvasX, 0, state.room.width)
-  state.mouse.y = utils.clamp(e.pageY - canvasY, 0, state.room.height)
+  state.mouse.x = e.pageX - canvasX
+  state.mouse.y = e.pageY - canvasY
+}
+
+/** @param {MouseEvent} e */
+const handleMouseMove = e => {
+  setMousePosition(e)
 }
 
 /** @param {MouseEvent} e */
 const handleMouseDown = e => {
   e.preventDefault()
   const button = MOUSE_BUTTON[e.button]
+
+  // the position hasn't been set if the user hasn't moved the mouse yet
+  setMousePosition(e)
 
   state.mouse.active.left = e.button === MOUSE_BUTTON.left
   state.mouse.active.middle = e.button === MOUSE_BUTTON.middle
@@ -134,6 +218,9 @@ const handleMouseUp = e => {
   e.preventDefault()
   const button = MOUSE_BUTTON[e.button]
 
+  // the position hasn't been set if the user hasn't moved the mouse yet
+  setMousePosition(e)
+
   state.mouse.up[button] = true
 
   // since mouse events are handled on game step we can only safely remove
@@ -144,5 +231,7 @@ const handleMouseUp = e => {
 document.addEventListener('mousemove', handleMouseMove)
 document.addEventListener('mousedown', handleMouseDown)
 document.addEventListener('mouseup', handleMouseUp)
+
+window.state = state
 
 export default state

@@ -1,8 +1,5 @@
-import * as collision from '../core/collision.js'
 import { GameImage, GameSprite, GameObject } from '../core/game/index.js'
 import state from '../core/state.js'
-import objPlayer from './player.js'
-import objSolid from './solid.js'
 
 // ----------------------------------------
 // RainbowDash
@@ -75,5 +72,7 @@ const objRainbowDash = new GameObject({
     },
   },
 })
+
+window.objRainbowDash = objRainbowDash
 
 export default objRainbowDash

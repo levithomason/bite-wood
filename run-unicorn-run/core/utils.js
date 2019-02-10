@@ -16,5 +16,5 @@ export const move = (x, y, direction, distance) => ({
 })
 
 export const clamp = (val, min, max) => {
-  return val > max ? max : val < min ? min : val
+  return Math.max(min, Math.min(max, val))
 }

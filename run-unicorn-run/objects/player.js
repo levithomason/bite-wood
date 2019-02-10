@@ -90,18 +90,33 @@ const objPlayer = new GameObject({
   events: {
     step: {
       actions: [
+        // add friction when on the ground
         self => {
           if (self.y >= state.room.height) {
             self.friction = physics.friction
           } else {
             self.friction = 0
           }
-
+        },
+        // remove friction when walking
+        self => {
           if (state.keys.active.ArrowRight || state.keys.active.ArrowLeft) {
             self.friction = 0
             self.hspeed =
               Math.sign(self.hspeed) *
               Math.min(Math.abs(self.hspeed), self.maxSpeed)
+          }
+        },
+        // go to next/prev room on room edge
+        self => {
+          if (self.x >= state.room.width) {
+            if (state.nextRoom()) {
+              self.x = self.hspeed
+            }
+          } else if (self.x <= 0) {
+            if (state.prevRoom()) {
+              self.x = state.room.width + self.hspeed
+            }
           }
         },
       ],
@@ -112,7 +127,7 @@ const objPlayer = new GameObject({
         self => {
           if (state.mouse.down.left) {
             draw.setLineWidth(2)
-            draw.setColor('brown')
+            draw.setColor('#753')
             draw.arrow(self.x, self.y, state.mouse.x, state.mouse.y)
           }
         },
@@ -185,5 +200,7 @@ const objPlayer = new GameObject({
     },
   },
 })
+
+window.objPlayer = objPlayer
 
 export default objPlayer

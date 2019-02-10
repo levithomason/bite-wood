@@ -37,6 +37,12 @@ const objSolid = new GameObject({
     step: {
       actions: [
         self => {
+          if (!state.debug) {
+            // TODO: introduce 'active' and .deactivate() to temp remove instances from the game
+            self.moveTo(-999, -999)
+            return
+          }
+
           self.moveTo(state.mouse.x, state.mouse.y)
 
           if (collision.objects(self)) {
@@ -49,5 +55,7 @@ const objSolid = new GameObject({
     },
   },
 })
+
+window.objSolid = objSolid
 
 export default objSolid

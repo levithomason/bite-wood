@@ -1,9 +1,17 @@
+import state from './state.js'
+
 let _ctx
 
 ///////////////////////////////////////////
 
-export const init = ctx => {
-  _ctx = ctx
+export const init = () => {
+  const canvas = document.createElement('canvas')
+  canvas.setAttribute('width', state.room.width)
+  canvas.setAttribute('height', state.room.height)
+  canvas.setAttribute('data-game', 'true')
+  document.body.append(canvas)
+
+  _ctx = canvas.getContext('2d')
   // render pixelated images
   _ctx.imageSmoothingEnabled = false
 
@@ -167,7 +175,7 @@ export const grid = (
   }
 
   saveSettings()
-  _ctx.setLineDash([3, 3])
+  _ctx.setLineDash([2, 2])
   _ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)'
   _drawLines()
   _ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)'

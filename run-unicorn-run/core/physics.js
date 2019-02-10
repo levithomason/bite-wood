@@ -58,7 +58,7 @@ export class Vector {
   }
 }
 
-export default {
+const physics = {
   DIRECTION_UP: 270,
   DIRECTION_DOWN: 90,
   DIRECTION_LEFT: 180,
@@ -69,3 +69,7 @@ export default {
 
   friction: 0.3,
 }
+
+window.physics = physics
+
+export default physics

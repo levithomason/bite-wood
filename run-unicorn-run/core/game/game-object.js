@@ -253,10 +253,10 @@ export default class GameObject {
     // this is the same as moving outside the room and stopping / moving back to room edge
 
     // keep in room
-    if (this.x < 0) {
+    if (this.x < 0 && state.isFirstRoom()) {
       this.hspeed = 0
       this.x = 0
-    } else if (this.x > state.room.width) {
+    } else if (this.x > state.room.width && state.isLastRoom()) {
       this.hspeed = 0
       this.x = state.room.width
     }
