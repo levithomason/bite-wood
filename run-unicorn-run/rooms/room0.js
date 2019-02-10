@@ -1,18 +1,36 @@
 import { GameAudio, GameImage, GameRoom } from '../core/game/index.js'
-import objPlayer from '../objects/player.js'
-import objRainbowDash from '../objects/rainbow-dash.js'
-import objSolid from '../objects/solid.js'
 
-const room0 = new GameRoom()
-room0.setBackgroundImage(new GameImage('../images/background.png'))
-room0.setBackgroundMusic(
-  new GameAudio(
-    'http://soundimage.org/wp-content/uploads/2016/03/Monkey-Island-Band_Looping.mp3',
-  ),
-)
-room0.addObject(objSolid)
-room0.addObject(objRainbowDash)
-room0.addObject(objPlayer)
+import Apple from '../objects/apple.js'
+import Player from '../objects/player.js'
+import RainbowDash from '../objects/rainbow-dash.js'
+import Solid from '../objects/solid.js'
+
+class Room0 extends GameRoom {
+  constructor() {
+    super()
+
+    this.backgroundImage = new GameImage('../images/background.png')
+
+    this.backgroundMusic = new GameAudio(
+      'http://soundimage.org/wp-content/uploads/2016/03/Monkey-Island-Band_Looping.mp3',
+    )
+  }
+
+  init() {
+    super.init()
+
+    room0.instanceCreate(Apple)
+    room0.instanceCreate(Apple)
+    room0.instanceCreate(Apple)
+    room0.instanceCreate(Apple)
+    room0.instanceCreate(Apple)
+    room0.instanceCreate(Solid)
+    room0.instanceCreate(RainbowDash)
+    room0.instanceCreate(Player, 100, 573)
+  }
+}
+
+const room0 = new Room0()
 
 window.room0 = room0
 

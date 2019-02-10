@@ -1,3 +1,4 @@
+import * as collision from './collision.js'
 import state from './state.js'
 
 let _ctx
@@ -133,15 +134,15 @@ export const rectangle = (x, y, w, h) => {
   _ctx.strokeRect(x, y, w, h)
 }
 
-export const polygon = verticies => {
-  const [start, ...rest] = verticies
-
-  _ctx.beginPath()
-  _ctx.moveTo(start[0], start[1])
-  rest.forEach(([x, y]) => _ctx.lineTo(x, y))
-  _ctx.fill()
-  _ctx.stroke()
-}
+// export const polygon = verticies => {
+//   const [start, ...rest] = verticies
+//
+//   _ctx.beginPath()
+//   _ctx.moveTo(start[0], start[1])
+//   rest.forEach(([x, y]) => _ctx.lineTo(x, y))
+//   _ctx.fill()
+//   _ctx.stroke()
+// }
 
 export const text = (text, x, y) => {
   _ctx.fillText(text, x, y)
@@ -202,7 +203,11 @@ export const objectDebug = object => {
 
   // bounding box
   // setBorderColor('rgba(255, 255, 255, 0.75)')
-  setBorderColor('#FF0')
+  if (collision.objects(object, 'any')) {
+    setBorderColor('#F00')
+  } else {
+    setBorderColor('#FF0')
+  }
   setFillColor('transparent')
   rectangle(
     x -

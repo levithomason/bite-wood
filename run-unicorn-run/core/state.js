@@ -17,7 +17,7 @@ const state = {
   rooms: [],
   roomIndex: -1,
   get room() {
-    return state.rooms[state.roomIndex] || {}
+    return state.rooms[state.roomIndex]
   },
 
   /** @param {GameRoom} room */
@@ -25,7 +25,7 @@ const state = {
     state.rooms.push(room)
 
     if (state.rooms.length === 1) {
-      state.setRoom(0)
+      state.setRoomIndex(0)
     }
   },
 
@@ -34,18 +34,37 @@ const state = {
    * @param {number} index
    * @returns {boolean}
    */
-  setRoom(index) {
-    const currIndex = state.roomIndex
+  setRoomIndex(index) {
     const nextIndex = utils.clamp(index, 0, state.rooms.length - 1)
-    const willChange = nextIndex !== currIndex
+    const didChange = nextIndex !== state.roomIndex
 
-    if (willChange) {
-      if (state.room.backgroundMusic) state.room.backgroundMusic.pause()
+    if (didChange) {
+      const persistedObjects = []
+
+      if (state.room) {
+        state.room.objects = state.room.objects.filter(o => {
+          if (o.persist) persistedObjects.push(o)
+
+          return !o.persist
+        })
+
+        if (state.room.backgroundMusic) {
+          state.room.backgroundMusic.pause()
+        }
+      }
+
       state.roomIndex = nextIndex
-      if (state.room.backgroundMusic) state.room.backgroundMusic.play()
+
+      if (state.room) {
+        if (!state.room.initialized) {
+          state.room.init()
+        }
+        state.room.objects = state.room.objects.concat(persistedObjects)
+        if (state.room.backgroundMusic) state.room.backgroundMusic.play()
+      }
     }
 
-    return willChange
+    return didChange && !!state.room
   },
 
   /**
@@ -53,8 +72,7 @@ const state = {
    * @returns {boolean}
    */
   nextRoom() {
-    const newIndex = state.rooms.findIndex(room => room === state.room) + 1
-    return state.setRoom(newIndex)
+    return state.setRoomIndex(state.roomIndex + 1)
   },
 
   /**
@@ -62,8 +80,7 @@ const state = {
    * @returns {boolean}
    */
   prevRoom() {
-    const newIndex = state.rooms.findIndex(room => room === state.room) - 1
-    return state.setRoom(newIndex)
+    return state.setRoomIndex(state.roomIndex - 1)
   },
 
   /** @returns {boolean} */

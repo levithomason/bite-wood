@@ -4,22 +4,56 @@ import state from '../state.js'
 import * as utils from '../utils.js'
 
 export default class GameObject {
+  /**
+   * @param {boolean} persist
+   * @param {GameSprite} sprite
+   * @param {boolean} solid
+   *
+   * @param {number} x
+   * @param {number} y
+   * @param {number} acceleration
+   * @param {number} gravity
+   * @param {number} gravityDirection
+   * @param {number} friction
+   * @param {number} speed
+   * @param {number} direction
+   *
+   * @param {object} events
+   * @param {object} events.create
+   * @param {function[]} events.create.actions
+   * @param {object} events.draw
+   * @param {function[]} events.draw.actions
+   * @param {object} events.keyActive
+   * @param {object} events.keyDown
+   * @param {object} events.keyUp
+   * @param {object} events.mouseActive
+   * @param {object} events.mouseDown
+   * @param {object} events.mouseup
+   * @param {object} events.step
+   * @param {function[]} events.step.actions
+   *
+   * @param {object} ...properties
+   */
   constructor({
+    persist = false,
     sprite,
     solid = true,
     x = 0,
     y = 0,
     acceleration = 0.2,
-    gravity = physics.gravity.magnitude,
-    gravityDirection = physics.gravity.direction,
-    friction = physics.friction,
+    gravity = 0,
+    gravityDirection = 0,
+    friction = 0,
     speed = 0,
     direction = 0,
     events = {},
-    ...rest
-  }) {
+    ...properties
+  } = {}) {
+    this.persist = persist
     this.sprite = sprite
     this.solid = solid
+    this.startX = x
+    this.startY = y
     this.x = x
     this.y = y
     this.acceleration = acceleration
@@ -29,8 +63,8 @@ export default class GameObject {
     this.velocity = new Vector(direction, speed)
     this.events = events
 
-    Object.keys(rest).forEach(key => {
-      this[key] = rest[key]
+    Object.keys(properties).forEach(property => {
+      this[property] = properties[property]
     })
 
     this.setSprite = this.setSprite.bind(this)
@@ -41,6 +75,16 @@ export default class GameObject {
     this.move = this.move.bind(this)
     this.moveTo = this.moveTo.bind(this)
     this.motionAdd = this.motionAdd.bind(this)
+
+    if (events.create && events.create.actions) {
+      events.create.actions.forEach(action => {
+        action(this)
+      })
+    }
+  }
+
+  get displayName() {
+    return this.constructor.displayName
   }
 
   get speed() {

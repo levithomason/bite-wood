@@ -7,9 +7,11 @@ import state from '../core/state.js'
 export const imgRainbowDashR = new GameImage(
   './../images/my-littlepony-right.png',
 )
+
 export const imgRainbowDashL = new GameImage(
   './../images/my-littlepony-left.png',
 )
+
 export const sprRainbowDashFlyR = new GameSprite({
   image: imgRainbowDashR,
   frameCount: 6,
@@ -27,6 +29,7 @@ export const sprRainbowDashFlyR = new GameSprite({
   boundingBoxWidth: 67,
   stepsPerFrame: 4,
 })
+
 export const sprRainbowDashFlyL = new GameSprite({
   image: imgRainbowDashL,
   frameCount: 6,
@@ -48,31 +51,43 @@ export const sprRainbowDashFlyL = new GameSprite({
   stepsPerFrame: 4,
 })
 
-const objRainbowDash = new GameObject({
-  sprite: sprRainbowDashFlyL,
-  x: 300,
-  y: 200,
-  speed: 4,
-  direction: 180,
-  friction: 0,
-  gravity: 0,
-  events: {
-    step: {
-      actions: [
-        self => {
-          if (self.x >= state.room.width) {
-            self.setSprite(sprRainbowDashFlyL)
-            self.hspeed = -self.hspeed
-          } else if (self.x <= 0) {
-            self.setSprite(sprRainbowDashFlyR)
-            self.hspeed = -self.hspeed
-          }
+class RainbowDash extends GameObject {
+  static displayName = 'objRainbowDash'
+
+  constructor({ x = 300, y = 200 }) {
+    super({
+      sprite: sprRainbowDashFlyL,
+      x: x,
+      y: y,
+      speed: 4,
+      direction: 180,
+      events: {
+        create: {
+          actions: [
+            self => {
+              self.x = 300
+              self.y = 200
+            },
+          ],
         },
-      ],
-    },
-  },
-})
+        step: {
+          actions: [
+            self => {
+              if (self.x >= state.room.width) {
+                self.setSprite(sprRainbowDashFlyL)
+                self.hspeed = -self.hspeed
+              } else if (self.x <= 0) {
+                self.setSprite(sprRainbowDashFlyR)
+                self.hspeed = -self.hspeed
+              }
+            },
+          ],
+        },
+      },
+    })
+  }
+}
 
-window.objRainbowDash = objRainbowDash
+window.RainbowDash = RainbowDash
 
-export default objRainbowDash
+export default RainbowDash

@@ -3,6 +3,7 @@ import state from '../state.js'
 
 const step = () => {
   if (!state.isPlaying) return
+  if (!state.room) return
 
   state.room.objects.forEach(object => {
     if (object.step) {
@@ -12,6 +13,8 @@ const step = () => {
 }
 
 const drawRoom = () => {
+  if (!state.room) return
+
   if (state.room.backgroundColor) {
     draw.setColor(state.room.backgroundColor)
     draw.rectangle(0, 0, state.room.width, state.room.height)
@@ -27,6 +30,8 @@ const drawRoom = () => {
 }
 
 const drawObjects = () => {
+  if (!state.room) return
+
   state.room.objects.forEach(object => {
     if (object.draw) object.draw()
 

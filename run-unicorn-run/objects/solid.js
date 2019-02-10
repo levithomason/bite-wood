@@ -14,6 +14,7 @@ const spriteConfig = {
   insertionX: width / 2,
   insertionY: height / 2,
 }
+
 const sprSolid = new GameSprite({
   image: new GameImage(`https://placehold.it/${width}x${height}/444`),
   ...spriteConfig,
@@ -24,38 +25,42 @@ const sprSolidColliding = new GameSprite({
   ...spriteConfig,
 })
 
-const objSolid = new GameObject({
-  sprite: sprSolid,
-  solid: true,
-  x: 300,
-  y: 600 - Math.random() * height * 2,
-  maxSpeed: 0,
-  acceleration: 0,
-  gravity: 0,
-  friction: 0,
-  events: {
-    step: {
-      actions: [
-        self => {
-          if (!state.debug) {
-            // TODO: introduce 'active' and .deactivate() to temp remove instances from the game
-            self.moveTo(-999, -999)
-            return
-          }
+class Solid extends GameObject {
+  static displayName = 'objSolid'
 
-          self.moveTo(state.mouse.x, state.mouse.y)
+  constructor({ x = 300, y = 600 - Math.random() * height * 2 }) {
+    super({
+      sprite: sprSolid,
+      solid: true,
+      x: x,
+      y: y,
+      maxSpeed: 0,
+      acceleration: 0,
+      events: {
+        step: {
+          actions: [
+            self => {
+              if (!state.debug) {
+                // TODO: introduce 'active' and .deactivate() to temp remove instances from the game
+                self.moveTo(-999, -999)
+                return
+              }
 
-          if (collision.objects(self)) {
-            self.setSprite(sprSolidColliding)
-          } else {
-            self.setSprite(sprSolid)
-          }
+              self.moveTo(state.mouse.x, state.mouse.y)
+
+              if (collision.objects(self, 'any')) {
+                self.setSprite(sprSolidColliding)
+              } else {
+                self.setSprite(sprSolid)
+              }
+            },
+          ],
         },
-      ],
-    },
-  },
-})
+      },
+    })
+  }
+}
 
-window.objSolid = objSolid
+window.Solid = Solid
 
-export default objSolid
+export default Solid
