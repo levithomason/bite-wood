@@ -9,7 +9,7 @@ class Room1 extends GameRoom {
     this.backgroundMusic = new GameAudio(
       'http://soundimage.org/wp-content/uploads/2017/05/Hypnotic-Puzzle.mp3',
     )
-    this.backgroundMusic.volume = 0.25
+    this.backgroundMusic.volume = 0.2
     this.backgroundMusic.loop = true
 
     // custom properties

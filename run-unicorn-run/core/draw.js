@@ -202,7 +202,6 @@ export const objectDebug = object => {
   saveSettings()
 
   // bounding box
-  // setBorderColor('rgba(255, 255, 255, 0.75)')
   if (collision.objects(object, 'any')) {
     setBorderColor('#F00')
   } else {

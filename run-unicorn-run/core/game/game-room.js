@@ -1,3 +1,5 @@
+import { inRange } from '../utils.js'
+
 export default class GameRoom {
   constructor(width = 800, height = 600) {
     this.width = width
@@ -25,6 +27,42 @@ export default class GameRoom {
     return !object
       ? this.objects.length
       : this.objects.filter(o => o.displayName === object.displayName).length
+  }
+
+  /**
+   * @param {number} paddingTop - Percentage (0 - 1) or number of pixels.
+   * @param {number} paddingBottom - Percentage (0 - 1) or number of pixels.
+   * @param {number} paddingLeft - Percentage (0 - 1) or number of pixels.
+   * @param {number} paddingRight - Percentage (0 - 1) or number of pixels.
+   * @returns {{x: number, y: number}}
+   */
+  randomPosition({
+    paddingTop = 0,
+    paddingBottom = 0,
+    paddingLeft = 0,
+    paddingRight = 0,
+  } = {}) {
+    const distanceLeft = inRange(paddingLeft, 1)
+      ? this.width * paddingLeft
+      : paddingLeft
+    const distanceRight = inRange(paddingRight, 1)
+      ? this.width * paddingRight
+      : paddingRight
+    const distanceTop = inRange(paddingTop, 1)
+      ? this.height * paddingTop
+      : tpaddingTop
+    const distanceBottom = inRange(paddingBottom, 1)
+      ? this.height * paddingBottom
+      : tpaddingBottom
+
+    const horizontalSpace = this.width - distanceLeft - distanceRight
+    const verticalSpace = this.height - distanceTop - distanceBottom
+
+    // TODO: avoid solid objects
+    return {
+      x: distanceLeft + horizontalSpace * Math.random(),
+      y: distanceTop + verticalSpace * Math.random(),
+    }
   }
 
   /** @param {GameObject} object */

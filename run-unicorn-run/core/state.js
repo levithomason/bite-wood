@@ -93,6 +93,25 @@ const state = {
     return state.roomIndex === state.rooms.length - 1
   },
 
+  //
+  // Physics
+  //
+  physics: {
+    DIRECTION_UP: 270,
+    DIRECTION_DOWN: 90,
+    DIRECTION_LEFT: 180,
+    DIRECTION_RIGHT: 0,
+
+    gravity: new utils.Vector(90, 0.4),
+    terminalVelocity: 15,
+
+    friction: 0.3,
+  },
+
+  //
+  // Input
+  //
+
   keys: {
     active: {},
     down: {},

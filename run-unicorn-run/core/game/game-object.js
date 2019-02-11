@@ -1,5 +1,4 @@
 import * as draw from '../draw.js'
-import physics, { Vector } from '../physics.js'
 import state from '../state.js'
 import * as utils from '../utils.js'
 
@@ -42,7 +41,7 @@ export default class GameObject {
     y = 0,
     acceleration = 0.2,
     gravity = 0,
-    gravityDirection = 0,
+    gravityDirection = state.physics.gravity.direction,
     friction = 0,
     speed = 0,
     direction = 0,
@@ -52,15 +51,13 @@ export default class GameObject {
     this.persist = persist
     this.sprite = sprite
     this.solid = solid
-    this.startX = x
-    this.startY = y
     this.x = x
     this.y = y
     this.acceleration = acceleration
     this.friction = friction
     this.gravity = gravity
     this.gravityDirection = gravityDirection
-    this.velocity = new Vector(direction, speed)
+    this._vector = new utils.Vector(direction, speed)
     this.events = events
 
     Object.keys(properties).forEach(property => {
@@ -78,9 +75,16 @@ export default class GameObject {
 
     if (events.create && events.create.actions) {
       events.create.actions.forEach(action => {
-        action(this)
+        action(this, state)
       })
     }
+
+    this.startX = this.x
+    this.startY = this.y
+  }
+
+  toJSON() {
+    return JSON.stringify({ ...this, events: null }, null, 2)
   }
 
   get displayName() {
@@ -88,35 +92,35 @@ export default class GameObject {
   }
 
   get speed() {
-    return this.velocity.magnitude
+    return this._vector.magnitude
   }
 
   set speed(speed) {
-    this.velocity.magnitude = speed
+    this._vector.magnitude = speed
   }
 
   get hspeed() {
-    return this.velocity.x
+    return this._vector.x
   }
 
   set hspeed(hspeed) {
-    this.velocity.x = hspeed
+    this._vector.x = hspeed
   }
 
   get vspeed() {
-    return this.velocity.y
+    return this._vector.y
   }
 
   set vspeed(vspeed) {
-    this.velocity.y = vspeed
+    this._vector.y = vspeed
   }
 
   get direction() {
-    return this.velocity.direction
+    return this._vector.direction
   }
 
   set direction(direction) {
-    this.velocity.direction = direction
+    this._vector.direction = direction
   }
 
   get boundingBoxTop() {
@@ -153,14 +157,15 @@ export default class GameObject {
   }
 
   move(direction, distance) {
-    const { x, y } = utils.move(this.x, this.y, direction, distance)
+    const newX = this.x + distance * Math.cos((direction * Math.PI) / 180)
+    const newY = this.y + distance * Math.sin((direction * Math.PI) / 180)
 
-    this.x = x
-    this.y = y
+    this.x = newX
+    this.y = newY
   }
 
   motionAdd(direction, speed) {
-    this.velocity.add(direction, speed)
+    this._vector.add(direction, speed)
   }
 
   setSprite(sprite) {
@@ -179,7 +184,7 @@ export default class GameObject {
         .forEach(key => {
           if (this.events.keyDown[key] && this.events.keyDown[key].actions) {
             this.events.keyDown[key].actions.forEach(action => {
-              action(this)
+              action(this, state)
             })
           }
           // keydown should only register for one step
@@ -193,7 +198,7 @@ export default class GameObject {
       Object.keys(state.keys.active).forEach(key => {
         if (this.events.keyActive[key] && this.events.keyActive[key].actions) {
           this.events.keyActive[key].actions.forEach(action => {
-            action(this)
+            action(this, state)
           })
         }
       })
@@ -204,7 +209,7 @@ export default class GameObject {
       Object.keys(state.keys.up).forEach(key => {
         if (this.events.keyUp[key] && this.events.keyUp[key].actions) {
           this.events.keyUp[key].actions.forEach(action => {
-            action(this)
+            action(this, state)
           })
         }
 
@@ -223,7 +228,7 @@ export default class GameObject {
             this.events.mouseDown[key].actions
           ) {
             this.events.mouseDown[key].actions.forEach(action => {
-              action(this)
+              action(this, state)
             })
           }
           // keydown should only register for one step
@@ -240,7 +245,7 @@ export default class GameObject {
           this.events.mouseActive[button].actions
         ) {
           this.events.mouseActive[button].actions.forEach(action => {
-            action(this)
+            action(this, state)
           })
         }
       })
@@ -254,7 +259,7 @@ export default class GameObject {
           this.events.mouseUp[button].actions
         ) {
           this.events.mouseUp[button].actions.forEach(action => {
-            action(this)
+            action(this, state)
           })
         }
 
@@ -277,14 +282,14 @@ export default class GameObject {
     }
 
     // terminal velocity
-    this.vspeed = Math.min(this.vspeed, physics.terminalVelocity)
+    this.vspeed = Math.min(this.vspeed, state.physics.terminalVelocity)
 
     // apply friction
     this.hspeed = this.hspeed * (1 - this.friction)
 
     if (this.events.step && this.events.step.actions) {
       this.events.step.actions.forEach(action => {
-        action(this)
+        action(this, state)
       })
     }
 
@@ -305,10 +310,7 @@ export default class GameObject {
       this.x = state.room.width
     }
 
-    if (this.y < 0 && this.vspeed < 0) {
-      this.vspeed = 0
-      this.y = 0
-    } else if (this.y > state.room.height && this.vspeed > 0) {
+    if (this.y > state.room.height && this.vspeed > 0) {
       this.vspeed = 0
       this.y = state.room.height
     }

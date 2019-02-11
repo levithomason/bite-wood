@@ -1,6 +1,5 @@
 import { GameImage, GameSprite, GameObject } from '../core/game/index.js'
 import * as draw from '../core/draw.js'
-import physics from '../core/physics.js'
 import state from '../core/state.js'
 import * as utils from '../core/utils.js'
 
@@ -90,9 +89,9 @@ class Player extends GameObject {
       x: x,
       y: y,
       acceleration: 0.5,
-      friction: physics.friction,
-      gravity: physics.gravity.magnitude,
-      gravityDirection: physics.gravity.direction,
+      friction: state.physics.friction,
+      gravity: state.physics.gravity.magnitude,
+      gravityDirection: state.physics.gravity.direction,
       jump: 12,
       maxSpeed: 4,
       events: {
@@ -101,7 +100,7 @@ class Player extends GameObject {
             // add friction when on the ground
             self => {
               if (self.y >= state.room.height) {
-                self.friction = physics.friction
+                self.friction = state.physics.friction
               } else {
                 self.friction = 0
               }
@@ -176,7 +175,7 @@ class Player extends GameObject {
             actions: [
               self => {
                 if (self.y >= state.room.height) {
-                  self.motionAdd(physics.DIRECTION_UP, self.jump)
+                  self.motionAdd(state.physics.DIRECTION_UP, self.jump)
                 }
               },
             ],
@@ -205,7 +204,7 @@ class Player extends GameObject {
             actions: [
               self => {
                 self.setSprite(sprPlayerWalkR)
-                self.motionAdd(physics.DIRECTION_RIGHT, self.acceleration)
+                self.motionAdd(state.physics.DIRECTION_RIGHT, self.acceleration)
               },
             ],
           },
@@ -214,7 +213,7 @@ class Player extends GameObject {
             actions: [
               self => {
                 self.setSprite(sprPlayerWalkL)
-                self.motionAdd(physics.DIRECTION_LEFT, self.acceleration)
+                self.motionAdd(state.physics.DIRECTION_LEFT, self.acceleration)
               },
             ],
           },

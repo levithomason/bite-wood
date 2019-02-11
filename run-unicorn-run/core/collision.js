@@ -18,26 +18,28 @@ export const point = (x, y, object) => {
 
 /**
  * Checks if an object is colliding with some other object.
- * @param {GameObject} object
- * @param {'any'|'solid'|GameObject} other
+ * @param {GameObject} self
+ * @param {'any'|'solid'|string|GameObject} other - If string, object display name.
  * @returns {boolean}
  */
-export const objects = (object, other) => {
-  return state.room.objects.some(b => {
+export const objects = (self, other) => {
+  const withAny = other === 'any'
+  const withSolid = other === 'solid'
+  const displayName = other.displayName || other
+
+  return state.room.objects.some(object => {
     // TODO: introduce object ids so as not to rely on instance equality, could be over network
-    if (object === b) return false
-
-    if (other === 'solid' && !b.solid) return false
-
-    if (other.displayName && other.displayName !== b.displayName) return false
+    if (self === object) return false
+    if (withSolid && !object.solid) return false
+    if (displayName !== object.displayName) return false
 
     const hasXIntersection =
-      object.boundingBoxRight >= b.boundingBoxLeft &&
-      object.boundingBoxLeft <= b.boundingBoxRight
+      self.boundingBoxRight >= object.boundingBoxLeft &&
+      self.boundingBoxLeft <= object.boundingBoxRight
 
     const hasYIntersection =
-      object.boundingBoxBottom >= b.boundingBoxTop &&
-      object.boundingBoxTop <= b.boundingBoxBottom
+      self.boundingBoxBottom >= object.boundingBoxTop &&
+      self.boundingBoxTop <= object.boundingBoxBottom
 
     return hasXIntersection && hasYIntersection
   })
