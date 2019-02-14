@@ -1,5 +1,4 @@
-import { GameAudio, GameImage, GameRoom } from '../core/game/index.js'
-import * as draw from '../core/draw.js'
+import { GameAudio, GameRoom } from '../core/game/index.js'
 import state from '../core/state.js'
 
 class Room1 extends GameRoom {
@@ -20,7 +19,9 @@ class Room1 extends GameRoom {
     this.rate = 1 / 200
   }
 
-  draw() {
+  draw(drawing) {
+    this.drawDefault(drawing)
+
     const starCount = state.room.width * state.room.height * room1.density
 
     // add any new stars we need
@@ -41,9 +42,9 @@ class Room1 extends GameRoom {
     }
 
     room1.stars.forEach(star => {
-      draw.setBorderColor('transparent')
-      draw.setFillColor(`rgba(${star.r}, ${star.g}, ${star.b}, ${star.a})`)
-      draw.rectangle(star.x, star.y, star.size, star.size)
+      drawing.setBorderColor('transparent')
+      drawing.setFillColor(`rgba(${star.r}, ${star.g}, ${star.b}, ${star.a})`)
+      drawing.rectangle(star.x, star.y, star.size, star.size)
 
       // grow in brightness then die
       if (star.dying) {

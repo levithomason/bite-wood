@@ -1,0 +1,164 @@
+@import 'global.css';
+
+/****************************
+        Sprite Editor
+****************************/
+.sprite-editor {
+  --drawing-tool-size: 64px;
+  --view-tool-size: 32px;
+  --tool-icon-space: 8px;
+  --editor-gap: 8px;
+  --divider-thickness: 2px;
+
+  display: grid;
+  grid-gap: var(--editor-gap);
+  grid-template:
+    'drawing-tools view-tools color-swatches ' auto
+    'drawing-tools stage      color-swatches' 1fr
+    '.             frames     .             ' auto /
+    auto 1fr auto;
+  padding: var(--editor-gap);
+  background: #222;
+  user-select: none;
+}
+
+/****************************
+        Frames
+****************************/
+.frames {
+  grid-area: frames;
+}
+
+/****************************
+        Color Swatches
+****************************/
+.color-swatches {
+  --swatch-size: 18px;
+  --swatches-rows: 15;
+  --swatches-per-row: 7;
+
+  grid-area: color-swatches;
+  display: grid;
+  grid-template-columns: repeat(var(--swatches-per-row), var(--swatch-size));
+  grid-template-rows: repeat(var(--swatches-rows), var(--swatch-size));
+  width: calc(var(--swatch-size) * var(--swatches-per-row));
+}
+
+.color-swatches .color-swatch {
+  width: var(--swatch-size);
+  cursor: pointer;
+  border: none;
+}
+.color-swatches .color-swatch.active,
+.color-swatches .color-swatch:hover,
+.color-swatches .color-swatch:active,
+.color-swatches .color-swatch:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px rgb(255, 255, 255), 0 0 0 2px rgb(0, 0, 0);
+  z-index: 1;
+}
+.color-swatches .color-swatch:hover {
+  z-index: 2;
+}
+
+/****************************
+            Tools
+****************************/
+.tool {
+  padding: 0;
+  margin: 0;
+  color: #ddd;
+  text-shadow: 0 0 0 #000;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.tool:hover,
+.tool:focus,
+.tool:active,
+.tool.active {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.2);
+  outline: none;
+}
+.tool .label {
+  text-transform: uppercase;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+/* Divider */
+.divider {
+  background: #fff4;
+  opacity: 0.2;
+}
+
+/* View Tools */
+.view-tools {
+  grid-area: view-tools;
+  display: flex;
+  width: 100%;
+  height: var(--view-tool-size);
+  background: rgba(255, 255, 255, 0.05);
+}
+.view-tools .tool {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--tool-icon-space);
+}
+.view-tools .tool i {
+  margin-right: var(--tool-icon-space);
+}
+
+.view-tools .divider {
+  flex: 0 0 auto;
+  height: var(--view-tool-size);
+  width: var(--divider-thickness);
+}
+
+/* Drawing Tools */
+.drawing-tools {
+  grid-area: drawing-tools;
+  display: flex;
+  flex-wrap: wrap;
+  width: calc(var(--drawing-tool-size) * 2);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.drawing-tools .divider {
+  flex: 0 0 auto;
+  width: 100%;
+  height: var(--divider-thickness);
+}
+
+.drawing-tools .tool {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--drawing-tool-size);
+  height: var(--drawing-tool-size);
+}
+
+.drawing-tools .tool .label {
+  display: block;
+  padding-top: var(--tool-icon-space);
+}
+
+/* Stage */
+.stage {
+  position: relative;
+  grid-area: stage;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #888;
+  background-image: url('data:sprite/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAKUlEQVQoU2NkYGAwZkAD////RxdiYBwKCv///4/hGUZGkNNRAeMQUAgAtxof+nLDzyUAAAAASUVORK5CYII=');
+}
+
+.stage canvas {
+  position: absolute;
+  cursor: crosshair;
+}

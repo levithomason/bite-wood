@@ -1,0 +1,32 @@
+@import url(/fonts/8bit_wonder/web/stylesheet.css);
+@import url(/fonts/mini_pixel_7/web/stylesheet.css);
+@import url(/fonts/pixelated/web/stylesheet.css);
+@import url(/fonts/Pixellari/web/stylesheet.css);
+@import url(/fonts/pixeltype/web/stylesheet.css);
+@import url(/fonts/small_pixel7/web/stylesheet.css);
+@import url(/fonts/visitor/web/stylesheet.css);
+
+html,
+body {
+  background: #000;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  font-family:
+
+    Pixellari, /*nice*/
+    /*Pixeltype, !*thin but OK*!*/
+    /*"Visitor TT1 BRK", !*10px wide but clear*!*/
+    /*"Visitor TT2 BRK",  !*wide and small*!*/
+
+    /*"8BIT WONDER", !*big and wide*!*/
+    /*"Small Pixel7", !* REALLY small*!*/
+    /*"Mini Pixel-7", !* REALLY mini*!*/
+    Pixelated, /*small and hard to read*/
+    Wingdings;
+}
+
+img,
+canvas {
+  image-rendering: pixelated;
+}

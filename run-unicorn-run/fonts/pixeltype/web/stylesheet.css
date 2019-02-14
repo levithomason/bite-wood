@@ -1,0 +1,11 @@
+@font-face {
+    font-family: 'Pixeltype';
+    src: url('Pixeltype.eot');
+    src: url('Pixeltype.eot?#iefix') format('embedded-opentype'),
+        url('Pixeltype.woff2') format('woff2'),
+        url('Pixeltype.woff') format('woff'),
+        url('Pixeltype.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+

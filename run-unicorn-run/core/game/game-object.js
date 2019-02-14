@@ -1,4 +1,3 @@
-import * as draw from '../draw.js'
 import state from '../state.js'
 import * as utils from '../utils.js'
 
@@ -65,7 +64,7 @@ export default class GameObject {
     })
 
     this.setSprite = this.setSprite.bind(this)
-    this.invokeInputEvents = this.invokeInputEvents.bind(this)
+    this.invokeEvents = this.invokeEvents.bind(this)
     this.step = this.step.bind(this)
     this.draw = this.draw.bind(this)
 
@@ -176,7 +175,7 @@ export default class GameObject {
     this.sprite.stepsThisFrame = 0
   }
 
-  invokeInputEvents() {
+  invokeEvents() {
     // KEYDOWN
     if (this.events.keyDown) {
       Object.keys(state.keys.down)
@@ -270,7 +269,7 @@ export default class GameObject {
   }
 
   step() {
-    this.invokeInputEvents()
+    this.invokeEvents()
 
     if (this.sprite && this.sprite.step) {
       this.sprite.step()
@@ -316,13 +315,24 @@ export default class GameObject {
     }
   }
 
-  draw() {
+  draw(drawing) {
     if (this.sprite) {
-      draw.sprite(this.sprite, this.x, this.y)
+      drawing.sprite(this.sprite, this.x, this.y)
 
       if (state.debug) {
-        draw.objectDebug(this)
+        drawing.objectDebug(this)
       }
+    }
+
+    if (
+      state.isPlaying &&
+      this.events &&
+      this.events.draw &&
+      this.events.draw.actions
+    ) {
+      this.events.draw.actions.forEach(action => {
+        action(this, state, drawing)
+      })
     }
   }
 }

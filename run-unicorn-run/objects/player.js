@@ -1,5 +1,4 @@
 import { GameImage, GameSprite, GameObject } from '../core/game/index.js'
-import * as draw from '../core/draw.js'
 import state from '../core/state.js'
 import * as utils from '../core/utils.js'
 
@@ -134,11 +133,11 @@ class Player extends GameObject {
 
         draw: {
           actions: [
-            self => {
+            (self, state, drawing) => {
               if (state.mouse.down.left) {
-                draw.setLineWidth(2)
-                draw.setColor('#753')
-                draw.arrow(self.x, self.y, state.mouse.x, state.mouse.y)
+                drawing.setLineWidth(2)
+                drawing.setColor('#753')
+                drawing.arrow(self.x, self.y, state.mouse.x, state.mouse.y)
               }
             },
           ],

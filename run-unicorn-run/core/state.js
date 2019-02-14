@@ -42,10 +42,10 @@ const state = {
       const persistedObjects = []
 
       if (state.room) {
-        state.room.objects = state.room.objects.filter(o => {
-          if (o.persist) persistedObjects.push(o)
+        state.room.objects = state.room.objects.filter(object => {
+          if (object.persist) persistedObjects.push(object)
 
-          return !o.persist
+          return !object.persist
         })
 
         if (state.room.backgroundMusic) {
@@ -207,18 +207,21 @@ const MOUSE_BUTTON = {
 
 /** @param {MouseEvent} e */
 const setMousePosition = e => {
-  let canvasX = 0
-  let canvasY = 0
-
-  const canvas = document.querySelector('[data-game="true"]')
-  if (canvas) {
-    const { x, y } = canvas.getBoundingClientRect()
-    canvasX = x
-    canvasY = y
+  // TODO: this doesn't let the mouse work outside of the canvas
+  // In order to track the mouse position outside of the canvas, we'd need to add the
+  // offset position of the canvas to the pageX/Y.  The canvas can be placed anywhere
+  // on the screen with CSS.  We would have to query for the canvas and add the offset.
+  // However, we don't want state to have a dependency on the canvas, since there may
+  // be multiple canvases (such as in a sprite editor).  It would also be a perf hit.
+  //
+  // By using the layerX/Y of any canvas, we get the added benefit of a proper mouse
+  // position on any canvas.
+  if (e.target.tagName !== 'CANVAS') {
+    return
   }
 
-  state.mouse.x = e.pageX - canvasX
-  state.mouse.y = e.pageY - canvasY
+  state.mouse.x = e.layerX // e.pageX - canvasX
+  state.mouse.y = e.layerY // e.pageY - canvasY
 }
 
 /** @param {MouseEvent} e */

@@ -7,7 +7,6 @@ export default class GameRoom {
     this.objects = []
 
     this.init = this.init.bind(this)
-    if (this.draw) this.draw = this.draw.bind(this)
 
     this.instanceCreate = this.instanceCreate.bind(this)
     this.instanceCount = this.instanceCount.bind(this)
@@ -16,6 +15,8 @@ export default class GameRoom {
     this.setBackgroundColor = this.setBackgroundColor.bind(this)
     this.setBackgroundMusic = this.setBackgroundMusic.bind(this)
     this.setBackgroundImage = this.setBackgroundImage.bind(this)
+
+    this.draw = this.draw.bind(this)
   }
 
   init() {
@@ -50,10 +51,10 @@ export default class GameRoom {
       : paddingRight
     const distanceTop = inRange(paddingTop, 1)
       ? this.height * paddingTop
-      : tpaddingTop
+      : paddingTop
     const distanceBottom = inRange(paddingBottom, 1)
       ? this.height * paddingBottom
-      : tpaddingBottom
+      : paddingBottom
 
     const horizontalSpace = this.width - distanceLeft - distanceRight
     const verticalSpace = this.height - distanceTop - distanceBottom
@@ -105,5 +106,22 @@ export default class GameRoom {
     audio.loop = true
     audio.volume = 0.25
     this.backgroundMusic = audio
+  }
+
+  // This is separated from draw() so that if you override the draw() method
+  // in a subclass, you can easily draw the default room contents.  Otherwise,
+  // the subclass needs to duplicate this logic.
+  drawDefault(drawing) {
+    if (this.backgroundColor) {
+      drawing.fill(this.backgroundColor)
+    }
+
+    if (this.backgroundImage) {
+      drawing.image(this.backgroundImage)
+    }
+  }
+
+  draw(drawing) {
+    this.drawDefault(drawing)
   }
 }
