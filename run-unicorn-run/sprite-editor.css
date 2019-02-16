@@ -38,7 +38,8 @@ button {
     'header        header     header        ' auto
     'drawing-tools view-tools view-tools    ' auto
     'drawing-tools stage      color-swatches' 1fr
-    'drawing-tools frames     color-swatches' auto /
+    'drawing-tools frames     color-swatches' auto
+    'files         files      files         ' auto /
     auto 1fr auto;
   padding: var(--editor-gap);
   background: var(--ui-bg);
@@ -233,4 +234,12 @@ button {
 ****************************/
 .frames {
   grid-area: frames;
+}
+
+/****************************
+           Files
+****************************/
+.files {
+  grid-area: files;
+  color: #fff;
 }

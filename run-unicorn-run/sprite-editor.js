@@ -4,7 +4,6 @@ import {
   html,
   render,
 } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module'
-
 import tinycolor from './tinycolor.js'
 
 // ----------------------------------------
@@ -357,6 +356,28 @@ function frames(state) {
 }
 
 // ----------------------------------------
+// Files
+// ----------------------------------------
+
+function files(state) {
+  const spriteStates = Object.keys(localStorage).map(key => {
+    return JSON.parse(localStorage[key])
+  })
+
+  if (!spriteStates.length) {
+    return null
+  }
+
+  console.log(spriteStates)
+  return html`
+    <div class="files">
+      <h1>Files</h1>
+      ${spriteStates.map(spriteState => spriteState.name)}
+    </div>
+  `
+}
+
+// ----------------------------------------
 // Sprite Editor
 // ----------------------------------------
 
@@ -417,7 +438,7 @@ function spriteEditor(state) {
         ${drawingCanvas(state)} ${gridCanvas(state)}
       </div>
 
-      ${colorSwatches(state)} ${frames(state)}
+      ${colorSwatches(state)} ${frames(state)} ${files(state)}
     </div>
   `
 }
@@ -443,6 +464,14 @@ const ctx = () => {
   return canvas.getContext('2d')
 }
 
+const drawDataOnCanvas = state => {
+  ctx().putImageData(state.image.imageData, 0, 0)
+}
+
+const clearCanvas = state => {
+  ctx().clearRect(0, 0, state.width, state.height)
+}
+
 const VIEW_TOOLS = {
   grid: {
     key: 'grid',
@@ -461,13 +490,8 @@ const DRAWING_TOOLS = {
     icon: 'pencil-alt',
     label: 'Pencil',
     draw(x, y, state) {
-      const coloredPixel = new ImageData(
-        new Uint8ClampedArray(state.color),
-        1,
-        1,
-      )
-
-      ctx().putImageData(coloredPixel, x, y)
+      state.image.setPixel(x, y, state.color)
+      drawDataOnCanvas(state)
     },
     onStart: (x, y, state) => {
       DRAWING_TOOLS.pencil.draw(x, y, state)
@@ -616,6 +640,18 @@ function setState(partial = {}) {
   console.log('setState', state)
 
   renderHTML(spriteEditor(state))
+  saveSprite(state)
+}
+
+// ----------------------------------------
+// Storage
+// ----------------------------------------
+function saveSprite(state) {
+  const imageData = ctx().getImageData(0, 0, state.width, state.height)
+  localStorage.setItem(
+    state.name,
+    JSON.stringify({ name: state.name, imageData }, null, 2),
+  )
 }
 
 function undo() {
