@@ -255,7 +255,7 @@ function viewTools(state) {
 
       <div class="divider"></div>
 
-      ${viewTool(state, { key: 'clear', icon: 'times-circle', label: 'Clear' })}
+      ${viewTool(state, VIEW_TOOLS.clear)}
       ${viewTool(state, VIEW_TOOLS.grid)}
     </div>
   `
@@ -473,6 +473,15 @@ const clearCanvas = state => {
 }
 
 const VIEW_TOOLS = {
+  clear: {
+    key: 'clear',
+    icon: 'times-circle',
+    label: 'Clear',
+    onClick: (e, state) => {
+      ctx().clearRect(0, 0, state.width, state.height)
+    },
+  },
+
   grid: {
     key: 'grid',
     icon: 'th',

@@ -31,7 +31,7 @@ export const objects = (self, other) => {
     // TODO: introduce object ids so as not to rely on instance equality, could be over network
     if (self === object) return false
     if (withSolid && !object.solid) return false
-    if (displayName !== object.displayName) return false
+    if (!withAny && displayName !== object.displayName) return false
 
     const hasXIntersection =
       self.boundingBoxRight >= object.boundingBoxLeft &&
