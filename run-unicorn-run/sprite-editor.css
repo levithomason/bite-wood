@@ -35,11 +35,11 @@ button {
   grid-gap: var(--editor-gap);
   justify-content: center;
   grid-template:
-    'header        header     header        ' auto
-    'drawing-tools view-tools view-tools    ' auto
-    'drawing-tools stage      color-swatches' 1fr
-    'drawing-tools frames     color-swatches' auto
-    'files         files      files         ' auto /
+    'header        header       header        ' auto
+    'drawing-tools action-tools action-tools    ' auto
+    'drawing-tools stage        color-swatches' 1fr
+    'drawing-tools frames       color-swatches' auto
+    'files         files        files         ' auto /
     auto 1fr auto;
   padding: var(--editor-gap);
   background: var(--ui-bg);
@@ -143,27 +143,27 @@ button {
 }
 
 /****************************
-         View Tools
+        Action Tools
 ****************************/
 
-.view-tools {
-  grid-area: view-tools;
+.action-tools {
+  grid-area: action-tools;
   display: flex;
   padding: var(--toolbar-padding);
   width: 100%;
   background: var(--ui-panel-bg);
 }
-.view-tools .tool {
+.action-tools .tool {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
 }
-.view-tools .tool .label {
+.action-tools .tool .label {
   margin-right: var(--tool-icon-space);
 }
 
-.view-tools .divider {
+.action-tools .divider {
   flex: 0 0 auto;
   border-left: var(--tool-divider-border);
 }

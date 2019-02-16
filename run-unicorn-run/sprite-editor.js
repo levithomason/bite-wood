@@ -10,7 +10,7 @@ import tinycolor from './tinycolor.js'
 // Sprite Image
 // ----------------------------------------
 
-class SpriteImage {
+class ImmutableSpriteImage {
   /**
    * @param {number} width
    * @param {number} height
@@ -21,10 +21,14 @@ class SpriteImage {
     height = 32,
     array = new Uint8ClampedArray(4 * width * height),
   ) {
-    this._imageData = new ImageData(array, width, height)
+    Object.defineProperty(this, '_imageData', {
+      value: new ImageData(array, width, height),
+      enumerable: false,
+      configurable: false,
+      writable: false,
+    })
   }
 
-  // TODO allow set width/height and clip/fill imageData accordingly
   get width() {
     return this._imageData.width
   }
@@ -33,51 +37,58 @@ class SpriteImage {
     return this._imageData.height
   }
 
+  /** @returns {Uint8ClampedArray} */
+  get data() {
+    return this._imageData.data.slice()
+  }
+
   get imageData() {
-    return this._imageData
-  }
-
-  set imageData(val) {
-    this._imageData = val
-  }
-
-  mapPixels(cb = x => x) {
-    const data = this.imageData.data
-    const length = this.imageData.data.length
-    const array = new Uint8ClampedArray(length)
-
-    for (let i = 0; i < length; i += 4) {
-      const pixel = cb(
-        [
-          data[i + 0], // r
-          data[i + 1], // g
-          data[i + 2], // b
-          data[i + 3], // a
-        ],
-        i,
-        data,
-      )
-
-      if (Array.isArray(pixel)) {
-        array[i + 0] = pixel[0]
-        array[i + 1] = pixel[1]
-        array[i + 2] = pixel[2]
-        array[i + 3] = pixel[3]
-      }
-    }
-
-    return new ImageData(array, this.width, this.height)
+    return new ImageData(this.data, this.width, this.height)
   }
 
   clear() {
-    this.fill(0, 0, 0, 0)
+    return this.fill(0, 0, 0, 0)
+  }
+
+  clone() {
+    return new ImmutableSpriteImage(this.width, this.height, this.data)
   }
 
   fill(r = 0, g = 0, b = 0, a = 255) {
-    this.imageData = this.mapPixels(() => [r, g, b, a])
+    return this.mapDataByPixel(() => [r, g, b, a])
+  }
+
+  getIndexFromXY(x, y) {
+    return (y * this.width + x) * 4
+  }
+
+  getPixel(x, y) {
+    const i = this.getIndexFromXY(x, y)
+    const dataCopy = this.data
+
+    return [
+      dataCopy[i + 1], // r
+      dataCopy[i + 2], // g
+      dataCopy[i + 3], // b
+      dataCopy[i + 0], // a
+    ]
+  }
+
+  drawPixel(x, y, [r, g, b, a]) {
+    const i = this.getIndexFromXY(x, y)
+    const dataCopy = this.data
+
+    dataCopy[i + 0] = r
+    dataCopy[i + 1] = g
+    dataCopy[i + 2] = b
+    dataCopy[i + 3] = a
+
+    return new ImmutableSpriteImage(this.width, this.height, dataCopy)
   }
 
   line(x1, y1, x2, y2, [r, g, b, a]) {
+    let clone = this.clone()
+
     const dx = Math.abs(x2 - x1)
     const sx = x1 < x2 ? 1 : -1
     const dy = -Math.abs(y2 - y1)
@@ -88,7 +99,7 @@ class SpriteImage {
     let er = dx + dy
 
     while (!done) {
-      this.setPixel(x1, y1, [r, g, b, a])
+      clone = clone.drawPixel(x1, y1, [r, g, b, a])
 
       if (x1 === x2 && y1 === y2) {
         done = true
@@ -104,45 +115,56 @@ class SpriteImage {
         }
       }
     }
+
+    return clone
   }
 
-  getIndexFromXY(x, y) {
-    return (y * this.width + x) * 4
+  mapDataByPixel(cb = x => x) {
+    const data = this._imageData.data
+    const length = this._imageData.data.length
+    const array = new Uint8ClampedArray(length)
+
+    for (let i = 0; i < length; i += 4) {
+      const [r = 0, g = 0, b = 0, a = 0] =
+        cb(
+          [
+            data[i + 0], // r
+            data[i + 1], // g
+            data[i + 2], // b
+            data[i + 3], // a
+          ],
+          i,
+          data,
+        ) || []
+
+      array[i + 0] = r
+      array[i + 1] = g
+      array[i + 2] = b
+      array[i + 3] = a
+    }
+
+    return new ImmutableSpriteImage(this.width, this.height, array)
   }
 
-  getPixel(x, y) {
-    const i = this.getIndexFromXY(x, y)
+  /**
+   * @param {Uint8ClampedArray} array
+   * @returns {ImmutableSpriteImage}
+   */
+  drawData(array) {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const { width, height } = this
 
-    return [
-      this.imageData.data[i + 0], // r
-      this.imageData.data[i + 1], // g
-      this.imageData.data[i + 2], // b
-      this.imageData.data[i + 3], // a
-    ]
-  }
+    const imageData = new ImageData(array, width, height)
+    ctx.putImageData(imageData, 0, 0)
 
-  setPixel(x, y, [r, g, b, a]) {
-    const i = this.getIndexFromXY(x, y)
+    const { data } = ctx.getImageData(0, 0, width, height)
 
-    this.imageData.data[i + 0] = r
-    this.imageData.data[i + 1] = g
-    this.imageData.data[i + 2] = b
-    this.imageData.data[i + 3] = a
-  }
-
-  draw(array) {
-    this.imageData = this.mapPixels((pixel, i) => {
-      return [
-        array[i + 0], // r
-        array[i + 1], // g
-        array[i + 2], // b
-        array[i + 3], // a
-      ]
-    })
+    return new ImmutableSpriteImage(width, height, data)
   }
 }
 
-window.SpriteImage = SpriteImage
+window.SpriteImage = ImmutableSpriteImage
 
 // ----------------------------------------
 // Name
@@ -221,12 +243,12 @@ function drawingTools(state) {
 }
 
 // ----------------------------------------
-// View Tools
+// Action Tools
 // ----------------------------------------
-function viewTool(state, { key, icon, label, onClick, activeWhen }) {
+function actionTool(state, { key, icon, label, onClick, activeWhen }) {
   return html`
     <button
-      ?disabled=${!VIEW_TOOLS[key]}
+      ?disabled=${!ACTION_TOOLS[key]}
       class="tool ${classMap({ active: activeWhen && activeWhen(state) })}"
       @click="${e => onClick(e, state)}"
     >
@@ -242,21 +264,21 @@ function viewTool(state, { key, icon, label, onClick, activeWhen }) {
   `
 }
 
-function viewTools(state) {
+function actionTools(state) {
   return html`
-    <div class="view-tools">
-      ${viewTool(state, { key: 'undo', icon: 'undo' })}
-      ${viewTool(state, { key: 'redo', icon: 'redo' })}
+    <div class="action-tools">
+      ${actionTool(state, { key: 'undo', icon: 'undo' })}
+      ${actionTool(state, { key: 'redo', icon: 'redo' })}
 
       <div class="divider"></div>
 
-      ${viewTool(state, { key: 'zoom-in', icon: 'search-plus' })}
-      ${viewTool(state, { key: 'zoom-out', icon: 'search-minus' })}
+      ${actionTool(state, { key: 'zoom-in', icon: 'search-plus' })}
+      ${actionTool(state, { key: 'zoom-out', icon: 'search-minus' })}
 
       <div class="divider"></div>
 
-      ${viewTool(state, VIEW_TOOLS.clear)}
-      ${viewTool(state, VIEW_TOOLS.grid)}
+      ${actionTool(state, ACTION_TOOLS.clear)}
+      ${actionTool(state, ACTION_TOOLS.grid)}
     </div>
   `
 }
@@ -368,7 +390,6 @@ function files(state) {
     return null
   }
 
-  console.log(spriteStates)
   return html`
     <div class="files">
       <h1>Files</h1>
@@ -432,7 +453,7 @@ function spriteEditor(state) {
       <a class="header">
         ${spriteName(state)}
       </a>
-      ${drawingTools(state)} ${viewTools(state)}
+      ${drawingTools(state)} ${actionTools(state)}
 
       <div class="stage">
         ${drawingCanvas(state)} ${gridCanvas(state)}
@@ -464,21 +485,17 @@ const ctx = () => {
   return canvas.getContext('2d')
 }
 
-const drawDataOnCanvas = state => {
+const drawImageToCanvas = () => {
   ctx().putImageData(state.image.imageData, 0, 0)
 }
 
-const clearCanvas = state => {
-  ctx().clearRect(0, 0, state.width, state.height)
-}
-
-const VIEW_TOOLS = {
+const ACTION_TOOLS = {
   clear: {
     key: 'clear',
     icon: 'times-circle',
     label: 'Clear',
     onClick: (e, state) => {
-      ctx().clearRect(0, 0, state.width, state.height)
+      setState({ image: state.image.clear() })
     },
   },
 
@@ -494,40 +511,18 @@ const VIEW_TOOLS = {
 }
 
 const DRAWING_TOOLS = {
-  pencil: {
-    key: 'pencil',
-    icon: 'pencil-alt',
-    label: 'Pencil',
-    draw(x, y, state) {
-      state.image.setPixel(x, y, state.color)
-      drawDataOnCanvas(state)
-    },
-    onStart: (x, y, state) => {
-      DRAWING_TOOLS.pencil.draw(x, y, state)
-    },
-    onMove: (x, y, state) => {
-      DRAWING_TOOLS.pencil.draw(x, y, state)
-    },
-  },
-
   eraser: {
     key: 'eraser',
     icon: 'eraser',
     label: 'Eraser',
     draw(x, y, state) {
-      const emptyPixel = new ImageData(
-        new Uint8ClampedArray([0, 0, 0, 0]),
-        1,
-        1,
-      )
-
-      ctx().putImageData(emptyPixel, x, y)
+      setState({ image: state.image.drawPixel(x, y, [0, 0, 0, 0]) })
     },
     onStart: (x, y, state) => {
-      DRAWING_TOOLS.eraser.draw(x, y)
+      DRAWING_TOOLS.eraser.draw(x, y, state)
     },
     onMove: (x, y, state) => {
-      DRAWING_TOOLS.eraser.draw(x, y)
+      DRAWING_TOOLS.eraser.draw(x, y, state)
     },
   },
 
@@ -536,25 +531,16 @@ const DRAWING_TOOLS = {
     icon: 'slash',
     label: 'Line',
     draw(x2, y2, state) {
-      const { startX, startY, startData, image } = DRAWING_TOOLS.line
-      image.clear()
-      image.draw(startData)
-      image.line(startX, startY, x2, y2, state.color)
+      const { startX, startY, startData } = DRAWING_TOOLS.line
 
-      ctx().clearRect(0, 0, state.width, state.height)
-      ctx().putImageData(image.imageData, 0, 0)
+      let image = new ImmutableSpriteImage(state.width, state.height, startData)
+
+      setState({ image: image.line(startX, startY, x2, y2, state.color) })
     },
-
     onStart: (x, y, state) => {
       DRAWING_TOOLS.line.startX = x
       DRAWING_TOOLS.line.startY = y
-      DRAWING_TOOLS.line.startData = ctx().getImageData(
-        0,
-        0,
-        state.width,
-        state.height,
-      ).data
-      DRAWING_TOOLS.line.image = new SpriteImage(state.width, state.height)
+      DRAWING_TOOLS.line.startData = state.image.data
 
       DRAWING_TOOLS.line.draw(x, y, state)
     },
@@ -565,40 +551,49 @@ const DRAWING_TOOLS = {
       DRAWING_TOOLS.line.draw(x, y, state)
     },
   },
+
+  pencil: {
+    key: 'pencil',
+    icon: 'pencil-alt',
+    label: 'Pencil',
+    draw(x, y, state) {
+      setState({ image: state.image.drawPixel(x, y, state.color) })
+    },
+    onStart: (x, y, state) => {
+      DRAWING_TOOLS.pencil.draw(x, y, state)
+    },
+    onMove: (x, y, state) => {
+      DRAWING_TOOLS.pencil.draw(x, y, state)
+    },
+  },
 }
 
 document.addEventListener('mousedown', e => {
   if (e.target.classList.contains('drawing-canvas')) {
     setState({ isDrawing: true })
     const tool = DRAWING_TOOLS[state.tool]
+    const x = Math.floor(e.layerX / state.scale)
+    const y = Math.floor(e.layerY / state.scale)
 
-    if (tool.onStart) {
-      const x = Math.floor(e.layerX / state.scale)
-      const y = Math.floor(e.layerY / state.scale)
-      tool.onStart(x, y, state)
-    }
+    if (tool.onStart) tool.onStart(x, y, state)
   }
 })
 document.addEventListener('mousemove', e => {
   if (state.isDrawing && e.target.classList.contains('drawing-canvas')) {
     const tool = DRAWING_TOOLS[state.tool]
+    const x = Math.floor(e.layerX / state.scale)
+    const y = Math.floor(e.layerY / state.scale)
 
-    if (tool.onMove) {
-      const x = Math.floor(e.layerX / state.scale)
-      const y = Math.floor(e.layerY / state.scale)
-      tool.onMove(x, y, state)
-    }
+    if (tool.onMove) tool.onMove(x, y, state)
   }
 })
 document.addEventListener('mouseup', e => {
   if (state.isDrawing) {
     const tool = DRAWING_TOOLS[state.tool]
+    const x = Math.floor(e.layerX / state.scale)
+    const y = Math.floor(e.layerY / state.scale)
 
-    if (tool.onEnd) {
-      const x = Math.floor(e.layerX / state.scale)
-      const y = Math.floor(e.layerY / state.scale)
-      tool.onEnd(x, y, state)
-    }
+    if (tool.onEnd) tool.onEnd(x, y, state)
 
     setState({ isDrawing: false })
   }
@@ -634,7 +629,7 @@ let state = {
   scale: 32,
   width: INITIAL_WIDTH,
   height: INITIAL_HEIGHT,
-  image: new SpriteImage(INITIAL_WIDTH * INITIAL_HEIGHT * 4),
+  image: new ImmutableSpriteImage(INITIAL_WIDTH, INITIAL_HEIGHT),
 }
 window.state = state
 
@@ -649,6 +644,7 @@ function setState(partial = {}) {
   console.log('setState', state)
 
   renderHTML(spriteEditor(state))
+  drawImageToCanvas()
   saveSprite(state)
 }
 
