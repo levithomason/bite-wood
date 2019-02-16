@@ -43,3 +43,10 @@ Set apple to random room.width...
 
 ## Drawing
 Allow options to drawing methods for setting the style on a one-off shape.
+
+## State
+Currently state.js listens for keyboard and mouse events globally.  However, when
+importing GameDrawing into the sprite editor, those listeners are invoked... so "p"
+attempts and fails to pause/play the game state.
+
+This is because the import chain GameDrawing > collision > state. 

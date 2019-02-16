@@ -138,7 +138,6 @@ export default class GameDrawing {
   }
 
   pixel(x, y) {
-    debugger
     this._ctx.fillRect(x, y, 1, 1)
   }
 

@@ -8,10 +8,6 @@ button {
   cursor: pointer;
   outline: none;
 }
-button[disabled] {
-  pointer-events: none;
-  opacity: 0.4;
-}
 
 /****************************
         Sprite Editor
@@ -69,9 +65,8 @@ button[disabled] {
   padding: 0;
   margin: var(--tool-margin);
   color: #eee;
-  text-shadow: -1px -1px 0 #0003,
-    1px -1px 0 #0003, -1px 1px 0 #0003,
-    1px 1px 0 #0003;
+  text-shadow: -1px -1px 0 #0003, 1px -1px 0 #0003,
+    -1px 1px 0 #0003, 1px 1px 0 #0003;
 }
 .tool:hover,
 .tool:active,
@@ -80,9 +75,7 @@ button[disabled] {
   background: var(--ui-darker);
   outline: none;
 }
-.tool:active,
 .tool.active,
-.tool:active .label,
 .tool.active .label {
   color: var(--ui-active);
 }
@@ -121,15 +114,14 @@ button[disabled] {
       var(--toolbar-padding) * 2 +
       var(--tool-margin) * 4
   );
+  height: fit-content;
   background: var(--ui-panel-bg);
 }
 
 .drawing-tools .divider {
   flex: 0 0 auto;
   width: 100%;
-  border-top: var(
-    --tool-divider-border
-  );
+  border-top: var(--tool-divider-border);
 }
 
 .drawing-tools .tool {
@@ -172,9 +164,7 @@ button[disabled] {
 
 .view-tools .divider {
   flex: 0 0 auto;
-  border-left: var(
-    --tool-divider-border
-  );
+  border-left: var(--tool-divider-border);
 }
 
 /****************************
@@ -186,12 +176,21 @@ button[disabled] {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 16px;
   background-color: var(--ui-darkest);
 }
 
-.stage canvas {
+.stage .drawing-canvas {
   background-image: url('data:sprite/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAKUlEQVQoU2NkYGAwZkAD////RxdiYBwKCv///4/hGUZGkNNRAeMQUAgAtxof+nLDzyUAAAAASUVORK5CYII=');
   cursor: crosshair;
+  background-color: #fff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.stage .grid-canvas {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
 }
 
 /****************************
@@ -200,7 +199,6 @@ button[disabled] {
 
 .color-swatches {
   --swatch-size: 18px;
-  --swatches-rows: 12;
   --swatches-per-row: 9;
 
   grid-area: color-swatches;
@@ -209,25 +207,21 @@ button[disabled] {
     var(--swatches-per-row),
     var(--swatch-size)
   );
-  grid-template-rows: repeat(
-    var(--swatches-rows),
-    var(--swatch-size)
-  );
+  grid-auto-rows: var(--swatch-size);
   width: calc(
-    var(--swatch-size) *
-      var(--swatches-per-row)
+    var(--swatch-size) * var(--swatches-per-row)
   );
 }
 
 .color-swatches .color-swatch {
   width: var(--swatch-size);
+  height: var(--swatch-size);
 }
-.color-swatches .color-swatch.active,
 .color-swatches .color-swatch:hover,
 .color-swatches .color-swatch:active,
+.color-swatches .color-swatch.active,
 .color-swatches .color-swatch:focus {
-  box-shadow: 0 0 0 2px #fff,
-    0 0 0 4px #000;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
   z-index: 1;
 }
 .color-swatches .color-swatch:hover {

@@ -30,3 +30,9 @@ img,
 canvas {
   image-rendering: pixelated;
 }
+
+.disabled,
+[disabled] {
+  pointer-events: none;
+  opacity: 0.3;
+}
