@@ -1,136 +1,135 @@
 @import 'global.css';
 
+/* Button style */
+button {
+  background: none;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  outline: none;
+}
+button[disabled] {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
 /****************************
         Sprite Editor
 ****************************/
 .sprite-editor {
-  --drawing-tool-size: 64px;
-  --view-tool-size: 32px;
-  --tool-icon-space: 8px;
   --editor-gap: 8px;
-  --divider-thickness: 2px;
+
+  --ui-active: burlywood;
+  --ui-darkest: #282828;
+  --ui-darker: #383838;
+  --ui-dark: #484848;
+
+  --ui-bg: var(--ui-darker);
+  --ui-stage-bg: var(--ui-darkest);
+  --ui-panel-bg: var(--ui-dark);
+
+  --toolbar-padding: 2px;
+  --tool-margin: 2px;
+  --tool-icon-space: 8px;
+  --tool-divider-border: 1px dotted
+    var(--ui-darker);
+  --drawing-tool-size: 56px;
 
   display: grid;
   grid-gap: var(--editor-gap);
+  justify-content: center;
   grid-template:
-    'drawing-tools view-tools color-swatches ' auto
+    'header        header     header        ' auto
+    'drawing-tools view-tools view-tools    ' auto
     'drawing-tools stage      color-swatches' 1fr
-    '.             frames     .             ' auto /
+    'drawing-tools frames     color-swatches' auto /
     auto 1fr auto;
   padding: var(--editor-gap);
-  background: #222;
+  background: var(--ui-bg);
   user-select: none;
 }
 
 /****************************
-        Frames
+            Header
 ****************************/
-.frames {
-  grid-area: frames;
+.header {
+  grid-area: header;
+  font-size: 28px;
+  color: #fff;
+  text-decoration: underline;
+}
+.header i {
+  text-decoration: inherit;
 }
 
 /****************************
-        Color Swatches
-****************************/
-.color-swatches {
-  --swatch-size: 18px;
-  --swatches-rows: 15;
-  --swatches-per-row: 7;
-
-  grid-area: color-swatches;
-  display: grid;
-  grid-template-columns: repeat(var(--swatches-per-row), var(--swatch-size));
-  grid-template-rows: repeat(var(--swatches-rows), var(--swatch-size));
-  width: calc(var(--swatch-size) * var(--swatches-per-row));
-}
-
-.color-swatches .color-swatch {
-  width: var(--swatch-size);
-  cursor: pointer;
-  border: none;
-}
-.color-swatches .color-swatch.active,
-.color-swatches .color-swatch:hover,
-.color-swatches .color-swatch:active,
-.color-swatches .color-swatch:focus {
-  outline: none;
-  box-shadow: 0 0 0 1px rgb(255, 255, 255), 0 0 0 2px rgb(0, 0, 0);
-  z-index: 1;
-}
-.color-swatches .color-swatch:hover {
-  z-index: 2;
-}
-
-/****************************
-            Tools
+      All Tool Buttons
 ****************************/
 .tool {
   padding: 0;
-  margin: 0;
-  color: #ddd;
-  text-shadow: 0 0 0 #000;
-  background: none;
-  border: none;
-  cursor: pointer;
+  margin: var(--tool-margin);
+  color: #eee;
+  text-shadow: -1px -1px 0 #0003,
+    1px -1px 0 #0003, -1px 1px 0 #0003,
+    1px 1px 0 #0003;
 }
 .tool:hover,
-.tool:focus,
 .tool:active,
-.tool.active {
-  color: #fff;
-  background: rgba(0, 0, 0, 0.2);
+.tool.active,
+.tool:focus {
+  background: var(--ui-darker);
   outline: none;
 }
+.tool:active,
+.tool.active,
+.tool:active .label,
+.tool.active .label {
+  color: var(--ui-active);
+}
+
+.tool i {
+  font-size: calc(
+    var(--drawing-tool-size) * 0.333
+  );
+}
+
 .tool .label {
   text-transform: uppercase;
   font-size: 12px;
-  opacity: 0.75;
+  color: #ccc;
 }
 
-/* Divider */
+/****************************
+           Divider
+****************************/
+
 .divider {
-  background: #fff4;
-  opacity: 0.2;
+  background: var(--ui-bg);
 }
 
-/* View Tools */
-.view-tools {
-  grid-area: view-tools;
-  display: flex;
-  width: 100%;
-  height: var(--view-tool-size);
-  background: rgba(255, 255, 255, 0.05);
-}
-.view-tools .tool {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  padding: 0 var(--tool-icon-space);
-}
-.view-tools .tool i {
-  margin-right: var(--tool-icon-space);
-}
+/****************************
+       Drawing Tools
+****************************/
 
-.view-tools .divider {
-  flex: 0 0 auto;
-  height: var(--view-tool-size);
-  width: var(--divider-thickness);
-}
-
-/* Drawing Tools */
 .drawing-tools {
   grid-area: drawing-tools;
   display: flex;
+  padding: var(--toolbar-padding);
   flex-wrap: wrap;
-  width: calc(var(--drawing-tool-size) * 2);
-  background: rgba(255, 255, 255, 0.05);
+  width: calc(
+    var(--drawing-tool-size) * 2 +
+      var(--toolbar-padding) * 2 +
+      var(--tool-margin) * 4
+  );
+  background: var(--ui-panel-bg);
 }
 
 .drawing-tools .divider {
   flex: 0 0 auto;
   width: 100%;
-  height: var(--divider-thickness);
+  border-top: var(
+    --tool-divider-border
+  );
 }
 
 .drawing-tools .tool {
@@ -142,23 +141,102 @@
   height: var(--drawing-tool-size);
 }
 
-.drawing-tools .tool .label {
-  display: block;
-  padding-top: var(--tool-icon-space);
+.tool i {
+  margin: var(--tool-icon-space);
 }
 
-/* Stage */
+.drawing-tools .tool .label {
+  display: block;
+}
+
+/****************************
+         View Tools
+****************************/
+
+.view-tools {
+  grid-area: view-tools;
+  display: flex;
+  padding: var(--toolbar-padding);
+  width: 100%;
+  background: var(--ui-panel-bg);
+}
+.view-tools .tool {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+.view-tools .tool .label {
+  margin-right: var(--tool-icon-space);
+}
+
+.view-tools .divider {
+  flex: 0 0 auto;
+  border-left: var(
+    --tool-divider-border
+  );
+}
+
+/****************************
+            Stage
+****************************/
 .stage {
   position: relative;
   grid-area: stage;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #888;
-  background-image: url('data:sprite/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAKUlEQVQoU2NkYGAwZkAD////RxdiYBwKCv///4/hGUZGkNNRAeMQUAgAtxof+nLDzyUAAAAASUVORK5CYII=');
+  background-color: var(--ui-darkest);
 }
 
 .stage canvas {
-  position: absolute;
+  background-image: url('data:sprite/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAKUlEQVQoU2NkYGAwZkAD////RxdiYBwKCv///4/hGUZGkNNRAeMQUAgAtxof+nLDzyUAAAAASUVORK5CYII=');
   cursor: crosshair;
+}
+
+/****************************
+       Color Swatches
+****************************/
+
+.color-swatches {
+  --swatch-size: 18px;
+  --swatches-rows: 12;
+  --swatches-per-row: 9;
+
+  grid-area: color-swatches;
+  display: grid;
+  grid-template-columns: repeat(
+    var(--swatches-per-row),
+    var(--swatch-size)
+  );
+  grid-template-rows: repeat(
+    var(--swatches-rows),
+    var(--swatch-size)
+  );
+  width: calc(
+    var(--swatch-size) *
+      var(--swatches-per-row)
+  );
+}
+
+.color-swatches .color-swatch {
+  width: var(--swatch-size);
+}
+.color-swatches .color-swatch.active,
+.color-swatches .color-swatch:hover,
+.color-swatches .color-swatch:active,
+.color-swatches .color-swatch:focus {
+  box-shadow: 0 0 0 2px #fff,
+    0 0 0 4px #000;
+  z-index: 1;
+}
+.color-swatches .color-swatch:hover {
+  z-index: 2;
+}
+
+/****************************
+           Frames
+****************************/
+.frames {
+  grid-area: frames;
 }

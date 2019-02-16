@@ -28,7 +28,7 @@ class Game {
   }
 
   _draw() {
-    this.drawing.erase()
+    this.drawing.clear()
 
     if (this.state.room) {
       if (this.state.room.draw) {

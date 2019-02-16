@@ -4,6 +4,9 @@ import * as collision from '../collision.js'
 
 export default class GameDrawing {
   constructor(width, height) {
+    if (typeof width === 'undefined' || typeof height === 'undefined') {
+      throw new Error('GameDrawing constructor missing width or height.')
+    }
     this.canvas = document.createElement('canvas')
     this.canvas.setAttribute('width', width)
     this.canvas.setAttribute('height', height)
@@ -21,9 +24,11 @@ export default class GameDrawing {
     this.setBorderColor = this.setBorderColor.bind(this)
     this.setFillColor = this.setFillColor.bind(this)
     this.setLineWidth = this.setLineWidth.bind(this)
-    this.erase = this.erase.bind(this)
+    this.clear = this.clear.bind(this)
     this.image = this.image.bind(this)
+    this.imageData = this.imageData.bind(this)
     this.sprite = this.sprite.bind(this)
+    this.fill = this.fill.bind(this)
     this.pixel = this.pixel.bind(this)
     this.line = this.line.bind(this)
     this.arrow = this.arrow.bind(this)
@@ -69,8 +74,13 @@ export default class GameDrawing {
   //
   // Erase
   //
-  erase() {
-    this._ctx.clearRect(0, 0, this._ctx.canvas.width, this._ctx.canvas.height)
+  clear(
+    x1 = 0,
+    y1 = 0,
+    w = this._ctx.canvas.width,
+    h = this._ctx.canvas.height,
+  ) {
+    this._ctx.clearRect(x1, y1, w, h)
   }
 
   //
@@ -128,6 +138,7 @@ export default class GameDrawing {
   }
 
   pixel(x, y) {
+    debugger
     this._ctx.fillRect(x, y, 1, 1)
   }
 
