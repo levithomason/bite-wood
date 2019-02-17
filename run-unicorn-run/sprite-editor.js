@@ -4,175 +4,57 @@ import {
   html,
   render,
 } from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module'
+
+import storage from './storage.js'
 import tinycolor from './tinycolor.js'
+import * as imageDataUtils from './imageDataUtils.js'
 
 // ----------------------------------------
-// Sprite Image
+// Save / Load
 // ----------------------------------------
 
-class ImmutableSpriteImage {
-  /**
-   * @param {number} width
-   * @param {number} height
-   * @param {Uint8ClampedArray} array
-   */
-  constructor(
-    width = 32,
-    height = 32,
-    array = new Uint8ClampedArray(4 * width * height),
-  ) {
-    Object.defineProperty(this, '_imageData', {
-      value: new ImageData(array, width, height),
-      enumerable: false,
-      configurable: false,
-      writable: false,
-    })
-  }
-
-  get width() {
-    return this._imageData.width
-  }
-
-  get height() {
-    return this._imageData.height
-  }
-
-  /** @returns {Uint8ClampedArray} */
-  get data() {
-    return this._imageData.data.slice()
-  }
-
-  get imageData() {
-    return new ImageData(this.data, this.width, this.height)
-  }
-
-  clear() {
-    return this.fill(0, 0, 0, 0)
-  }
-
-  clone() {
-    return new ImmutableSpriteImage(this.width, this.height, this.data)
-  }
-
-  fill(r = 0, g = 0, b = 0, a = 255) {
-    return this.mapDataByPixel(() => [r, g, b, a])
-  }
-
-  getIndexFromXY(x, y) {
-    return (y * this.width + x) * 4
-  }
-
-  getPixel(x, y) {
-    const i = this.getIndexFromXY(x, y)
-    const dataCopy = this.data
-
-    return [
-      dataCopy[i + 1], // r
-      dataCopy[i + 2], // g
-      dataCopy[i + 3], // b
-      dataCopy[i + 0], // a
-    ]
-  }
-
-  drawPixel(x, y, [r, g, b, a]) {
-    const i = this.getIndexFromXY(x, y)
-    const dataCopy = this.data
-
-    dataCopy[i + 0] = r
-    dataCopy[i + 1] = g
-    dataCopy[i + 2] = b
-    dataCopy[i + 3] = a
-
-    return new ImmutableSpriteImage(this.width, this.height, dataCopy)
-  }
-
-  line(x1, y1, x2, y2, [r, g, b, a]) {
-    let clone = this.clone()
-
-    const dx = Math.abs(x2 - x1)
-    const sx = x1 < x2 ? 1 : -1
-    const dy = -Math.abs(y2 - y1)
-    const sy = y1 < y2 ? 1 : -1
-
-    let done
-    let e2
-    let er = dx + dy
-
-    while (!done) {
-      clone = clone.drawPixel(x1, y1, [r, g, b, a])
-
-      if (x1 === x2 && y1 === y2) {
-        done = true
-      } else {
-        e2 = 2 * er
-        if (e2 > dy) {
-          er += dy
-          x1 += sx
-        }
-        if (e2 < dx) {
-          er += dx
-          y1 += sy
-        }
-      }
-    }
-
-    return clone
-  }
-
-  mapDataByPixel(cb = x => x) {
-    const data = this._imageData.data
-    const length = this._imageData.data.length
-    const array = new Uint8ClampedArray(length)
-
-    for (let i = 0; i < length; i += 4) {
-      const [r = 0, g = 0, b = 0, a = 0] =
-        cb(
-          [
-            data[i + 0], // r
-            data[i + 1], // g
-            data[i + 2], // b
-            data[i + 3], // a
-          ],
-          i,
-          data,
-        ) || []
-
-      array[i + 0] = r
-      array[i + 1] = g
-      array[i + 2] = b
-      array[i + 3] = a
-    }
-
-    return new ImmutableSpriteImage(this.width, this.height, array)
-  }
-
-  /**
-   * @param {Uint8ClampedArray} array
-   * @returns {ImmutableSpriteImage}
-   */
-  drawData(array) {
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    const { width, height } = this
-
-    const imageData = new ImageData(array, width, height)
-    ctx.putImageData(imageData, 0, 0)
-
-    const { data } = ctx.getImageData(0, 0, width, height)
-
-    return new ImmutableSpriteImage(width, height, data)
-  }
+const stateToJSON = state => {
+  return { ...state, data: new Array(state.data) }
 }
 
-window.SpriteImage = ImmutableSpriteImage
+const stateFromJSON = json => {
+  return { ...json, data: imageDataUtils.newArray(json.data) }
+}
+
+function save(state) {
+  storage.set(state.uid, stateToJSON(state))
+}
+
+/** @param {string} uid */
+function load(uid) {
+  const state = storage.get(state.uid)
+
+  if (state) {
+    setState(stateFromJSON(state))
+  }
+}
 
 // ----------------------------------------
 // Name
 // ----------------------------------------
 
 function spriteName(state) {
+  const handleInput = e => {
+    setState({ name: e.target.value })
+  }
+  const handleKeyDown = e => {
+    if (e.key === 'Enter') e.target.blur()
+  }
+
   return html`
-    <i class="far fa-image"></i> ${state.name}
+    <div class="sprite-name">
+      <i class="fas fa-image"></i>
+      <input
+        @keyDown=${handleKeyDown}
+        @input=${handleInput}
+        value=${state.name}
+      />
+    </div>
   `
 }
 
@@ -245,6 +127,7 @@ function drawingTools(state) {
 // ----------------------------------------
 // Action Tools
 // ----------------------------------------
+
 function actionTool(state, { key, icon, label, onClick, activeWhen }) {
   return html`
     <button
@@ -354,9 +237,31 @@ function colorSwatches(state) {
     swatches.push(...row)
   }
 
+  const rgbaInUseMap = new Map()
+  imageDataUtils.forEachPixel(state.data, ([r, g, b, a]) => {
+    const obj = { r, g, b, a }
+    const key = `rgba(${r}, ${g}, ${b}, ${a})`
+
+    if (!rgbaInUseMap.has(key) && a > 0) {
+      rgbaInUseMap.set(key, obj)
+    }
+  })
+
+  const swatchesInUse = [...rgbaInUseMap.values()]
+    .sort((a, b) => {
+      return tinycolor(a).toHsv().v > tinycolor(b).toHsv().v ? -1 : 1
+    })
+    .map(rgbaObj => {
+      return colorSwatch(state, rgbaObj)
+    })
+
   return html`
     <div class="color-swatches">
-      ${swatches}
+      <strong>palette</strong>
+      <div class="all-colors">${swatches}</div>
+
+      <strong>in use</strong>
+      <div class="used-colors">${swatchesInUse}</div>
     </div>
   `
 }
@@ -382,9 +287,7 @@ function frames(state) {
 // ----------------------------------------
 
 function files(state) {
-  const spriteStates = Object.keys(localStorage).map(key => {
-    return JSON.parse(localStorage[key])
-  })
+  const spriteStates = storage.values()
 
   if (!spriteStates.length) {
     return null
@@ -392,8 +295,16 @@ function files(state) {
 
   return html`
     <div class="files">
-      <h1>Files</h1>
-      ${spriteStates.map(spriteState => spriteState.name)}
+      <h2>Files</h2>
+      ${spriteStates.map(
+        spriteState =>
+          html`
+            <button class="file">
+              <i class="fas fa-upload"></i>
+              ${spriteState.name || 'UNNAMED'}
+            </button>
+          `,
+      )}
     </div>
   `
 }
@@ -429,7 +340,6 @@ function gridCanvas(state) {
   canvas.height = height
 
   const ctx = canvas.getContext('2d')
-  ctx.globalCompositeOperation = 'difference'
   ctx.fillStyle = 'rgba(127, 127, 127)'
 
   // horizontals
@@ -478,15 +388,11 @@ function renderHTML(html) {
 // ----------------------------------------
 // Drawing Tools
 // ----------------------------------------
-/** @returns {CanvasRenderingContext2D} */
-const ctx = () => {
+const drawImageToCanvas = state => {
   const canvas = document.querySelector('.drawing-canvas')
-
-  return canvas.getContext('2d')
-}
-
-const drawImageToCanvas = () => {
-  ctx().putImageData(state.image.imageData, 0, 0)
+  const ctx = canvas.getContext('2d')
+  const imageData = new ImageData(state.data, state.width, state.height)
+  ctx.putImageData(imageData, 0, 0)
 }
 
 const ACTION_TOOLS = {
@@ -495,7 +401,9 @@ const ACTION_TOOLS = {
     icon: 'times-circle',
     label: 'Clear',
     onClick: (e, state) => {
-      setState({ image: state.image.clear() })
+      if (confirm('Are you sure you want to CLEAR your image?')) {
+        setState({ data: imageDataUtils.clear(state.data) })
+      }
     },
   },
 
@@ -516,7 +424,11 @@ const DRAWING_TOOLS = {
     icon: 'eraser',
     label: 'Eraser',
     draw(x, y, state) {
-      setState({ image: state.image.drawPixel(x, y, [0, 0, 0, 0]) })
+      const empty = [0, 0, 0, 0]
+
+      setState({
+        data: imageDataUtils.drawPixel(state.data, state.width, x, y, empty),
+      })
     },
     onStart: (x, y, state) => {
       DRAWING_TOOLS.eraser.draw(x, y, state)
@@ -533,9 +445,17 @@ const DRAWING_TOOLS = {
     draw(x2, y2, state) {
       const { startX, startY, startData } = DRAWING_TOOLS.line
 
-      let image = new ImmutableSpriteImage(state.width, state.height, startData)
-
-      setState({ image: image.line(startX, startY, x2, y2, state.color) })
+      setState({
+        data: imageDataUtils.line(
+          startData,
+          state.width,
+          startX,
+          startY,
+          x2,
+          y2,
+          state.color,
+        ),
+      })
     },
     onStart: (x, y, state) => {
       DRAWING_TOOLS.line.startX = x
@@ -547,9 +467,6 @@ const DRAWING_TOOLS = {
     onMove: (x, y, state) => {
       DRAWING_TOOLS.line.draw(x, y, state)
     },
-    oneEnd: (x, y, state) => {
-      DRAWING_TOOLS.line.draw(x, y, state)
-    },
   },
 
   pencil: {
@@ -557,7 +474,15 @@ const DRAWING_TOOLS = {
     icon: 'pencil-alt',
     label: 'Pencil',
     draw(x, y, state) {
-      setState({ image: state.image.drawPixel(x, y, state.color) })
+      setState({
+        data: imageDataUtils.drawPixel(
+          state.data,
+          state.width,
+          x,
+          y,
+          state.color,
+        ),
+      })
     },
     onStart: (x, y, state) => {
       DRAWING_TOOLS.pencil.draw(x, y, state)
@@ -568,6 +493,75 @@ const DRAWING_TOOLS = {
   },
 }
 
+// ----------------------------------------
+// State
+// ----------------------------------------
+
+const DEFAULT_WIDTH = 8
+const DEFAULT_HEIGHT = 8
+
+const DEFAULT_STATE = {
+  uid: Date.now().toString(36),
+  name: 'New Sprite',
+  tool: DRAWING_TOOLS.pencil.key,
+  color: [0, 0, 0, 255],
+  scale: 32,
+  width: DEFAULT_WIDTH,
+  height: DEFAULT_HEIGHT,
+  data: imageDataUtils.newArray(DEFAULT_HEIGHT * DEFAULT_WIDTH * 4),
+}
+
+// debugger
+
+// load
+const lastState = storage.first()
+const lastStateJSON = lastState ? stateFromJSON(lastState) : null
+
+const INITIAL_STATE = lastStateJSON ? lastStateJSON : DEFAULT_STATE
+
+let state = INITIAL_STATE
+window.state = state
+
+let undos = []
+let redos = []
+
+function setState(partial = {}) {
+  undos.push(state)
+  redos = []
+  state = Object.assign({}, state, partial)
+
+  console.log('setState', state)
+
+  // Order mostly matters here:
+  // 1. storage MUST updated before UI can read from it
+  // 2. UI SHOULD be rendered before canvas is drawn
+  // 3. draw on canvas AFTER it is rendered
+  if (partial !== INITIAL_STATE) save(state)
+  renderHTML(spriteEditor(state))
+  drawImageToCanvas(state)
+}
+
+function undo() {
+  console.log('undo')
+  if (undos.length) {
+    redos.push(state)
+    state = undos.pop()
+  }
+}
+
+function redo() {
+  console.log('redo')
+  if (redos.length) {
+    undos.push(state)
+    state = redos.pop()
+  }
+}
+
+setState(state)
+
+//
+// Global Listeners
+//
 document.addEventListener('mousedown', e => {
   if (e.target.classList.contains('drawing-canvas')) {
     setState({ isDrawing: true })
@@ -614,63 +608,3 @@ document.addEventListener('keydown', e => {
       break
   }
 })
-
-// ----------------------------------------
-// State
-// ----------------------------------------
-
-const INITIAL_WIDTH = 8
-const INITIAL_HEIGHT = 8
-
-let state = {
-  name: 'sprApple',
-  tool: DRAWING_TOOLS.pencil.key,
-  color: [0, 0, 0, 255],
-  scale: 32,
-  width: INITIAL_WIDTH,
-  height: INITIAL_HEIGHT,
-  image: new ImmutableSpriteImage(INITIAL_WIDTH, INITIAL_HEIGHT),
-}
-window.state = state
-
-let undos = []
-let redos = []
-
-function setState(partial = {}) {
-  undos.push(state)
-  redos = []
-  state = Object.assign({}, state, partial)
-
-  console.log('setState', state)
-
-  renderHTML(spriteEditor(state))
-  drawImageToCanvas()
-  saveSprite(state)
-}
-
-// ----------------------------------------
-// Storage
-// ----------------------------------------
-function saveSprite(state) {
-  const imageData = ctx().getImageData(0, 0, state.width, state.height)
-  localStorage.setItem(
-    state.name,
-    JSON.stringify({ name: state.name, imageData }, null, 2),
-  )
-}
-
-function undo() {
-  if (undos.length) {
-    redos.push(state)
-    state = undos.pop()
-  }
-}
-
-function redo() {
-  if (redos.length) {
-    undos.push(state)
-    state = redos.pop()
-  }
-}
-
-setState(state)

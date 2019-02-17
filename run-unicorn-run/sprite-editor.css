@@ -42,6 +42,9 @@ button {
     'files         files        files         ' auto /
     auto 1fr auto;
   padding: var(--editor-gap);
+  color: #fff;
+  text-shadow: -1px -1px 0 #0003, 1px -1px 0 #0003,
+    -1px 1px 0 #0003, 1px 1px 0 #0003;
   background: var(--ui-bg);
   user-select: none;
 }
@@ -52,11 +55,38 @@ button {
 .header {
   grid-area: header;
   font-size: 28px;
-  color: #fff;
   text-decoration: underline;
 }
 .header i {
   text-decoration: inherit;
+}
+.header i {
+  text-decoration: inherit;
+}
+
+/****************************
+       Sprite Name Input
+****************************/
+.sprite-name {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.sprite-name i {
+  position: absolute;
+  padding: 0.125em 0.375em;
+  opacity: 0.5;
+}
+
+.sprite-name input {
+  display: block;
+  height: 1em;
+  padding: 0.625em 0 0.625em 1.75em;
+  margin: 0;
+  color: inherit;
+  background: none;
+  border: none;
 }
 
 /****************************
@@ -66,8 +96,6 @@ button {
   padding: 0;
   margin: var(--tool-margin);
   color: #eee;
-  text-shadow: -1px -1px 0 #0003, 1px -1px 0 #0003,
-    -1px 1px 0 #0003, 1px 1px 0 #0003;
 }
 .tool:hover,
 .tool:active,
@@ -203,29 +231,33 @@ button {
   --swatches-per-row: 9;
 
   grid-area: color-swatches;
+  width: calc(
+    var(--swatch-size) * var(--swatches-per-row)
+  );
+}
+
+.all-colors,
+.used-colors {
   display: grid;
   grid-template-columns: repeat(
     var(--swatches-per-row),
     var(--swatch-size)
   );
   grid-auto-rows: var(--swatch-size);
-  width: calc(
-    var(--swatch-size) * var(--swatches-per-row)
-  );
 }
 
-.color-swatches .color-swatch {
+.color-swatch {
   width: var(--swatch-size);
   height: var(--swatch-size);
 }
-.color-swatches .color-swatch:hover,
-.color-swatches .color-swatch:active,
-.color-swatches .color-swatch.active,
-.color-swatches .color-swatch:focus {
+.color-swatch:hover,
+.color-swatch:active,
+.color-swatch.active,
+.color-swatch:focus {
   box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
   z-index: 1;
 }
-.color-swatches .color-swatch:hover {
+.color-swatch:hover {
   z-index: 2;
 }
 
@@ -242,4 +274,10 @@ button {
 .files {
   grid-area: files;
   color: #fff;
+}
+
+.files .file {
+  color: inherit;
+  padding: 8px 16px;
+  background: var(--ui-dark);
 }
