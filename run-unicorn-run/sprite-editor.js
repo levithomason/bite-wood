@@ -152,14 +152,17 @@ function drawingTools(state) {
 // Action Tools
 // ----------------------------------------
 
-function actionTool(state, { key, icon, label, onClick, activeWhen }) {
+function actionTool(
+  state,
+  { key, icon, label, disabledWhen, onClick, activeWhen },
+) {
   const handleClick = e => {
     onClick(e, state)
   }
 
   return html`
     <button
-      ?disabled=${!ACTION_TOOLS[key]}
+      ?disabled=${!ACTION_TOOLS[key] || (disabledWhen && disabledWhen(state))}
       class="tool ${classMap({ active: activeWhen && activeWhen(state) })}"
       @click="${handleClick}"
     >
@@ -475,6 +478,7 @@ const ACTION_TOOLS = {
   zoomIn: {
     key: 'zoomIn',
     icon: 'search-plus',
+    disabledWhen: state => state.scale >= SETTINGS.MAX_ZOOM,
     onClick: (e, state) => {
       zoomIn(state)
     },
@@ -483,6 +487,7 @@ const ACTION_TOOLS = {
   zoomOut: {
     key: 'zoomOut',
     icon: 'search-minus',
+    disabledWhen: state => state.scale <= SETTINGS.MIN_ZOOM,
     onClick: (e, state) => {
       zoomOut(state)
     },
