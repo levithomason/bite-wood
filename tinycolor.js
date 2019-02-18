@@ -1,4 +1,4 @@
-import 'https://unpkg.com/tinycolor2@1.4.1/tinycolor.js'
+import './node_modules/tinycolor2/tinycolor.js'
 
 const { tinycolor } = window
 

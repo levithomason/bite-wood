@@ -8,6 +8,8 @@
 
 html,
 body {
+  --timing-function-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
   background: #000;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -32,9 +34,9 @@ canvas {
 
   /* animate sizes smoothly */
   transition: width 0.15s, height 0.15s;
-  transitiontimingfunction: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition-timing-function: var(--timing-function-bounce);
   transform: translateZ(0);
-  backfacevisibility: hidden;
+  backface-visibility: hidden;
 }
 
 .disabled,

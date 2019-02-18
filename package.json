@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "cd run-unicorn-run && live-server",
+    "start": "live-server",
     "start:console": "cd console && nodemon --quiet --no-stdin"
   },
   "prettier": {
@@ -15,7 +15,11 @@
   "dependencies": {
     "axel": "^0.0.3",
     "keypress": "^0.2.1",
-    "nodemon": "^1.18.9"
+    "lit-html": "^1.0.0",
+    "nodemon": "^1.18.9",
+    "normalize.css": "^8.0.1",
+    "tinycolor": "^0.0.1",
+    "tinycolor2": "^1.4.1"
   },
   "devDependencies": {
     "live-server": "^1.2.1",

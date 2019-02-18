@@ -1,9 +1,6 @@
-import { classMap } from 'https://unpkg.com/lit-html/directives/class-map.js?module'
-import { styleMap } from 'https://unpkg.com/lit-html/directives/style-map.js?module'
-import {
-  html,
-  render,
-} from 'https://unpkg.com/lit-html@1.0.0/lit-html.js?module'
+import { classMap } from './node_modules/lit-html/directives/class-map.js'
+import { styleMap } from './node_modules/lit-html/directives/style-map.js'
+import { html, render } from './node_modules/lit-html/lit-html.js'
 
 import storage from './storage.js'
 import tinycolor from './tinycolor.js'
@@ -364,10 +361,6 @@ function drawingCanvas(state) {
       width="${state.width}"
       height="${state.height}"
       style="${styleMap({
-        transition: 'transform 0.15s, zoom 0.15s, width 0.15s, height 0.15s',
-        transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-        backfaceVisibility: 'hidden',
-        transform: `translateZ(0)`,
         width: state.width * state.scale + 'px',
         height: state.height * state.scale + 'px',
       })}"
@@ -427,6 +420,7 @@ function spriteEditor(state) {
 // ----------------------------------------
 
 const mountNode = document.createElement('div')
+mountNode.id = '#root'
 document.body.appendChild(mountNode)
 
 function renderHTML(html) {
