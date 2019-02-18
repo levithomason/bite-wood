@@ -9,12 +9,17 @@ import storage from './storage.js'
 import tinycolor from './tinycolor.js'
 import * as imageDataUtils from './imageDataUtils.js'
 
+const SETTINGS = {
+  MAX_ZOOM: 32,
+  MIN_ZOOM: 1,
+}
+
 // ----------------------------------------
 // Save / Load
 // ----------------------------------------
 
 const stateToJSON = state => {
-  return { ...state, data: new Array(state.data) }
+  return { ...state, data: new Array(...state.data) }
 }
 
 const stateFromJSON = json => {
@@ -22,7 +27,8 @@ const stateFromJSON = json => {
 }
 
 function save(state) {
-  storage.set(state.uid, stateToJSON(state))
+  const val = stateToJSON(state)
+  storage.set(state.uid, val)
 }
 
 /** @param {string} uid */
@@ -39,20 +45,28 @@ function load(uid) {
 // ----------------------------------------
 
 function spriteName(state) {
-  const handleInput = e => {
-    setState({ name: e.target.value })
+  const handleInput = {
+    handleEvent(e) {
+      setState({ name: e.target.value })
+    },
+
+    capture: true,
   }
+
   const handleKeyDown = e => {
-    if (e.key === 'Enter') e.target.blur()
+    if (e.key === 'Enter') {
+      e.target.blur()
+    }
   }
 
   return html`
     <div class="sprite-name">
       <i class="fas fa-image"></i>
       <input
-        @keyDown=${handleKeyDown}
         @input=${handleInput}
+        @keydown=${handleKeyDown}
         value=${state.name}
+        placeholder=${'Name your sprite...'}
       />
     </div>
   `
@@ -88,38 +102,48 @@ function drawingTool(state, { key, icon, label }) {
 function drawingTools(state) {
   return html`
     <div class="drawing-tools">
-      ${drawingTool(state, DRAWING_TOOLS.pencil)}
-      ${drawingTool(state, DRAWING_TOOLS.eraser)}
+      <div class="tool-group">
+        ${drawingTool(state, DRAWING_TOOLS.pencil)}
+        ${drawingTool(state, DRAWING_TOOLS.eraser)}
+      </div>
 
-      <div class="divider"></div>
+      <div class="tool-group">
+        ${drawingTool(state, DRAWING_TOOLS.eyeDropper)}
+        ${drawingTool(state, { key: 'brush', icon: 'brush', label: 'Brush' })}
+        ${drawingTool(state, { key: 'fill', icon: 'fill-drip', label: 'Fill' })}
+        ${drawingTool(state, {
+          key: 'spray',
+          icon: 'spray-can',
+          label: 'Spray',
+        })}
+      </div>
 
-      ${drawingTool(state, {
-        key: 'eye-dropper',
-        icon: 'eye-dropper',
-        label: 'Pick',
-      })}
-      ${drawingTool(state, { key: 'brush', icon: 'brush', label: 'Brush' })}
-      ${drawingTool(state, { key: 'fill', icon: 'fill-drip', label: 'Fill' })}
-      ${drawingTool(state, { key: 'spray', icon: 'spray-can', label: 'Spray' })}
+      <div class="tool-group">
+        ${drawingTool(state, {
+          key: 'circle',
+          icon: 'circle',
+          label: 'Circle',
+        })}
+        ${drawingTool(state, {
+          key: 'square',
+          icon: 'square',
+          label: 'Square',
+        })}
+        ${drawingTool(state, DRAWING_TOOLS.line)}
+      </div>
 
-      <div class="divider"></div>
-
-      ${drawingTool(state, { key: 'circle', icon: 'circle', label: 'Circle' })}
-      ${drawingTool(state, { key: 'square', icon: 'square', label: 'Square' })}
-      ${drawingTool(state, DRAWING_TOOLS.line)}
-
-      <div class="divider"></div>
-
-      ${drawingTool(state, {
-        key: 'spline',
-        icon: 'bezier-curve',
-        label: 'Spline',
-      })}
-      ${drawingTool(state, {
-        key: 'polygon',
-        icon: 'draw-polygon',
-        label: 'Polygon',
-      })}
+      <div class="tool-group">
+        ${drawingTool(state, {
+          key: 'spline',
+          icon: 'bezier-curve',
+          label: 'Spline',
+        })}
+        ${drawingTool(state, {
+          key: 'polygon',
+          icon: 'draw-polygon',
+          label: 'Polygon',
+        })}
+      </div>
     </div>
   `
 }
@@ -129,11 +153,15 @@ function drawingTools(state) {
 // ----------------------------------------
 
 function actionTool(state, { key, icon, label, onClick, activeWhen }) {
+  const handleClick = e => {
+    onClick(e, state)
+  }
+
   return html`
     <button
       ?disabled=${!ACTION_TOOLS[key]}
       class="tool ${classMap({ active: activeWhen && activeWhen(state) })}"
-      @click="${e => onClick(e, state)}"
+      @click="${handleClick}"
     >
       ${icon &&
         html`
@@ -150,18 +178,18 @@ function actionTool(state, { key, icon, label, onClick, activeWhen }) {
 function actionTools(state) {
   return html`
     <div class="action-tools">
-      ${actionTool(state, { key: 'undo', icon: 'undo' })}
-      ${actionTool(state, { key: 'redo', icon: 'redo' })}
-
-      <div class="divider"></div>
-
-      ${actionTool(state, { key: 'zoom-in', icon: 'search-plus' })}
-      ${actionTool(state, { key: 'zoom-out', icon: 'search-minus' })}
-
-      <div class="divider"></div>
-
-      ${actionTool(state, ACTION_TOOLS.clear)}
-      ${actionTool(state, ACTION_TOOLS.grid)}
+      <div class="tool-group">
+        ${actionTool(state, { key: 'undo', icon: 'undo' })}
+        ${actionTool(state, { key: 'redo', icon: 'redo' })}
+      </div>
+      <div class="tool-group">
+        ${actionTool(state, ACTION_TOOLS.zoomIn)}
+        ${actionTool(state, ACTION_TOOLS.zoomOut)}
+      </div>
+      <div class="tool-group">
+        ${actionTool(state, ACTION_TOOLS.clear)}
+        ${actionTool(state, ACTION_TOOLS.grid)}
+      </div>
     </div>
   `
 }
@@ -173,12 +201,16 @@ function actionTools(state) {
 function colorSwatch(state, { r = 0, g = 0, b = 0, a = 1 } = {}) {
   const a255 = a * 255
 
-  const handleClick = {
-    handleEvent(e) {
-      setState({ color: [r, g, b, a255] })
-    },
-
-    capture: true,
+  const handleClick = e => {
+    setState({
+      color: [r, g, b, a255],
+      tool:
+        // if choosing a color while on eraser or eye dropper, go back to prev tool or pencil
+        state.tool === DRAWING_TOOLS.eraser.key ||
+        state.tool === DRAWING_TOOLS.eyeDropper.key
+          ? state.prevTool || DRAWING_TOOLS.pencil.key
+          : state.tool,
+    })
   }
 
   return html`
@@ -238,11 +270,12 @@ function colorSwatches(state) {
   }
 
   const rgbaInUseMap = new Map()
-  imageDataUtils.forEachPixel(state.data, ([r, g, b, a]) => {
+  imageDataUtils.forEachPixel(state.data, ([r, g, b, a255]) => {
+    const a = a255 / 255
     const obj = { r, g, b, a }
-    const key = `rgba(${r}, ${g}, ${b}, ${a})`
+    const key = `rgba(${r}, ${g}, ${b}, ${a255})`
 
-    if (!rgbaInUseMap.has(key) && a > 0) {
+    if (!rgbaInUseMap.has(key) && a255 > 0) {
       rgbaInUseMap.set(key, obj)
     }
   })
@@ -257,11 +290,13 @@ function colorSwatches(state) {
 
   return html`
     <div class="color-swatches">
-      <strong>palette</strong>
-      <div class="all-colors">${swatches}</div>
+      <div class="header">Used colors</div>
+      <div class="used-colors">
+        ${swatchesInUse.length ? swatchesInUse : '...'}
+      </div>
 
-      <strong>in use</strong>
-      <div class="used-colors">${swatchesInUse}</div>
+      <div class="header">All colors</div>
+      <div class="all-colors">${swatches}</div>
     </div>
   `
 }
@@ -295,16 +330,22 @@ function files(state) {
 
   return html`
     <div class="files">
-      <h2>Files</h2>
-      ${spriteStates.map(
-        spriteState =>
-          html`
-            <button class="file">
-              <i class="fas fa-upload"></i>
-              ${spriteState.name || 'UNNAMED'}
-            </button>
-          `,
-      )}
+      <h2>My Sprites</h2>
+      ${spriteStates.map(spriteState => {
+        return spriteState.uid === state.uid
+          ? html`
+              <div class="file active">
+                <i class="fas fa-image"></i>
+                ${spriteState.name || 'UNNAMED'}
+              </div>
+            `
+          : html`
+              <button class="file">
+                <i class="fas fa-image"></i>
+                ${spriteState.name || 'UNNAMED'}
+              </button>
+            `
+      })}
     </div>
   `
 }
@@ -320,6 +361,10 @@ function drawingCanvas(state) {
       width="${state.width}"
       height="${state.height}"
       style="${styleMap({
+        transition: 'transform 0.15s, zoom 0.15s, width 0.15s, height 0.15s',
+        transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        backfaceVisibility: 'hidden',
+        transform: `translateZ(0)`,
         width: state.width * state.scale + 'px',
         height: state.height * state.scale + 'px',
       })}"
@@ -360,7 +405,7 @@ function gridCanvas(state) {
 function spriteEditor(state) {
   return html`
     <div class="sprite-editor">
-      <a class="header">
+      <a class="sprite-editor-header">
         ${spriteName(state)}
       </a>
       ${drawingTools(state)} ${actionTools(state)}
@@ -395,6 +440,16 @@ const drawImageToCanvas = state => {
   ctx.putImageData(imageData, 0, 0)
 }
 
+function zoomIn(state) {
+  setState({ scale: Math.min(SETTINGS.MAX_ZOOM, state.scale * 1.5) })
+}
+
+function zoomOut(state) {
+  setState({
+    scale: Math.max(SETTINGS.MIN_ZOOM, Math.round(state.scale / 1.5)),
+  })
+}
+
 const ACTION_TOOLS = {
   clear: {
     key: 'clear',
@@ -416,8 +471,26 @@ const ACTION_TOOLS = {
       setState({ showGrid: !state.showGrid })
     },
   },
+
+  zoomIn: {
+    key: 'zoomIn',
+    icon: 'search-plus',
+    onClick: (e, state) => {
+      zoomIn(state)
+    },
+  },
+
+  zoomOut: {
+    key: 'zoomOut',
+    icon: 'search-minus',
+    onClick: (e, state) => {
+      zoomOut(state)
+    },
+  },
 }
 
+// 1, 2, 4, 8, 12, 16, 24, 32
+// 1, 2, 4, 4, 4,  4,  6,  6
 const DRAWING_TOOLS = {
   eraser: {
     key: 'eraser',
@@ -435,6 +508,18 @@ const DRAWING_TOOLS = {
     },
     onMove: (x, y, state) => {
       DRAWING_TOOLS.eraser.draw(x, y, state)
+    },
+  },
+
+  eyeDropper: {
+    key: 'eyeDropper',
+    icon: 'eye-dropper',
+    label: 'Pick',
+    onEnd(x, y, state) {
+      setState({
+        color: imageDataUtils.getPixel(state.data, state.width, x, y),
+        tool: state.prevTool,
+      })
     },
   },
 
@@ -460,7 +545,7 @@ const DRAWING_TOOLS = {
     onStart: (x, y, state) => {
       DRAWING_TOOLS.line.startX = x
       DRAWING_TOOLS.line.startY = y
-      DRAWING_TOOLS.line.startData = state.image.data
+      DRAWING_TOOLS.line.startData = state.data
 
       DRAWING_TOOLS.line.draw(x, y, state)
     },
@@ -502,7 +587,8 @@ const DEFAULT_HEIGHT = 8
 
 const DEFAULT_STATE = {
   uid: Date.now().toString(36),
-  name: 'New Sprite',
+  name: '',
+  prevTool: '',
   tool: DRAWING_TOOLS.pencil.key,
   color: [0, 0, 0, 255],
   scale: 32,
@@ -510,8 +596,6 @@ const DEFAULT_STATE = {
   height: DEFAULT_HEIGHT,
   data: imageDataUtils.newArray(DEFAULT_HEIGHT * DEFAULT_WIDTH * 4),
 }
-
-// debugger
 
 // load
 const lastState = storage.first()
@@ -528,7 +612,15 @@ let redos = []
 function setState(partial = {}) {
   undos.push(state)
   redos = []
+
+  const prevTool = state.tool
+  const didToolChange = partial.tool && partial.tool !== state.prevTool
+
   state = Object.assign({}, state, partial)
+
+  if (didToolChange) {
+    state.prevTool = prevTool
+  }
 
   console.log('setState', state)
 
@@ -593,18 +685,39 @@ document.addEventListener('mouseup', e => {
   }
 })
 document.addEventListener('keydown', e => {
+  // only allow keyboard shortcuts when not typing in an input
+  if (e.target.tagName === 'INPUT') {
+    return
+  }
+
   switch (e.key) {
     case 'p':
+      e.preventDefault()
       setState({ tool: DRAWING_TOOLS.pencil.key })
       break
     case 'e':
+      e.preventDefault()
       setState({ tool: DRAWING_TOOLS.eraser.key })
       break
     case 'l':
+      e.preventDefault()
       setState({ tool: DRAWING_TOOLS.line.key })
       break
     case 'g':
+      e.preventDefault()
       setState({ showGrid: !state.showGrid })
+      break
+    case '=':
+      if (e.metaKey) {
+        e.preventDefault()
+        zoomIn(state)
+      }
+      break
+    case '-':
+      if (e.metaKey) {
+        e.preventDefault()
+        zoomOut(state)
+      }
       break
   }
 })

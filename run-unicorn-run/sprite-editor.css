@@ -15,7 +15,8 @@ button {
 .sprite-editor {
   --editor-gap: 8px;
 
-  --ui-active: burlywood;
+  --ui-active-color: burlywood;
+  --ui-active-bg: #0003;
   --ui-darkest: #282828;
   --ui-darker: #383838;
   --ui-dark: #484848;
@@ -24,43 +25,42 @@ button {
   --ui-stage-bg: var(--ui-darkest);
   --ui-panel-bg: var(--ui-dark);
 
-  --toolbar-padding: 2px;
-  --tool-margin: 2px;
-  --tool-icon-space: 8px;
-  --tool-divider-border: 1px dotted
-    var(--ui-darker);
-  --drawing-tool-size: 56px;
+  --toolbar-space: 4px;
+  --tool-inner-gap: 8px;
+  --tool-icon-size: 18px;
+  --tool-divider-border: 1px solid var(--ui-darker);
+  --drawing-tool-size: 60px;
 
   display: grid;
   grid-gap: var(--editor-gap);
   justify-content: center;
   grid-template:
     'header        header       header        ' auto
-    'drawing-tools action-tools action-tools    ' auto
+    'drawing-tools action-tools action-tools  ' auto
     'drawing-tools stage        color-swatches' 1fr
     'drawing-tools frames       color-swatches' auto
     'files         files        files         ' auto /
     auto 1fr auto;
   padding: var(--editor-gap);
   color: #fff;
-  text-shadow: -1px -1px 0 #0003, 1px -1px 0 #0003,
-    -1px 1px 0 #0003, 1px 1px 0 #0003;
+  text-shadow: -1px -1px 0 #0003, 1px -1px 0 #0003, -1px 1px 0 #0003,
+    1px 1px 0 #0003;
   background: var(--ui-bg);
   user-select: none;
 }
 
 /****************************
-            Header
+           Header
 ****************************/
-.header {
+.sprite-editor-header {
   grid-area: header;
   font-size: 28px;
   text-decoration: underline;
 }
-.header i {
+.sprite-editor-header i {
   text-decoration: inherit;
 }
-.header i {
+.sprite-editor-header i {
   text-decoration: inherit;
 }
 
@@ -94,25 +94,22 @@ button {
 ****************************/
 .tool {
   padding: 0;
-  margin: var(--tool-margin);
+  margin: 0;
   color: #eee;
 }
 .tool:hover,
 .tool:active,
-.tool.active,
-.tool:focus {
-  background: var(--ui-darker);
+.tool.active {
+  background: var(--ui-active-bg);
   outline: none;
 }
 .tool.active,
 .tool.active .label {
-  color: var(--ui-active);
+  color: var(--ui-active-color);
 }
 
 .tool i {
-  font-size: calc(
-    var(--drawing-tool-size) * 0.333
-  );
+  font-size: var(--tool-icon-size);
 }
 
 .tool .label {
@@ -120,13 +117,10 @@ button {
   font-size: 12px;
   color: #ccc;
 }
+/* Tool Groups */
 
-/****************************
-           Divider
-****************************/
-
-.divider {
-  background: var(--ui-bg);
+.tool-group {
+  padding: var(--toolbar-space);
 }
 
 /****************************
@@ -135,21 +129,17 @@ button {
 
 .drawing-tools {
   grid-area: drawing-tools;
-  display: flex;
-  padding: var(--toolbar-padding);
-  flex-wrap: wrap;
-  width: calc(
-    var(--drawing-tool-size) * 2 +
-      var(--toolbar-padding) * 2 +
-      var(--tool-margin) * 4
-  );
   height: fit-content;
   background: var(--ui-panel-bg);
 }
+.drawing-tools .tool-group {
+  display: grid;
+  grid-template-columns: var(--drawing-tool-size) var(--drawing-tool-size);
+  grid-auto-rows: var(--drawing-tool-size);
+  gap: var(--toolbar-space);
+}
 
-.drawing-tools .divider {
-  flex: 0 0 auto;
-  width: 100%;
+.drawing-tools .tool-group + .tool-group {
   border-top: var(--tool-divider-border);
 }
 
@@ -158,16 +148,10 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: var(--drawing-tool-size);
-  height: var(--drawing-tool-size);
 }
 
 .tool i {
-  margin: var(--tool-icon-space);
-}
-
-.drawing-tools .tool .label {
-  display: block;
+  margin: var(--tool-inner-gap);
 }
 
 /****************************
@@ -176,23 +160,22 @@ button {
 
 .action-tools {
   grid-area: action-tools;
-  display: flex;
-  padding: var(--toolbar-padding);
-  width: 100%;
   background: var(--ui-panel-bg);
 }
 .action-tools .tool {
-  display: flex;
-  flex: 0 0 auto;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
 }
 .action-tools .tool .label {
-  margin-right: var(--tool-icon-space);
+  margin-right: var(--tool-inner-gap);
+  margin-top: 0.25em;
 }
 
-.action-tools .divider {
-  flex: 0 0 auto;
+.action-tools .tool-group {
+  display: inline-block;
+}
+
+.action-tools .tool-group + .tool-group {
   border-left: var(--tool-divider-border);
 }
 
@@ -213,7 +196,6 @@ button {
   background-image: url('data:sprite/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAKUlEQVQoU2NkYGAwZkAD////RxdiYBwKCv///4/hGUZGkNNRAeMQUAgAtxof+nLDzyUAAAAASUVORK5CYII=');
   cursor: crosshair;
   background-color: #fff;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .stage .grid-canvas {
@@ -227,23 +209,27 @@ button {
 ****************************/
 
 .color-swatches {
-  --swatch-size: 18px;
+  --swatch-size: 16px;
   --swatches-per-row: 9;
 
   grid-area: color-swatches;
-  width: calc(
-    var(--swatch-size) * var(--swatches-per-row)
-  );
+  padding: var(--toolbar-space);
+  height: fit-content;
+  background: var(--ui-panel-bg);
+}
+.color-swatches .header {
+  margin: 8px 0 2px;
 }
 
 .all-colors,
 .used-colors {
   display: grid;
-  grid-template-columns: repeat(
-    var(--swatches-per-row),
-    var(--swatch-size)
-  );
+  grid-template-columns: repeat(var(--swatches-per-row), var(--swatch-size));
   grid-auto-rows: var(--swatch-size);
+  padding: var(--toolbar-space);
+  gap: 1px;
+  border: 1px solid #fff2;
+  border-radius: 4px;
 }
 
 .color-swatch {
@@ -254,7 +240,7 @@ button {
 .color-swatch:active,
 .color-swatch.active,
 .color-swatch:focus {
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
+  box-shadow: 0 0 0 1px #fff, 0 0 0 3px #000;
   z-index: 1;
 }
 .color-swatch:hover {
@@ -277,7 +263,12 @@ button {
 }
 
 .files .file {
-  color: inherit;
+  display: inline-block;
   padding: 8px 16px;
+  color: inherit;
   background: var(--ui-dark);
+}
+.files .file.active {
+  color: var(--ui-active-color);
+  background: var(--ui-active-bg);
 }

@@ -10,15 +10,7 @@
   "prettier": {
     "semi": false,
     "singleQuote": true,
-    "trailingComma": "all",
-    "overrides": [
-      {
-        "files": "*.css",
-        "options": {
-          "printWidth": 50
-        }
-      }
-    ]
+    "trailingComma": "all"
   },
   "dependencies": {
     "axel": "^0.0.3",

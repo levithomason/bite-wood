@@ -29,6 +29,12 @@ body {
 img,
 canvas {
   image-rendering: pixelated;
+
+  /* animate sizes smoothly */
+  transition: width 0.15s, height 0.15s;
+  transitiontimingfunction: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateZ(0);
+  backfacevisibility: hidden;
 }
 
 .disabled,
