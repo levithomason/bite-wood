@@ -5,7 +5,7 @@ export function clear(array) {
  * @param {number|[]} lengthOrArray
  * @return {Uint8ClampedArray}
  */
-export function newArray(lengthOrArray) {
+export function arrayFrom(lengthOrArray) {
   return new Uint8ClampedArray(lengthOrArray)
 }
 
@@ -36,7 +36,7 @@ export function getPixel(array, width, x, y) {
  * @return {Uint8ClampedArray}
  */
 export function drawPixel(array, width, x, y, [r, g, b, a]) {
-  const cloned = newArray(array)
+  const cloned = arrayFrom(array)
 
   return drawPixelMutate(cloned, width, x, y, [r, g, b, a])
 }
@@ -61,7 +61,7 @@ export function drawPixelMutate(array, width, x, y, [r, g, b, a]) {
 }
 
 export function line(array, width, x1, y1, x2, y2, [r, g, b, a]) {
-  const cloned = newArray(array)
+  const cloned = arrayFrom(array)
 
   const dx = Math.abs(x2 - x1)
   const sx = x1 < x2 ? 1 : -1
@@ -95,7 +95,7 @@ export function line(array, width, x1, y1, x2, y2, [r, g, b, a]) {
 
 export function mapPixels(array, cb = x => x) {
   const length = array.length
-  const cloned = newArray(length)
+  const cloned = arrayFrom(length)
 
   for (let i = 0; i < length; i += 4) {
     const [r = 0, g = 0, b = 0, a = 0] = cb(

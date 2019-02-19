@@ -1,12 +1,30 @@
 @import 'global.css';
 
 /* Button style */
-button {
+.button {
+  /*padding: var(--button-inner-gap);*/
+  margin: 0;
+  color: inherit;
   background: none;
   border: none;
   border-radius: 0;
   cursor: pointer;
   outline: none;
+}
+.button:hover,
+.button:active,
+.button.active,
+.button:focus {
+  background: var(--ui-active-bg);
+  outline: none;
+}
+.button.active,
+.button.active .label {
+  color: var(--ui-active-color);
+}
+.tool i {
+  font-size: var(--button-icon-size);
+  margin: var(--button-inner-gap);
 }
 
 /****************************
@@ -25,9 +43,10 @@ button {
   --ui-stage-bg: var(--ui-darkest);
   --ui-panel-bg: var(--ui-dark);
 
+  --button-inner-gap: 8px;
+  --button-icon-size: 18px;
+
   --toolbar-space: 4px;
-  --tool-inner-gap: 8px;
-  --tool-icon-size: 18px;
   --tool-divider-border: 1px solid var(--ui-darker);
   --drawing-tool-size: 60px;
 
@@ -92,33 +111,14 @@ button {
 /****************************
       All Tool Buttons
 ****************************/
-.tool {
-  padding: 0;
-  margin: 0;
-  color: #eee;
-}
-.tool:hover,
-.tool:active,
-.tool.active {
-  background: var(--ui-active-bg);
-  outline: none;
-}
-.tool.active,
-.tool.active .label {
-  color: var(--ui-active-color);
-}
-
-.tool i {
-  font-size: var(--tool-icon-size);
-}
 
 .tool .label {
   text-transform: uppercase;
   font-size: 12px;
   color: #ccc;
 }
-/* Tool Groups */
 
+/* Tool Groups */
 .tool-group {
   padding: var(--toolbar-space);
 }
@@ -132,13 +132,13 @@ button {
   height: fit-content;
   background: var(--ui-panel-bg);
 }
+
 .drawing-tools .tool-group {
   display: grid;
   grid-template-columns: var(--drawing-tool-size) var(--drawing-tool-size);
   grid-auto-rows: var(--drawing-tool-size);
   gap: var(--toolbar-space);
 }
-
 .drawing-tools .tool-group + .tool-group {
   border-top: var(--tool-divider-border);
 }
@@ -148,10 +148,6 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-.tool i {
-  margin: var(--tool-inner-gap);
 }
 
 /****************************
@@ -167,7 +163,7 @@ button {
   align-items: center;
 }
 .action-tools .tool .label {
-  margin-right: var(--tool-inner-gap);
+  margin-right: var(--button-inner-gap);
   margin-top: 0.25em;
 }
 
@@ -193,7 +189,7 @@ button {
 }
 
 .stage .drawing-canvas {
-  background-image: url('data:sprite/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAKUlEQVQoU2NkYGAwZkAD////RxdiYBwKCv///4/hGUZGkNNRAeMQUAgAtxof+nLDzyUAAAAASUVORK5CYII=');
+  background-image: var(--transparent-background);
   cursor: crosshair;
   background-color: #fff;
 }
@@ -209,7 +205,7 @@ button {
 ****************************/
 
 .color-swatches {
-  --swatch-size: 14px;
+  --swatch-size: 16px;
   --swatches-per-row: 9;
 
   grid-area: color-swatches;
@@ -233,7 +229,7 @@ button {
 }
 
 .color-swatch {
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s;
   transition-timing-function: var(--timing-function-bounce);
   width: var(--swatch-size);
   height: var(--swatch-size);
@@ -242,13 +238,13 @@ button {
 .color-swatch:active,
 .color-swatch.active,
 .color-swatch:focus {
-  transform: scale(1.15);
+  transform: scale(1.125);
   box-shadow: 0 0 0 1px #fff, 0 0 0 2px #000;
   z-index: 1;
 }
 .color-swatch:active,
 .color-swatch.active {
-  transform: scale(1.3);
+  transform: scale(1.25);
 }
 .color-swatch:hover {
   z-index: 2;
@@ -258,7 +254,34 @@ button {
            Frames
 ****************************/
 .frames {
+  --frame-color: #888;
+
   grid-area: frames;
+  display: flex;
+}
+
+.frames .frame {
+  min-width: 32px;
+  height: 32px;
+  background: var(--ui-panel-bg);
+}
+.frames .frame:not(.add-frame) {
+  padding: 0;
+}
+.frames .frame + .frame {
+  margin-left: 4px;
+}
+
+.frames .frame canvas {
+  padding-bottom: 2px;
+  width: 32px;
+  height: 32px;
+  background-image: var(--transparent-background);
+  background-size: 5px;
+  border-bottom: 2px solid transparent;
+}
+.frames .frame.active canvas {
+  border-color: var(--ui-active-color);
 }
 
 /****************************
@@ -266,16 +289,28 @@ button {
 ****************************/
 .files {
   grid-area: files;
+  margin-top: 24px;
   color: #fff;
+  border-top: 2px solid var(--ui-darkest);
 }
 
 .files .file {
-  display: inline-block;
-  padding: 8px 16px;
-  color: inherit;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 56px;
+  height: 56px;
   background: var(--ui-dark);
 }
 .files .file.active {
   color: var(--ui-active-color);
   background: var(--ui-active-bg);
+}
+.files .file canvas,
+.files .file i {
+  margin: var(--button-inner-gap);
+}
+.files .file canvas {
+  width: 24px;
+  height: 24px;
 }

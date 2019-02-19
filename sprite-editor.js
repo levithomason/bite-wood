@@ -1,40 +1,17 @@
+import * as imageDataUtils from './imageDataUtils.js'
 import { classMap } from './node_modules/lit-html/directives/class-map.js'
 import { styleMap } from './node_modules/lit-html/directives/style-map.js'
 import { html, render } from './node_modules/lit-html/lit-html.js'
 
 import storage from './storage.js'
 import tinycolor from './tinycolor.js'
-import * as imageDataUtils from './imageDataUtils.js'
 
 const SETTINGS = {
+  MAX_UNDOS: 100,
   MAX_ZOOM: 32,
   MIN_ZOOM: 1,
-}
-
-// ----------------------------------------
-// Save / Load
-// ----------------------------------------
-
-const stateToJSON = state => {
-  return { ...state, data: new Array(...state.data) }
-}
-
-const stateFromJSON = json => {
-  return { ...json, data: imageDataUtils.newArray(json.data) }
-}
-
-function save(state) {
-  const val = stateToJSON(state)
-  storage.set(state.uid, val)
-}
-
-/** @param {string} uid */
-function load(uid) {
-  const state = storage.get(state.uid)
-
-  if (state) {
-    setState(stateFromJSON(state))
-  }
+  DEFAULT_WIDTH: 8,
+  DEFAULT_HEIGHT: 8,
 }
 
 // ----------------------------------------
@@ -81,7 +58,7 @@ function drawingTool(state, { key, icon, label }) {
   return html`
     <button
       ?disabled=${!DRAWING_TOOLS[key]}
-      class="tool ${classMap({ active: state.tool === key })}"
+      class="button tool ${classMap({ active: state.tool === key })}"
       @click="${handleClick}"
     >
       ${icon &&
@@ -160,7 +137,9 @@ function actionTool(
   return html`
     <button
       ?disabled=${!ACTION_TOOLS[key] || (disabledWhen && disabledWhen(state))}
-      class="tool ${classMap({ active: activeWhen && activeWhen(state) })}"
+      class="button tool ${classMap({
+        active: activeWhen && activeWhen(state),
+      })}"
       @click="${handleClick}"
     >
       ${icon &&
@@ -190,6 +169,13 @@ function actionTools(state) {
         ${actionTool(state, ACTION_TOOLS.clear)}
         ${actionTool(state, ACTION_TOOLS.grid)}
       </div>
+      <div class="tool-group">
+        ${actionTool(state, {
+          key: 'download',
+          icon: 'download',
+          label: 'Download',
+        })}
+      </div>
     </div>
   `
 }
@@ -215,7 +201,7 @@ function colorSwatch(state, { r = 0, g = 0, b = 0, a = 1 } = {}) {
 
   return html`
     <button
-      class="color-swatch ${classMap({
+      class="button color-swatch ${classMap({
         active:
           state.color[0] === r &&
           state.color[1] === g &&
@@ -270,7 +256,7 @@ function colorSwatches(state) {
   }
 
   const rgbaInUseMap = new Map()
-  imageDataUtils.forEachPixel(state.data, ([r, g, b, a255]) => {
+  imageDataUtils.forEachPixel(state.frameDataDrawing, ([r, g, b, a255]) => {
     const a = a255 / 255
     const obj = { r, g, b, a }
     const key = `rgba(${r}, ${g}, ${b}, ${a255})`
@@ -305,14 +291,62 @@ function colorSwatches(state) {
 // Frames
 // ----------------------------------------
 
+function HACK__playLoop() {
+  window.HACK__playLoopTimer = setTimeout(() => {
+    setState({
+      frameIndexDrawing: (state.frameIndexDrawing + 1) % state.frames.length,
+    })
+    HACK__playLoop()
+  }, 200)
+}
+
 function frames(state) {
-  const canvas = html`
-    <canvas width="32" height="32" style="background: #888;"></canvas>
-  `
+  function handleAddFrameClick(e) {
+    addFrame(state)
+  }
+
+  function handlePlayClick(e) {
+    if (state.HACK__isPlaying) {
+      setState({ HACK__isPlaying: false })
+      clearInterval(window.HACK__playLoopTimer)
+    } else {
+      setState({ HACK__isPlaying: true })
+      HACK__playLoop()
+    }
+  }
+
   return html`
     <div class="frames">
-      ${canvas} ${canvas} ${canvas} ${canvas} ${canvas} ${canvas} ${canvas}
-      ${canvas} ${canvas}
+      <button class="button frame play" @click=${handlePlayClick}>
+        <i class="fas fa-${state.HACK__isPlaying ? 'pause' : 'play'}"></i>
+      </button>
+
+      ${state.frames.map((frameData, i) => {
+        const canvas = document.createElement('canvas')
+        canvas.width = state.width
+        canvas.height = state.height
+
+        const imageData = new ImageData(frameData, state.width, state.height)
+
+        const ctx = canvas.getContext('2d')
+        ctx.putImageData(imageData, 0, 0)
+
+        return html`
+          <button
+            @click="${e => {
+              setState({ frameIndexDrawing: i })
+            }}"
+            class="button frame ${classMap({
+              active: i === state.frameIndexDrawing,
+            })}"
+          >
+            ${canvas}
+          </button>
+        `
+      })}
+      <button class="button frame add-frame" @click=${handleAddFrameClick}>
+        <i class="fas fa-plus-circle"></i>
+      </button>
     </div>
   `
 }
@@ -322,30 +356,58 @@ function frames(state) {
 // ----------------------------------------
 
 function files(state) {
-  const spriteStates = storage.values()
+  const spriteStates = storage.values().map(json => State.fromJSON(json))
 
   if (!spriteStates.length) {
     return null
+  }
+
+  function handleClick(e) {
+    const spriteStateUID = e.target.getAttribute('data-sprite-state-uid')
+
+    if (state.uid !== spriteStateUID) {
+      setState(loadState(spriteStateUID))
+    }
+  }
+
+  function handleNewClick(e) {
+    setState(new State())
   }
 
   return html`
     <div class="files">
       <h2>My Sprites</h2>
       ${spriteStates.map(spriteState => {
-        return spriteState.uid === state.uid
-          ? html`
-              <div class="file active">
-                <i class="fas fa-image"></i>
-                ${spriteState.name || 'UNNAMED'}
-              </div>
-            `
-          : html`
-              <button class="file">
-                <i class="fas fa-image"></i>
-                ${spriteState.name || 'UNNAMED'}
-              </button>
-            `
+        const isActive = spriteState.uid === state.uid
+
+        // TODO: make canvas component, we're drawing data inline a lot
+        const canvas = document.createElement('canvas')
+        canvas.width = state.width
+        canvas.height = state.height
+
+        const imageData = new ImageData(
+          spriteState.frames[0],
+          state.width,
+          state.height,
+        )
+
+        const ctx = canvas.getContext('2d')
+        ctx.putImageData(imageData, 0, 0)
+
+        return html`
+          <button
+            data-sprite-state-uid="${spriteState.uid}"
+            @click=${handleClick}
+            class="button file ${classMap({ active: isActive })}"
+          >
+            ${canvas} ${spriteState.name || 'UNNAMED'}
+          </button>
+        `
       })}
+      <button class="button file" @click=${handleNewClick}>
+        <i class="fas fa-plus-circle"></i>
+        New
+      </button>
     </div>
   `
 }
@@ -428,13 +490,28 @@ function renderHTML(html) {
 }
 
 // ----------------------------------------
-// Drawing Tools
+// Actions
 // ----------------------------------------
+
 const drawImageToCanvas = state => {
   const canvas = document.querySelector('.drawing-canvas')
   const ctx = canvas.getContext('2d')
-  const imageData = new ImageData(state.data, state.width, state.height)
+  const imageData = new ImageData(
+    state.frameDataDrawing,
+    state.width,
+    state.height,
+  )
   ctx.putImageData(imageData, 0, 0)
+}
+
+function addFrame(state) {
+  setState({
+    frames: [
+      ...state.frames,
+      imageDataUtils.arrayFrom(state.height * state.width * 4),
+    ],
+    frameIndexDrawing: state.frames.length,
+  })
 }
 
 function zoomIn(state) {
@@ -447,6 +524,10 @@ function zoomOut(state) {
   })
 }
 
+// ----------------------------------------
+// Tools
+// ----------------------------------------
+
 const ACTION_TOOLS = {
   clear: {
     key: 'clear',
@@ -454,7 +535,9 @@ const ACTION_TOOLS = {
     label: 'Clear',
     onClick: (e, state) => {
       if (confirm('Are you sure you want to CLEAR your image?')) {
-        setState({ data: imageDataUtils.clear(state.data) })
+        setState({
+          frameDataDrawing: imageDataUtils.clear(state.frameDataDrawing),
+        })
       }
     },
   },
@@ -499,7 +582,13 @@ const DRAWING_TOOLS = {
       const empty = [0, 0, 0, 0]
 
       setState({
-        data: imageDataUtils.drawPixel(state.data, state.width, x, y, empty),
+        frameDataDrawing: imageDataUtils.drawPixel(
+          state.frameDataDrawing,
+          state.width,
+          x,
+          y,
+          empty,
+        ),
       })
     },
     onStart: (x, y, state) => {
@@ -516,7 +605,12 @@ const DRAWING_TOOLS = {
     label: 'Pick',
     onEnd(x, y, state) {
       setState({
-        color: imageDataUtils.getPixel(state.data, state.width, x, y),
+        color: imageDataUtils.getPixel(
+          state.frameDataDrawing,
+          state.width,
+          x,
+          y,
+        ),
         tool: state.prevTool,
       })
     },
@@ -530,7 +624,7 @@ const DRAWING_TOOLS = {
       const { startX, startY, startData } = DRAWING_TOOLS.line
 
       setState({
-        data: imageDataUtils.line(
+        frameDataDrawing: imageDataUtils.line(
           startData,
           state.width,
           startX,
@@ -544,7 +638,7 @@ const DRAWING_TOOLS = {
     onStart: (x, y, state) => {
       DRAWING_TOOLS.line.startX = x
       DRAWING_TOOLS.line.startY = y
-      DRAWING_TOOLS.line.startData = state.data
+      DRAWING_TOOLS.line.startData = state.frameDataDrawing
 
       DRAWING_TOOLS.line.draw(x, y, state)
     },
@@ -559,8 +653,8 @@ const DRAWING_TOOLS = {
     label: 'Pencil',
     draw(x, y, state) {
       setState({
-        data: imageDataUtils.drawPixel(
-          state.data,
+        frameDataDrawing: imageDataUtils.drawPixel(
+          state.frameDataDrawing,
           state.width,
           x,
           y,
@@ -578,44 +672,102 @@ const DRAWING_TOOLS = {
 }
 
 // ----------------------------------------
-// State
+// Save / Load
 // ----------------------------------------
 
-const DEFAULT_WIDTH = 8
-const DEFAULT_HEIGHT = 8
-
-const DEFAULT_STATE = {
-  uid: Date.now().toString(36),
-  name: '',
-  prevTool: '',
-  tool: DRAWING_TOOLS.pencil.key,
-  color: [0, 0, 0, 255],
-  scale: 32,
-  width: DEFAULT_WIDTH,
-  height: DEFAULT_HEIGHT,
-  data: imageDataUtils.newArray(DEFAULT_HEIGHT * DEFAULT_WIDTH * 4),
+function saveState(state) {
+  const val = State.toJSON(state)
+  storage.set(state.uid, val)
 }
 
-// load
-const lastState = storage.first()
-const lastStateJSON = lastState ? stateFromJSON(lastState) : null
+function loadState(uid) {
+  const json = uid ? storage.get(uid) : storage.first()
 
-const INITIAL_STATE = lastStateJSON ? lastStateJSON : DEFAULT_STATE
+  return new State(json)
+}
 
-let state = INITIAL_STATE
-window.state = state
+// ----------------------------------------
+// State
+// ----------------------------------------
+class State {
+  static toJSON(state) {
+    const json = {
+      ...state,
+      frames: state.frames.map(frame => new Array(...frame)),
+    }
 
+    delete json.frameDataDrawing
+    delete json.toJSON
+
+    return json
+  }
+
+  static fromJSON = json => {
+    return {
+      ...json,
+      frames: json.frames.map(frame => imageDataUtils.arrayFrom(frame)),
+    }
+  }
+
+  constructor(json) {
+    if (json) {
+      Object.assign(this, State.fromJSON(json))
+      return
+    }
+
+    this.uid = Date.now().toString(36)
+    this.name = ''
+    this.prevTool = ''
+    this.tool = DRAWING_TOOLS.pencil.key
+    this.color = [0, 0, 0, 255]
+    this.scale = 32
+    this.width = SETTINGS.DEFAULT_WIDTH
+    this.height = SETTINGS.DEFAULT_HEIGHT
+    this.frames = [
+      imageDataUtils.arrayFrom(
+        SETTINGS.DEFAULT_HEIGHT * SETTINGS.DEFAULT_WIDTH * 4,
+      ),
+    ]
+    this.frameIndexDrawing = 0
+  }
+
+  get frameDataDrawing() {
+    return this.frames[this.frameIndexDrawing]
+  }
+
+  set frameDataDrawing(val) {
+    this.frames[this.frameIndexDrawing] = val
+  }
+}
+
+// History
 let undos = []
 let redos = []
 
+function undo() {
+  console.log('undo')
+  if (undos.length) {
+    redos.push(state)
+    setState(undos.pop())
+  }
+}
+
+function redo() {
+  console.log('redo')
+  if (redos.length) {
+    undos.push(state)
+    setState(redos.pop())
+  }
+}
+
 function setState(partial = {}) {
-  undos.push(state)
-  redos = []
+  const isInit = state === partial
 
   const prevTool = state.tool
   const didToolChange = partial.tool && partial.tool !== state.prevTool
 
-  state = Object.assign({}, state, partial)
+  state = new State({ ...state, ...partial })
+  window.state = state
 
   if (didToolChange) {
     state.prevTool = prevTool
@@ -627,32 +779,16 @@ function setState(partial = {}) {
   // 1. storage MUST updated before UI can read from it
   // 2. UI SHOULD be rendered before canvas is drawn
   // 3. draw on canvas AFTER it is rendered
-  if (partial !== INITIAL_STATE) save(state)
+  if (!isInit) saveState(state)
   renderHTML(spriteEditor(state))
   drawImageToCanvas(state)
 }
 
-function undo() {
-  console.log('undo')
-  if (undos.length) {
-    redos.push(state)
-    state = undos.pop()
-  }
-}
+let state = loadState()
 
-function redo() {
-  console.log('redo')
-  if (redos.length) {
-    undos.push(state)
-    state = redos.pop()
-  }
-}
-
-setState(state)
-
-//
+// ----------------------------------------
 // Global Listeners
-//
+// ----------------------------------------
 document.addEventListener('mousedown', e => {
   if (e.target.classList.contains('drawing-canvas')) {
     setState({ isDrawing: true })
@@ -707,16 +843,21 @@ document.addEventListener('keydown', e => {
       setState({ showGrid: !state.showGrid })
       break
     case '=':
-      if (e.metaKey) {
+      if (!e.metaKey) {
         e.preventDefault()
         zoomIn(state)
       }
       break
     case '-':
-      if (e.metaKey) {
+      if (!e.metaKey) {
         e.preventDefault()
         zoomOut(state)
       }
       break
   }
 })
+
+// ----------------------------------------
+// Start!
+// ----------------------------------------
+setState(state)
