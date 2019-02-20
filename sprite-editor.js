@@ -317,8 +317,16 @@ function frames(state) {
 
   return html`
     <div class="frames">
-      <button class="button frame play" @click=${handlePlayClick}>
+      <button
+        class="button frame play"
+        @click=${handlePlayClick}
+        ?disabled="${state.frames.length < 2}"
+      >
         <i class="fas fa-${state.HACK__isPlaying ? 'pause' : 'play'}"></i>
+      </button>
+
+      <button class="button frame add-frame" @click=${handleAddFrameClick}>
+        <i class="fas fa-plus-circle"></i>
       </button>
 
       ${state.frames.map((frameData, i) => {
@@ -331,6 +339,30 @@ function frames(state) {
         const ctx = canvas.getContext('2d')
         ctx.putImageData(imageData, 0, 0)
 
+        const handleDeleteClick = e => {
+          if (confirm(`Are you sure you want to DELETE frame index ${i}?`)) {
+            setState({
+              frameIndexDrawing: Math.max(0, i - 1),
+              frames: [
+                ...state.frames.slice(0, i),
+                ...state.frames.slice(i + 1),
+              ],
+            })
+          }
+        }
+
+        const handleCopyClick = e => {
+          const frames = [
+            ...state.frames.slice(0, i + 1),
+            ...state.frames.slice(i),
+          ]
+          console.log(frames)
+          setState({
+            frameIndexDrawing: i + 1,
+            frames,
+          })
+        }
+
         return html`
           <button
             @click="${e => {
@@ -341,12 +373,28 @@ function frames(state) {
             })}"
           >
             ${canvas}
+            <div class="index">${i}</div>
+            <ul class="menu" @click="${e => e.stopPropagation()}">
+              <li>
+                <a @click="${handleCopyClick}">
+                  <i class="fas fa-fw fa-copy"></i>
+                  Copy
+                </a>
+              </li>
+              ${state.frames.length > 1
+                ? html`
+                    <li>
+                      <a @click="${handleDeleteClick}">
+                        <i class="fas fa-fw fa-trash-alt"></i>
+                        Delete
+                      </a>
+                    </li>
+                  `
+                : ''}
+            </ul>
           </button>
         `
       })}
-      <button class="button frame add-frame" @click=${handleAddFrameClick}>
-        <i class="fas fa-plus-circle"></i>
-      </button>
     </div>
   `
 }
@@ -362,21 +410,25 @@ function files(state) {
     return null
   }
 
-  function handleClick(e) {
-    const spriteStateUID = e.target.getAttribute('data-sprite-state-uid')
-
-    if (state.uid !== spriteStateUID) {
-      setState(loadState(spriteStateUID))
+  const handleClick = uid => e => {
+    if (state.uid !== uid) {
+      setState(loadState(uid))
     }
   }
 
-  function handleNewClick(e) {
+  function handleNewClick() {
     setState(new State())
   }
 
   return html`
     <div class="files">
-      <h2>My Sprites</h2>
+      <h3 class="header">Sprites</h3>
+
+      <button class="button new-sprite file" @click=${handleNewClick}>
+        <i class="fas fa-plus-circle"></i>
+        <span class="label">New</span>
+      </button>
+
       ${spriteStates.map(spriteState => {
         const isActive = spriteState.uid === state.uid
 
@@ -396,18 +448,14 @@ function files(state) {
 
         return html`
           <button
-            data-sprite-state-uid="${spriteState.uid}"
-            @click=${handleClick}
+            @click=${handleClick(spriteState.uid)}
             class="button file ${classMap({ active: isActive })}"
           >
-            ${canvas} ${spriteState.name || 'UNNAMED'}
+            ${canvas}
+            <label class="label">${spriteState.name || 'UNNAMED'}</label>
           </button>
         `
       })}
-      <button class="button file" @click=${handleNewClick}>
-        <i class="fas fa-plus-circle"></i>
-        New
-      </button>
     </div>
   `
 }
@@ -534,7 +582,7 @@ const ACTION_TOOLS = {
     icon: 'times-circle',
     label: 'Clear',
     onClick: (e, state) => {
-      if (confirm('Are you sure you want to CLEAR your image?')) {
+      if (confirm('Are you sure you want to CLEAR the image?')) {
         setState({
           frameDataDrawing: imageDataUtils.clear(state.frameDataDrawing),
         })
@@ -691,15 +739,13 @@ function loadState(uid) {
 // ----------------------------------------
 class State {
   static toJSON(state) {
-    const json = {
-      ...state,
+    return {
+      uid: state.uid,
+      name: state.name,
+      width: state.width,
+      height: state.height,
       frames: state.frames.map(frame => new Array(...frame)),
     }
-
-    delete json.frameDataDrawing
-    delete json.toJSON
-
-    return json
   }
 
   static fromJSON = json => {
@@ -710,25 +756,25 @@ class State {
   }
 
   constructor(json) {
-    if (json) {
-      Object.assign(this, State.fromJSON(json))
-      return
-    }
-
+    this.uid = Date.now().toString(36)
     this.uid = Date.now().toString(36)
     this.name = ''
     this.prevTool = ''
     this.tool = DRAWING_TOOLS.pencil.key
     this.color = [0, 0, 0, 255]
-    this.scale = 32
+    this.scale = 16
     this.width = SETTINGS.DEFAULT_WIDTH
     this.height = SETTINGS.DEFAULT_HEIGHT
+    this.frameIndexDrawing = 0
     this.frames = [
       imageDataUtils.arrayFrom(
         SETTINGS.DEFAULT_HEIGHT * SETTINGS.DEFAULT_WIDTH * 4,
       ),
     ]
-    this.frameIndexDrawing = 0
+
+    if (json) {
+      Object.assign(this, State.fromJSON(json))
+    }
   }
 
   get frameDataDrawing() {

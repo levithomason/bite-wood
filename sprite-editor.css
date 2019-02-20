@@ -2,7 +2,7 @@
 
 /* Button style */
 .button {
-  /*padding: var(--button-inner-gap);*/
+  padding: var(--button-inner-gap);
   margin: 0;
   color: inherit;
   background: none;
@@ -22,9 +22,19 @@
 .button.active .label {
   color: var(--ui-active-color);
 }
-.tool i {
-  font-size: var(--button-icon-size);
+.button > * {
   margin: var(--button-inner-gap);
+}
+.button i {
+  font-size: var(--button-icon-size);
+}
+
+.button {
+  background: var(--ui-dark);
+}
+.button.active {
+  color: var(--ui-active-color);
+  background: var(--ui-active-bg);
 }
 
 /****************************
@@ -43,7 +53,7 @@
   --ui-stage-bg: var(--ui-darkest);
   --ui-panel-bg: var(--ui-dark);
 
-  --button-inner-gap: 8px;
+  --button-inner-gap: 4px;
   --button-icon-size: 18px;
 
   --toolbar-space: 4px;
@@ -162,10 +172,6 @@
   display: inline-flex;
   align-items: center;
 }
-.action-tools .tool .label {
-  margin-right: var(--button-inner-gap);
-  margin-top: 0.25em;
-}
 
 .action-tools .tool-group {
   display: inline-block;
@@ -255,62 +261,150 @@
 ****************************/
 .frames {
   --frame-color: #888;
+  --frame-size: 32px;
 
   grid-area: frames;
   display: flex;
 }
 
 .frames .frame {
-  min-width: 32px;
-  height: 32px;
+  position: relative;
+  padding: 0;
+  width: var(--frame-size);
+  height: var(--frame-size);
   background: var(--ui-panel-bg);
 }
-.frames .frame:not(.add-frame) {
-  padding: 0;
+.frames .frame.active {
+  box-shadow: 0 0 0 1px #000, 0 0 0 2px var(--ui-active-color);
 }
 .frames .frame + .frame {
   margin-left: 4px;
 }
 
 .frames .frame canvas {
-  padding-bottom: 2px;
-  width: 32px;
-  height: 32px;
+  margin: 0;
+  width: var(--frame-size);
+  height: var(--frame-size);
   background-image: var(--transparent-background);
   background-size: 5px;
-  border-bottom: 2px solid transparent;
 }
-.frames .frame.active canvas {
-  border-color: var(--ui-active-color);
+.frames .frame .index {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 4px 0 0;
+  font-size: 0.875em;
+  pointer-events: none;
 }
 
+/* menu */
+.frames .frame .menu {
+  transition: transform 0.1s 0.5s ease-out, opacity 0.1s 0.5s ease-out;
+  list-style: none;
+  position: absolute;
+  padding: 0;
+  margin: 0 auto;
+  top: 100%;
+  left: -999%;
+  right: -999%;
+  width: 100px;
+  text-align: left;
+  background: var(--ui-panel-bg);
+  box-shadow: 0 2px 8px #0002;
+  opacity: 1;
+  transform: translateY(8px);
+  cursor: default;
+  z-index: 2;
+}
+.frames .frame .menu::before {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin: auto;
+  border: 16px solid transparent;
+  border-top-width: 0;
+  border-bottom-width: 8px;
+  border-bottom-color: var(--ui-panel-bg);
+}
+.frames .frame:not(:hover) .menu {
+  transition-delay: 0.2s;
+  transform: translateY(0);
+  opacity: 0;
+  pointer-events: none;
+}
+.frames .frame .menu li {
+  display: inline;
+  white-space: nowrap;
+}
+.frames .frame .menu li > * {
+  display: block;
+  padding: var(--button-inner-gap);
+  margin: var(--toolbar-space);
+  color: #fff;
+}
+.frames .frame .menu li > a {
+  cursor: pointer;
+}
+.frames .frame .menu li a:hover,
+.frames .frame .menu li a:active,
+.frames .frame .menu li a.active,
+.frames .frame .menu li a:focus {
+  background: var(--ui-active-bg);
+}
+.frames .frame .menu li a:active,
+.frames .frame .menu li a.active {
+  color: var(--ui-active-color);
+}
 /****************************
            Files
 ****************************/
 .files {
   grid-area: files;
+  display: flex;
+  flex-wrap: wrap;
   margin-top: 24px;
-  color: #fff;
   border-top: 2px solid var(--ui-darkest);
+}
+.files .header {
+  width: 100%;
 }
 
 .files .file {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  width: 56px;
-  height: 56px;
-  background: var(--ui-dark);
+  justify-content: space-between;
+  padding: 0;
+  margin: 0;
+  width: 96px;
+  height: 96px;
 }
-.files .file.active {
-  color: var(--ui-active-color);
-  background: var(--ui-active-bg);
+.files .file:not(.new-sprite) {
+  background: var(--transparent-background);
 }
+.files .file + .file {
+  margin-left: 4px;
+}
+
 .files .file canvas,
-.files .file i {
-  margin: var(--button-inner-gap);
+.files .file i,
+.files .file .label {
+  margin: 8px;
 }
 .files .file canvas {
-  width: 24px;
-  height: 24px;
+  width: 48px;
+  height: 48px;
+}
+.files .file i {
+  padding: 8px;
+  font-size: 32px;
+}
+.files .file .label {
+  display: block;
+  font-size: 14px;
 }

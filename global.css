@@ -40,6 +40,12 @@ canvas {
   backface-visibility: hidden;
 }
 
+button {
+  color: #fff;
+  background: #555;
+  border: none;
+}
+
 .disabled,
 [disabled] {
   pointer-events: none;
