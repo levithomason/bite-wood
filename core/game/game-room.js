@@ -1,4 +1,4 @@
-import { inRange } from '../utils.js'
+import { inRange } from '../math.js'
 
 export default class GameRoom {
   constructor(width = 800, height = 600) {

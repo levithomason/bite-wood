@@ -5,7 +5,7 @@ import {
   GameObject,
   GameSprite,
 } from '../core/game/index.js'
-import * as utils from '../core/utils.js'
+import * as utils from '../core/math.js'
 
 // ----------------------------------------
 // Player

@@ -1,6 +1,6 @@
 import { GameImage, GameSprite, GameObject } from '../core/game/index.js'
 import state from '../core/state.js'
-import * as utils from '../core/utils.js'
+import * as utils from '../core/math.js'
 
 // ----------------------------------------
 // Player

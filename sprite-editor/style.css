@@ -1,7 +1,8 @@
-@import 'global.css';
+@import '../global.css';
 
 /* Button style */
 .button {
+  position: relative;
   padding: var(--button-inner-gap);
   margin: 0;
   color: inherit;
@@ -126,6 +127,14 @@
   text-transform: uppercase;
   font-size: 12px;
   color: #ccc;
+}
+
+.tool .badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 2px;
+  font-size: 12px;
 }
 
 /* Tool Groups */
@@ -265,20 +274,19 @@
 
   grid-area: frames;
   display: flex;
+  flex-wrap: wrap;
 }
 
 .frames .frame {
   position: relative;
   padding: 0;
+  margin: 2px;
   width: var(--frame-size);
   height: var(--frame-size);
   background: var(--ui-panel-bg);
 }
 .frames .frame.active {
   box-shadow: 0 0 0 1px #000, 0 0 0 2px var(--ui-active-color);
-}
-.frames .frame + .frame {
-  margin-left: 4px;
 }
 
 .frames .frame canvas {
@@ -287,6 +295,9 @@
   height: var(--frame-size);
   background-image: var(--transparent-background);
   background-size: 5px;
+}
+.frames .frame.dragging {
+  opacity: .5;
 }
 .frames .frame .index {
   position: absolute;
@@ -331,6 +342,7 @@
   border-bottom-width: 8px;
   border-bottom-color: var(--ui-panel-bg);
 }
+.frames .frame.dragging .menu,
 .frames .frame:not(:hover) .menu {
   transition-delay: 0.2s;
   transform: translateY(0);
@@ -383,6 +395,9 @@
   margin: 0;
   width: 96px;
   height: 96px;
+}
+.files .file.active {
+  border-bottom: 2px solid var(--ui-active-color);
 }
 .files .file:not(.new-sprite) {
   background: var(--transparent-background);

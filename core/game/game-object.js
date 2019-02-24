@@ -1,5 +1,5 @@
 import state from '../state.js'
-import * as utils from '../utils.js'
+import * as utils from '../math.js'
 
 export default class GameObject {
   /**
