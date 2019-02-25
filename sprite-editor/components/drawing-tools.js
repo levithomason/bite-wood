@@ -36,6 +36,11 @@ function drawingTools(state) {
       </div>
 
       <div class="tool-group">
+        ${drawingTool(state, { key: 'select', icon: 'expand', label: 'Select' })}
+        ${drawingTool(state, { key: 'move', icon: 'arrows-alt', label: 'Move' })}
+      </div>
+
+      <div class="tool-group">
         ${drawingTool(state, DRAWING_TOOLS.eyeDropper)}
         ${drawingTool(state, { key: 'brush', icon: 'brush', label: 'Brush' })}
         ${drawingTool(state, { key: 'fill', icon: 'fill-drip', label: 'Fill' })}
@@ -52,11 +57,7 @@ function drawingTools(state) {
           icon: 'circle',
           label: 'Circle',
         })}
-        ${drawingTool(state, {
-          key: 'square',
-          icon: 'square',
-          label: 'Square',
-        })}
+        ${drawingTool(state, DRAWING_TOOLS.square)}
         ${drawingTool(state, DRAWING_TOOLS.line)}
       </div>
 

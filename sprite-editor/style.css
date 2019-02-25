@@ -311,12 +311,12 @@
 
 /* menu */
 .frames .frame .menu {
-  transition: transform 0.1s 0.5s ease-out, opacity 0.1s 0.5s ease-out;
+  transition: opacity 0.1s ease-out;
   list-style: none;
   position: absolute;
   padding: 0;
   margin: 0 auto;
-  top: 100%;
+  top: calc(100% + 10px);
   left: -999%;
   right: -999%;
   width: 100px;
@@ -324,7 +324,6 @@
   background: var(--ui-panel-bg);
   box-shadow: 0 2px 8px #0002;
   opacity: 1;
-  transform: translateY(8px);
   cursor: default;
   z-index: 2;
 }
@@ -344,8 +343,6 @@
 }
 .frames .frame.dragging .menu,
 .frames .frame:not(:hover) .menu {
-  transition-delay: 0.2s;
-  transform: translateY(0);
   opacity: 0;
   pointer-events: none;
 }

@@ -75,6 +75,38 @@ const DRAWING_TOOLS = {
     },
   },
 
+  square: {
+    key: 'square',
+    icon: 'square',
+    label: 'Square',
+    draw(x2, y2, state) {
+      const { startX, startY, startData } = DRAWING_TOOLS.square
+
+      setState({
+        frameDataDrawing: imageDataUtils.rectangle(
+          startData,
+          state.width,
+          startX,
+          startY,
+          x2,
+          y2,
+          state.color,
+        ),
+      })
+    },
+    onStart: (x, y, state) => {
+      console.log('START')
+      DRAWING_TOOLS.square.startX = x
+      DRAWING_TOOLS.square.startY = y
+      DRAWING_TOOLS.square.startData = state.frameDataDrawing
+
+      DRAWING_TOOLS.square.draw(x, y, state)
+    },
+    onMove: (x, y, state) => {
+      DRAWING_TOOLS.square.draw(x, y, state)
+    },
+  },
+
   pencil: {
     key: 'pencil',
     icon: 'pencil-alt',

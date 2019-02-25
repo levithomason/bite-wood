@@ -78,14 +78,16 @@ function colorSwatches(state) {
   }
 
   const rgbaInUseMap = new Map()
-  imageDataUtils.forEachPixel(state.frameDataDrawing, ([r, g, b, a255]) => {
-    const a = a255 / 255
-    const obj = { r, g, b, a }
-    const key = `rgba(${r}, ${g}, ${b}, ${a255})`
+  state.frames.forEach(frame => {
+    imageDataUtils.forEachPixel(frame, ([r, g, b, a255]) => {
+      const a = a255 / 255
+      const obj = { r, g, b, a }
+      const key = `rgba(${r}, ${g}, ${b}, ${a255})`
 
-    if (!rgbaInUseMap.has(key) && a255 > 0) {
-      rgbaInUseMap.set(key, obj)
-    }
+      if (!rgbaInUseMap.has(key) && a255 > 0) {
+        rgbaInUseMap.set(key, obj)
+      }
+    })
   })
 
   const swatchesInUse = [...rgbaInUseMap.values()]

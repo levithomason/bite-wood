@@ -10,12 +10,16 @@ function HACK__playLoop() {
       frameIndexDrawing: (state.frameIndexDrawing + 1) % state.frames.length,
     })
     HACK__playLoop()
-  }, 200)
+  }, 1000 / 10)
 }
 
 function frames(state) {
   function handleAddFrameClick(e) {
     actions.addFrame(state)
+  }
+
+  function handleReverseClick(e) {
+    actions.reverseFrames(state)
   }
 
   function handlePlayClick(e) {
@@ -111,6 +115,9 @@ function frames(state) {
 
       <button class="button frame add-frame" @click=${handleAddFrameClick}>
         <i class="fas fa-plus-circle"></i>
+      </button>
+      <button class="button frame reverse-frame" @click=${handleReverseClick}>
+        <i class="fas fa-exchange-alt"></i>
       </button>
 
       <!-- TODO: break out frame() component -->

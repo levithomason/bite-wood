@@ -60,6 +60,24 @@ export function drawPixelMutate(array, width, x, y, [r, g, b, a]) {
   return array
 }
 
+export const rectangle = (array, width, x1, y1, x2, y2, [r, g, b, a]) => {
+  const cloned = arrayFrom(array)
+
+  const startX = Math.min(x1, x2)
+  const startY = Math.min(y1, y2)
+
+  const endX = Math.max(x1, x2)
+  const endY = Math.max(y1, y2)
+
+  for (let y = startY; y <= endY; y += 1) {
+    for (let x = startX; x <= endX; x += 1) {
+      drawPixelMutate(cloned, width, x, y, [r, g, b, a])
+    }
+  }
+
+  return cloned
+}
+
 export function line(array, width, x1, y1, x2, y2, [r, g, b, a]) {
   const cloned = arrayFrom(array)
 
@@ -144,7 +162,11 @@ export function forEachPixel(array, cb) {
  * @param addArray
  * @param width
  * @param height
- * @param {{color: string, screen: string, exclusion: string, 'destination-out': string, saturation: string, 'hard-light': string, 'soft-light': string, 'source-in': string, lighten: string, luminosity: string, xor: string, copy: string, multiply: string, 'destination-atop': string, overlay: string, 'destination-over': string, lighter: string, 'source-atop': string, 'destination-in': string, darken: string, 'color-burn': string, 'source-out': string, 'source-over': string, difference: string, hue: string, 'color-dodge': string}} blendMode
+ * @param {{color: string, screen: string, exclusion: string, 'destination-out': string, saturation: string,
+ *   'hard-light': string, 'soft-light': string, 'source-in': string, lighten: string, luminosity: string, xor: string,
+ *   copy: string, multiply: string, 'destination-atop': string, overlay: string, 'destination-over': string, lighter:
+ *   string, 'source-atop': string, 'destination-in': string, darken: string, 'color-burn': string, 'source-out':
+ *   string, 'source-over': string, difference: string, hue: string, 'color-dodge': string}} blendMode
  */
 export function composite(baseArray, addArray, width, height, blendMode) {
   const canvas = document.createElement('canvas')

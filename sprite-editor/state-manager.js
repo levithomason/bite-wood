@@ -154,6 +154,12 @@ actions.addFrame = state => {
   })
 }
 
+actions.reverseFrames = state => {
+  setState({
+    frames: state.frames.reverse(),
+  })
+}
+
 //
 // Actions: Editor
 //
