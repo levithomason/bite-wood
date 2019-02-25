@@ -45,11 +45,7 @@ function actionTools(state) {
         ${actionTool(state, ACTION_TOOLS.grid(state))}
       </div>
       <div class="tool-group">
-        ${actionTool(state, {
-          key: 'download',
-          icon: 'download',
-          label: 'Download',
-        })}
+        ${actionTool(state, ACTION_TOOLS.export(state))}
         ${actionTool(state, {
           key: 'background',
           icon: 'swatchbook',

@@ -1,4 +1,5 @@
 import * as imageDataUtils from '../lib/image-data-utils.js'
+import { loadState } from '../storage-manager.js'
 import SETTINGS from './settings.js'
 import { actions, setState } from '../state-manager.js'
 
@@ -43,6 +44,30 @@ const ACTION_TOOLS = {
     disabled: state.redos.length < 1,
     onClick: e => {
       actions.redo(state)
+    },
+  }),
+
+  export: state => ({
+    key: 'export',
+    icon: 'file-export',
+    label: 'Export',
+    onClick: e => {
+      const filename = `${state.name}.json`
+      const contentType = 'application/json;charset=utf-8;'
+      const uriComponent = encodeURIComponent(
+        JSON.stringify(loadState(state.uid)),
+      )
+
+      const a = document.createElement('a')
+      a.download = filename
+      a.href = `data:${contentType},${uriComponent}`
+      a.target = '_blank'
+
+      document.body.appendChild(a)
+
+      a.click()
+
+      document.body.removeChild(a)
     },
   }),
 
