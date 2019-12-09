@@ -1,17 +1,17 @@
-import * as collision from '../core/collision.js'
+import * as collision from '../../core/collision.js'
 import {
   GameAudio,
   GameImage,
   GameObject,
   GameSprite,
-} from '../core/game/index.js'
-import * as utils from '../core/math.js'
+} from '../../core/game/index.js'
+import * as utils from '../../core/math.js'
 
 // ----------------------------------------
 // Player
 // ----------------------------------------
 const sprApple = new GameSprite({
-  image: new GameImage(`../images/apple.png`),
+  image: new GameImage(`../game/images/apple.png`),
   scaleX: 2,
   scaleY: 2,
   frameCount: 1,
@@ -21,7 +21,7 @@ const sprApple = new GameSprite({
   insertionY: 12,
 })
 
-const sndEatApple = new GameAudio('../sounds/20269__koops__apple-crunch-06.wav')
+const sndEatApple = new GameAudio('../game/sounds/20269__koops__apple-crunch-06.wav')
 
 /**
  * Evaluates action parameter values and invokes action.

@@ -1,7 +1,7 @@
-import { Game, GameDrawing } from './core/game/index.js'
+import { Game, GameDrawing } from '../core/game/index.js'
 import room0 from './rooms/room0.js'
 import room1 from './rooms/room1.js'
-import state from './core/state.js'
+import state from '../core/state.js'
 
 // ----------------------------------------
 // Game

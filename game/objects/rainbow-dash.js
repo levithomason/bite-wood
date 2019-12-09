@@ -1,15 +1,15 @@
-import { GameImage, GameSprite, GameObject } from '../core/game/index.js'
-import state from '../core/state.js'
+import { GameImage, GameSprite, GameObject } from '../../core/game/index.js'
+import state from '../../core/state.js'
 
 // ----------------------------------------
 // RainbowDash
 // ----------------------------------------
 export const imgRainbowDashR = new GameImage(
-  './../images/my-littlepony-right.png',
+  './../game/images/my-littlepony-right.png',
 )
 
 export const imgRainbowDashL = new GameImage(
-  './../images/my-littlepony-left.png',
+  './../game/images/my-littlepony-left.png',
 )
 
 export const sprRainbowDashFlyR = new GameSprite({

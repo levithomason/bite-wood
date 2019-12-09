@@ -1,11 +1,10 @@
 {
   "name": "violet",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "game/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "live-server",
-    "start:console": "cd console && nodemon --quiet --no-stdin"
+    "start": "live-server --port=4321"
   },
   "prettier": {
     "semi": false,

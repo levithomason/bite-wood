@@ -1,5 +1,5 @@
-import { GameAudio, GameRoom } from '../core/game/index.js'
-import state from '../core/state.js'
+import { GameAudio, GameRoom } from '../../core/game/index.js'
+import state from '../../core/state.js'
 
 class Room1 extends GameRoom {
   constructor() {

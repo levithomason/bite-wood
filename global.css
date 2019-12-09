@@ -1,10 +1,10 @@
-@import url(/fonts/8bit_wonder/web/stylesheet.css);
-@import url(/fonts/mini_pixel_7/web/stylesheet.css);
-@import url(/fonts/pixelated/web/stylesheet.css);
-@import url(/fonts/Pixellari/web/stylesheet.css);
-@import url(/fonts/pixeltype/web/stylesheet.css);
-@import url(/fonts/small_pixel7/web/stylesheet.css);
-@import url(/fonts/visitor/web/stylesheet.css);
+@import url(/game/fonts/8bit_wonder/web/stylesheet.css);
+@import url(/game/fonts/mini_pixel_7/web/stylesheet.css);
+@import url(/game/fonts/pixelated/web/stylesheet.css);
+@import url(/game/fonts/Pixellari/web/stylesheet.css);
+@import url(/game/fonts/pixeltype/web/stylesheet.css);
+@import url(/game/fonts/small_pixel7/web/stylesheet.css);
+@import url(/game/fonts/visitor/web/stylesheet.css);
 
 html,
 body {

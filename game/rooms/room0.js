@@ -1,4 +1,4 @@
-import { GameAudio, GameImage, GameRoom } from '../core/game/index.js'
+import { GameAudio, GameImage, GameRoom } from '../../core/game/index.js'
 
 import Apple from '../objects/apple.js'
 import Player from '../objects/player.js'
@@ -9,7 +9,7 @@ class Room0 extends GameRoom {
   constructor() {
     super()
 
-    this.backgroundImage = new GameImage('../images/background.png')
+    this.backgroundImage = new GameImage('../game/images/background.png')
 
     this.backgroundMusic = new GameAudio(
       'http://soundimage.org/wp-content/uploads/2016/03/Monkey-Island-Band_Looping.mp3',
