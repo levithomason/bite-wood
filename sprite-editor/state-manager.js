@@ -31,6 +31,9 @@ export class State {
   }
 
   constructor(json) {
+    this.__previewLoopTimer = null
+    this.__isPreviewPlaying = false
+
     this.uid = Date.now().toString(36)
     this.name = ''
     this.prevTool = ''
@@ -47,6 +50,7 @@ export class State {
     ]
     this.undos = []
     this.redos = []
+    this.previewFPS = 10
 
     if (json) {
       Object.assign(this, State.fromJSON(json))
@@ -65,7 +69,6 @@ export class State {
 // ----------------------------------------
 // Private
 // ----------------------------------------
-
 const renderApp = state => {
   if (!renderApp.mountNode) {
     renderApp.mountNode = document.createElement('div')
@@ -76,7 +79,7 @@ const renderApp = state => {
   render(editor(state), renderApp.mountNode)
 }
 
-const drawImageToCanvas = state => {
+const drawDrawingCanvas = state => {
   const canvas = document.querySelector('.drawing-canvas')
   const ctx = canvas.getContext('2d')
   const imageData = new ImageData(
@@ -126,12 +129,12 @@ export function setState(partial = {}) {
   window.state = state
 
   // Order mostly matters here:
-  // 1. storage MUST updated before UI can read from it
+  // 1. storage MUST be updated before UI can read from it
   // 2. UI SHOULD be rendered before canvas is drawn
-  // 3. draw on canvas AFTER it is rendered
+  // 3. draw on canvas AFTER the canvas is rendered
   if (!isInit) saveState(State.toJSON(nextState))
   renderApp(nextState)
-  drawImageToCanvas(nextState)
+  drawDrawingCanvas(nextState)
 }
 
 // ----------------------------------------
@@ -158,6 +161,27 @@ actions.reverseFrames = state => {
   setState({
     frames: state.frames.reverse(),
   })
+}
+
+actions.deleteFrame = (state, index) => {
+  if (confirm(`DELETE frame index ${index}?`)) {
+    setState({
+      frameIndexDrawing: Math.max(0, index - 1),
+      frames: [
+        ...state.frames.slice(0, index),
+        ...state.frames.slice(index + 1),
+      ],
+    })
+  }
+}
+
+actions.deleteAllFrames = (state, index) => {
+  if (confirm(`DELETE ALL frames?`)) {
+    setState({
+      frameIndexDrawing: 0,
+      frames: [imageDataUtils.arrayFrom(state.height * state.width * 4)],
+    })
+  }
 }
 
 //

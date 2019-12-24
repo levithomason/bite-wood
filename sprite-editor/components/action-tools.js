@@ -12,7 +12,7 @@ function actionTool(state, { key, icon, label, badge, disabled, onClick, active 
     >
       ${icon !== undefined
         ? html`
-            <i class="fas fa-fw fa-sm fa-${icon}"></i>
+            <i class="fas fa-fw fa-${icon}"></i>
           `
         : ''}
       ${label !== undefined

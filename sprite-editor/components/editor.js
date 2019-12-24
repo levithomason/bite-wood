@@ -14,8 +14,8 @@ function editor(state) {
       ${drawingTools(state)}
       ${actionTools(state)}
       ${stage(state)}
-      ${colorSwatches(state)} 
-      ${frames(state)} 
+      ${colorSwatches(state)}
+      ${frames(state)}
       ${files(state)}
     </div>
   `

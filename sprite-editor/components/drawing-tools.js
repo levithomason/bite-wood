@@ -17,7 +17,7 @@ function drawingTool(state, { key, icon, label }) {
     >
       ${icon &&
         html`
-          <i class="fas fa-fw fa-sm fa-${icon}"></i>
+          <i class="fas fa-fw fa-${icon}"></i>
         `}
       ${label &&
         html`

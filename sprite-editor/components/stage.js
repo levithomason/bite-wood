@@ -2,6 +2,7 @@ import { html } from '../../node_modules/lit-html/lit-html.js'
 import { styleMap } from '../../node_modules/lit-html/directives/style-map.js'
 import DRAWING_TOOLS from '../config/drawing-tools.js'
 import { actions, getState, setState } from '../state-manager.js'
+import spritePreview from './sprite-preview.js'
 
 // ----------------------------------------
 // Events
@@ -108,7 +109,7 @@ function gridCanvas(state) {
 function stage(state) {
   return html`
     <div class="stage">
-      ${drawingCanvas(state)} ${gridCanvas(state)}
+      ${spritePreview(state)} ${drawingCanvas(state)} ${gridCanvas(state)}
     </div>
   `
 }

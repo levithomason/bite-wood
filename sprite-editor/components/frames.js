@@ -4,15 +4,6 @@ import { classMap } from '../../node_modules/lit-html/directives/class-map.js'
 import { actions, setState } from '../state-manager.js'
 import * as utils from '../../core/math.js'
 
-function HACK__playLoop() {
-  window.HACK__playLoopTimer = setTimeout(() => {
-    setState({
-      frameIndexDrawing: (state.frameIndexDrawing + 1) % state.frames.length,
-    })
-    HACK__playLoop()
-  }, 1000 / 10)
-}
-
 function frames(state) {
   function handleAddFrameClick(e) {
     actions.addFrame(state)
@@ -22,14 +13,8 @@ function frames(state) {
     actions.reverseFrames(state)
   }
 
-  function handlePlayClick(e) {
-    if (state.HACK__isPlaying) {
-      setState({ HACK__isPlaying: false })
-      clearInterval(window.HACK__playLoopTimer)
-    } else {
-      setState({ HACK__isPlaying: true })
-      HACK__playLoop()
-    }
+  function handleDeleteAll() {
+    actions.deleteAllFrames(state)
   }
 
   function handleDnD(eventname, element, event) {
@@ -105,19 +90,14 @@ function frames(state) {
 
   return html`
     <div class="frames">
-      <button
-        class="button frame play"
-        @click=${handlePlayClick}
-        ?disabled="${state.frames.length < 2}"
-      >
-        <i class="fas fa-${state.HACK__isPlaying ? 'pause' : 'play'}"></i>
-      </button>
-
       <button class="button frame add-frame" @click=${handleAddFrameClick}>
         <i class="fas fa-plus-circle"></i>
       </button>
       <button class="button frame reverse-frame" @click=${handleReverseClick}>
-        <i class="fas fa-exchange-alt"></i>
+        <i class="fas fa-sort-amount-down fa-rotate-90"></i>
+      </button>
+      <button class="button frame delete-all-frame" @click=${handleDeleteAll}>
+        <i class="fas fa-trash-alt"></i>
       </button>
 
       <!-- TODO: break out frame() component -->
@@ -134,15 +114,7 @@ function frames(state) {
         ctx.putImageData(imageData, 0, 0)
 
         const handleDeleteClick = e => {
-          if (confirm(`Are you sure you want to DELETE frame index ${i}?`)) {
-            setState({
-              frameIndexDrawing: Math.max(0, i - 1),
-              frames: [
-                ...state.frames.slice(0, i),
-                ...state.frames.slice(i + 1),
-              ],
-            })
-          }
+          actions.deleteFrame(state, i)
         }
 
         const handleCopyClick = e => {

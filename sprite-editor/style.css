@@ -3,7 +3,7 @@
 /* Button style */
 .button {
   position: relative;
-  padding: var(--button-inner-gap);
+  padding: var(--micro-space-inside);
   margin: 0;
   color: inherit;
   background: none;
@@ -24,10 +24,10 @@
   color: var(--ui-active-color);
 }
 .button > * {
-  margin: var(--button-inner-gap);
+  margin: var(--micro-space-inside);
 }
 .button i {
-  font-size: var(--button-icon-size);
+  font-size: var(--font-size-large);
 }
 
 .button {
@@ -42,7 +42,21 @@
         Sprite Editor
 ****************************/
 .sprite-editor {
-  --editor-gap: 8px;
+  --base: 4px;
+  --proximity: 2px;
+  --micro-space-outside: 8px;
+  --micro-space-inside: 4px;
+
+  --macro-space-outside: 16px;
+  --macro-space-inside: 8px;
+
+  --font-smallest: 10px;
+  --font-smaller: 12px;
+  --font-small: 14px;
+  --font-base: 16px;
+  --font-size-large: 18px;
+  --font-size-larger: 21px;
+  --font-size-largest: 24px;
 
   --ui-active-color: burlywood;
   --ui-active-bg: #0003;
@@ -54,15 +68,12 @@
   --ui-stage-bg: var(--ui-darkest);
   --ui-panel-bg: var(--ui-dark);
 
-  --button-inner-gap: 4px;
-  --button-icon-size: 18px;
-
   --toolbar-space: 4px;
   --tool-divider-border: 1px solid var(--ui-darker);
   --drawing-tool-size: 60px;
 
   display: grid;
-  grid-gap: var(--editor-gap);
+  grid-gap: var(--macro-space-outside);
   justify-content: center;
   grid-template:
     'header        header       header        ' auto
@@ -71,7 +82,7 @@
     'drawing-tools frames       color-swatches' auto
     'files         files        files         ' auto /
     auto 1fr auto;
-  padding: var(--editor-gap);
+  padding: var(--macro-space-inside);
   color: #fff;
   text-shadow: -1px -1px 0 #0003, 1px -1px 0 #0003, -1px 1px 0 #0003,
     1px 1px 0 #0003;
@@ -125,16 +136,19 @@
 
 .tool .label {
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: var(--font-smallest);
   color: #ccc;
 }
 
 .tool .badge {
   position: absolute;
+  width: 2ch;
   bottom: 0;
   right: 0;
-  margin: 2px;
+  margin: 0;
   font-size: 12px;
+  line-height: 1;
+  text-align: center;
 }
 
 /* Tool Groups */
@@ -213,6 +227,25 @@
   position: absolute;
   pointer-events: none;
   z-index: 1;
+}
+
+/****************************
+       Sprite Preview
+****************************/
+.sprite-preview {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 64px;
+}
+
+.sprite-preview .preview-canvas {
+  display: block;
+}
+.sprite-preview .speed-control {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
 }
 
 /****************************
@@ -297,7 +330,7 @@
   background-size: 5px;
 }
 .frames .frame.dragging {
-  opacity: .5;
+  opacity: 0.5;
 }
 .frames .frame .index {
   position: absolute;
@@ -352,7 +385,7 @@
 }
 .frames .frame .menu li > * {
   display: block;
-  padding: var(--button-inner-gap);
+  padding: var(--micro-space-inside);
   margin: var(--toolbar-space);
   color: #fff;
 }
@@ -400,7 +433,7 @@
   background: var(--transparent-background);
 }
 .files .file + .file {
-  margin-left: 4px;
+  margin-left: var(--proximity);
 }
 
 .files .file canvas,
