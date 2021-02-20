@@ -1,10 +1,5 @@
-@import url(/game/fonts/8bit_wonder/web/stylesheet.css);
-@import url(/game/fonts/mini_pixel_7/web/stylesheet.css);
-@import url(/game/fonts/pixelated/web/stylesheet.css);
 @import url(/game/fonts/Pixellari/web/stylesheet.css);
-@import url(/game/fonts/pixeltype/web/stylesheet.css);
-@import url(/game/fonts/small_pixel7/web/stylesheet.css);
-@import url(/game/fonts/visitor/web/stylesheet.css);
+@import url(/slider.css);
 
 html,
 body {
@@ -16,13 +11,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
 
-  font-family: Pixellari,
-    /*nice*/ /*Pixeltype, !*thin but OK*!*/
-      /*"Visitor TT1 BRK", !*10px wide but clear*!*/
-      /*"Visitor TT2 BRK",  !*wide and small*!*/
-      /*"8BIT WONDER", !*big and wide*!*/ /*"Small Pixel7", !* REALLY small*!*/
-      /*"Mini Pixel-7", !* REALLY mini*!*/
-      /*Pixelated, !*small and hard to read*!*/ Wingdings;
+  font-family: Pixellari;
 }
 
 * {
@@ -34,7 +23,7 @@ canvas {
   image-rendering: pixelated;
 
   /* animate sizes smoothly */
-  transition: width 0.15s, height 0.15s;
+  transition: width 5s, height 5s;
   transition-timing-function: var(--timing-function-bounce);
   transform: translateZ(0);
   backface-visibility: hidden;
