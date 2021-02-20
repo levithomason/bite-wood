@@ -253,8 +253,7 @@
 ****************************/
 
 .color-swatches {
-  --swatch-size: 16px;
-  --swatches-per-row: 9;
+  --swatch-size: 14px;
 
   grid-area: color-swatches;
   padding: var(--toolbar-space);

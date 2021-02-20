@@ -39,19 +39,20 @@ function colorSwatch(state, { r = 0, g = 0, b = 0, a = 1 } = {}) {
 function colorSwatches(state) {
   const deg = 360
 
-  const hues = 12
+  const hues = 16
   const step = deg / hues
 
-  const tints = 4
-  const shades = 4
+  const tints = 2
+  const shades = 8
   const variants = tints + shades + 1
 
   const swatches = []
 
   // grayscale
   const gray = tinycolor('#fff')
-  for (let i = 0; i < variants; i += 1) {
-    gray.darken(100 / variants)
+  swatches.push(colorSwatch(state, gray.toRgb()))
+  for (let i = 1; i < variants; i += 1) {
+    gray.darken(100 / (variants - 1))
     swatches.push(colorSwatch(state, gray.toRgb()))
   }
 
@@ -70,7 +71,7 @@ function colorSwatches(state) {
 
     const dark = tinycolor(hsl)
     for (let k = 0; k < shades; k += 1) {
-      dark.darken(100 / (shades * 2 + 2))
+      dark.darken(100 / (shades * 2 + 3))
       row.push(colorSwatch(state, dark.toRgb()))
     }
 
@@ -99,7 +100,7 @@ function colorSwatches(state) {
     })
 
   return html`
-    <div class="color-swatches">
+    <div class="color-swatches" style="--swatches-per-row: ${variants};">
       <div class="header">Used colors</div>
       <div class="used-colors">
         ${swatchesInUse.length ? swatchesInUse : '...'}
