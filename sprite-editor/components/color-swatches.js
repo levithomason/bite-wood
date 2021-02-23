@@ -23,7 +23,7 @@ function colorSwatch(state, { r = 0, g = 0, b = 0, a = 1 } = {}) {
 
   return html`
     <button
-      class="button color-swatch ${classMap({
+      class="color-swatch ${classMap({
         active:
           state.color[0] === r &&
           state.color[1] === g &&

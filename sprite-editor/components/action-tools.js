@@ -7,7 +7,7 @@ function actionTool(state, { key, icon, label, badge, disabled, onClick, active 
   return html`
     <button
       ?disabled=${disabled || !ACTION_TOOLS[key]}
-      class="button tool ${classMap({ active })}"
+      class="tool ${classMap({ active })}"
       @click="${onClick}"
     >
       ${icon !== undefined

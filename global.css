@@ -1,17 +1,51 @@
 @import url(/game/fonts/Pixellari/web/stylesheet.css);
-@import url(/slider.css);
+@import url(/public/css/slider.css);
+@import url(/public/css/button.css);
+
+:root {
+  --micro-space-outside: 8px;
+  --micro-space-inside: 4px;
+
+  --macro-space-outside: 16px;
+  --macro-space-inside: 8px;
+
+  --font-smallest: 10px;
+  --font-smaller: 12px;
+  --font-small: 14px;
+  --font-base: 16px;
+  --font-size-large: 18px;
+  --font-size-larger: 21px;
+  --font-size-largest: 24px;
+
+  --ui-active-color: burlywood;
+  --ui-active-bg: #0003;
+  --ui-darkest: #282828;
+  --ui-darker: #383838;
+  --ui-dark: #484848;
+
+  --ui-bg: var(--ui-darker);
+  --ui-stage-bg: var(--ui-darkest);
+  --ui-panel-bg: var(--ui-dark);
+
+  --toolbar-space: 4px;
+  --tool-divider-border: 1px solid var(--ui-darker);
+  --drawing-tool-size: 60px;
+
+  --timing-function-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --transparent-background: url('data:sprite/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAKUlEQVQoU2NkYGAwZkAD////RxdiYBwKCv///4/hGUZGkNNRAeMQUAgAtxof+nLDzyUAAAAASUVORK5CYII=');
+}
 
 html,
 body {
-  --timing-function-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --transparent-background: url('data:sprite/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAKUlEQVQoU2NkYGAwZkAD////RxdiYBwKCv///4/hGUZGkNNRAeMQUAgAtxof+nLDzyUAAAAASUVORK5CYII=');
-
   background: #000;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
-
+  color: #fff;
+  text-shadow: -1px -1px 0 #0003, 1px -1px 0 #0003, -1px 1px 0 #0003,
+    1px 1px 0 #0003;
   font-family: Pixellari;
+  background: var(--ui-bg);
 }
 
 * {
@@ -29,14 +63,12 @@ canvas {
   backface-visibility: hidden;
 }
 
-button {
-  color: #fff;
-  background: #555;
-  border: none;
-}
-
 .disabled,
 [disabled] {
   pointer-events: none;
   opacity: 0.3;
+}
+
+a {
+  color: inherit;
 }

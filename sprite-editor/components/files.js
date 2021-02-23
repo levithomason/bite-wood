@@ -24,7 +24,7 @@ function files(state) {
     <div class="files">
       <h3 class="header">Sprites</h3>
 
-      <button class="button new-sprite file" @click=${handleNewClick}>
+      <button class="new-sprite file" @click=${handleNewClick}>
         <i class="fas fa-plus-circle"></i>
         <span class="label">New</span>
       </button>
@@ -52,7 +52,7 @@ function files(state) {
         return html`
           <button
             @click=${handleClick(spriteState.uid)}
-            class="button file ${classMap({ active: isActive })}"
+            class="file ${classMap({ active: isActive })}"
           >
             ${canvas}
             <label class="label">${spriteState.name || 'UNNAMED'}</label>

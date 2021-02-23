@@ -3,7 +3,7 @@ import * as utils from '../math.js'
 
 export default class GameObject {
   /**
-   * @param {boolean} persist
+   * @param {boolean} persist - Determines whether or not this object should still exist when the room changes.
    * @param {GameSprite} sprite
    * @param {boolean} solid
    *

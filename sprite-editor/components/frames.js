@@ -90,13 +90,13 @@ function frames(state) {
 
   return html`
     <div class="frames">
-      <button class="button frame add-frame" @click=${handleAddFrameClick}>
+      <button class="frame add-frame" @click=${handleAddFrameClick}>
         <i class="fas fa-plus-circle"></i>
       </button>
-      <button class="button frame reverse-frame" @click=${handleReverseClick}>
+      <button class="frame reverse-frame" @click=${handleReverseClick}>
         <i class="fas fa-sort-amount-down fa-rotate-90"></i>
       </button>
-      <button class="button frame delete-all-frame" @click=${handleDeleteAll}>
+      <button class="frame delete-all-frame" @click=${handleDeleteAll}>
         <i class="fas fa-trash-alt"></i>
       </button>
 
@@ -138,7 +138,7 @@ function frames(state) {
             @click="${e => {
               setState({ frameIndexDrawing: i })
             }}"
-            class="button frame ${classMap({
+            class="frame ${classMap({
               active: i === state.frameIndexDrawing,
             })}"
           >

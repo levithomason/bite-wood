@@ -12,7 +12,7 @@ function drawingTool(state, { key, icon, label }) {
   return html`
     <button
       ?disabled=${!DRAWING_TOOLS[key]}
-      class="button tool ${classMap({ active: state.tool === key })}"
+      class="tool ${classMap({ active: state.tool === key })}"
       @click="${handleClick}"
     >
       ${icon &&
@@ -36,8 +36,16 @@ function drawingTools(state) {
       </div>
 
       <div class="tool-group">
-        ${drawingTool(state, { key: 'select', icon: 'expand', label: 'Select' })}
-        ${drawingTool(state, { key: 'move', icon: 'arrows-alt', label: 'Move' })}
+        ${drawingTool(state, {
+          key: 'select',
+          icon: 'expand',
+          label: 'Select',
+        })}
+        ${drawingTool(state, {
+          key: 'move',
+          icon: 'arrows-alt',
+          label: 'Move',
+        })}
       </div>
 
       <div class="tool-group">

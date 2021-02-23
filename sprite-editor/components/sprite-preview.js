@@ -1,6 +1,4 @@
 import { html } from '../../node_modules/lit-html/lit-html.js'
-import { styleMap } from '../../node_modules/lit-html/directives/style-map.js'
-import * as imageDataUtils from '../lib/image-data-utils.js'
 import { setState, getState } from '../state-manager.js'
 
 let __previewLoopTimer
@@ -48,7 +46,7 @@ function spritePreview(state) {
   //   setState({ isPreviewPlaying: !state.isPreviewPlaying })
   // }
   //       <button
-  //         class="button frame play"
+  //         class="frame play"
   //         @click=${handlePlayClick}
   //         ?disabled="${state.frames.length < 2}"
   //       >
@@ -61,10 +59,7 @@ function spritePreview(state) {
         class="preview-canvas"
         width="${state.width}"
         height="${state.height}"
-        style="${styleMap({
-          width: state.width * 4 + 'px',
-          height: state.height * 4 + 'px',
-        })}"
+        style="width:100%;"
       ></canvas>
       <input
         class="speed-control"

@@ -26,14 +26,11 @@ export class State {
   static fromJSON = json => {
     return {
       ...json,
-      frames: json.frames.map(frame => imageDataUtils.arrayFrom(frame)),
+      frames: json.frames?.map(frame => imageDataUtils.arrayFrom(frame)) ?? [],
     }
   }
 
   constructor(json) {
-    this.__previewLoopTimer = null
-    this.__isPreviewPlaying = false
-
     this.uid = Date.now().toString(36)
     this.name = ''
     this.prevTool = ''
