@@ -26,6 +26,8 @@ class Room0 extends GameRoom {
     room0.instanceCreate(Apple)
     room0.instanceCreate(Apple)
     room0.instanceCreate(Apple)
+    // TODO: this throws DOMException when trying to execute `drawImage`
+    //       maybe we don't handle objects with no image?
     room0.instanceCreate(Solid)
     room0.instanceCreate(RainbowDash)
     room0.instanceCreate(Player, 100, 573)

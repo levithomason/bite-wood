@@ -3,18 +3,18 @@ import * as utils from '../math.js'
 
 export default class GameObject {
   /**
-   * @param {boolean} persist - Determines whether or not this object should still exist when the room changes.
    * @param {GameSprite} sprite
-   * @param {boolean} solid
+   * @param {boolean} [persist=false] - Determines whether or not this object should still exist when the room changes.
+   * @param {boolean} [solid=true]
    *
-   * @param {number} x
-   * @param {number} y
-   * @param {number} acceleration
-   * @param {number} gravity
-   * @param {number} gravityDirection
-   * @param {number} friction
-   * @param {number} speed
-   * @param {number} direction
+   * @param {number} [x=0]
+   * @param {number} [y=0]
+   * @param {number} [acceleration =02]
+   * @param {number} [gravity=0]
+   * @param {number} [gravityDirection = state.physics.gravity.direction]
+   * @param {number} [friction=0]
+   * @param {number} [speed=0]
+   * @param {number} [direction=0]
    *
    * @param {object} events
    * @param {object} events.create

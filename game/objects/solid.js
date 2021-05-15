@@ -16,12 +16,12 @@ const spriteConfig = {
 }
 
 const sprSolid = new GameSprite({
-  image: new GameImage(`https://placehold.it/${width}x${height}/444`),
+  image: new GameImage(`http://placehold.it/${width}x${height}/444`),
   ...spriteConfig,
 })
 
 const sprSolidColliding = new GameSprite({
-  image: new GameImage(`https://placehold.it/${width}x${height}/F00`),
+  image: new GameImage(`http://placehold.it/${width}x${height}/F00`),
   ...spriteConfig,
 })
 
@@ -31,7 +31,6 @@ class Solid extends GameObject {
   constructor({ x = 300, y = 600 - Math.random() * height * 2 }) {
     super({
       sprite: sprSolid,
-      solid: true,
       x: x,
       y: y,
       maxSpeed: 0,
