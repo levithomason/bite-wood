@@ -12,7 +12,7 @@ class Room0 extends GameRoom {
     this.backgroundImage = new GameImage('../game/images/background.png')
 
     this.backgroundMusic = new GameAudio(
-      'http://soundimage.org/wp-content/uploads/2016/03/Monkey-Island-Band_Looping.mp3',
+      'https://soundimage.org/wp-content/uploads/2016/03/More-Monkey-Island-Band_Looping.mp3',
     )
     this.backgroundMusic.volume = 0.25
     this.backgroundMusic.loop = true
