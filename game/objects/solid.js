@@ -16,12 +16,12 @@ const spriteConfig = {
 }
 
 const sprSolid = new GameSprite({
-  image: new GameImage(`http://placehold.it/${width}x${height}/444`),
+  image: new GameImage(`https://via.placeholder.com/${width}x${height}/444`),
   ...spriteConfig,
 })
 
 const sprSolidColliding = new GameSprite({
-  image: new GameImage(`http://placehold.it/${width}x${height}/F00`),
+  image: new GameImage(`https://via.placeholder.com/${width}x${height}/F00`),
   ...spriteConfig,
 })
 
