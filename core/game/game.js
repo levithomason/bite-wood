@@ -8,6 +8,7 @@ class Game {
     this.state = state
     this.drawing = drawing
     this.isStarted = false
+    this.lastTickTimestamp = 0
 
     this._step = this._step.bind(this)
     this._draw = this._draw.bind(this)
@@ -70,9 +71,16 @@ class Game {
   }
 
   _tick() {
+    const timestamp = Date.now()
+    const timeSinceTick = timestamp - this.lastTickTimestamp
+
+    if (timeSinceTick >= 15) {
+      this.lastTickTimestamp = timestamp
+      this._step()
+      this._draw()
+    }
+
     this.raf = requestAnimationFrame(this._tick)
-    this._step()
-    this._draw()
   }
 
   start() {
