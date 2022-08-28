@@ -7,6 +7,7 @@ class Game {
   constructor(state, drawing) {
     this.state = state
     this.drawing = drawing
+    this.isStarted = false
 
     this._step = this._step.bind(this)
     this._draw = this._draw.bind(this)
@@ -75,6 +76,9 @@ class Game {
   }
 
   start() {
+    if (this.isStarted) return
+
+    this.isStarted = true
     this._tick()
   }
 
