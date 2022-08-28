@@ -21,8 +21,10 @@ class Game {
     if (!this.state.room) return
 
     this.state.room.objects.forEach(object => {
-      if (object.step) {
-        object.step(object, this.state)
+      try {
+        object?.step?.(object, this.state)
+      } catch (err) {
+        console.error('Failed to step object:', err)
       }
     })
   }
@@ -31,12 +33,18 @@ class Game {
     this.drawing.clear()
 
     if (this.state.room) {
-      if (this.state.room.draw) {
-        this.state.room.draw(this.drawing)
+      try {
+        this.state.room.draw?.(this.drawing)
+      } catch (err) {
+        console.error('Failed to draw room:', err)
       }
 
       this.state.room.objects.forEach(object => {
-        if (object.draw) object.draw(this.drawing)
+        try {
+          object.draw?.(this.drawing)
+        } catch (err) {
+          console.error('Failed to draw object:', err)
+        }
       })
     }
 

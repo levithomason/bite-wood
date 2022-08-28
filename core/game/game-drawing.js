@@ -175,8 +175,8 @@ export default class GameDrawing {
     this._ctx.strokeRect(x, y, w, h)
   }
 
-  polygon(verticies) {
-    const [start, ...rest] = verticies
+  polygon(vertices) {
+    const [start, ...rest] = vertices
 
     this._ctx.beginPath()
     this._ctx.moveTo(start[0], start[1])
