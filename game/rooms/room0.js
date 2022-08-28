@@ -1,6 +1,7 @@
 import { GameAudio, GameImage, GameRoom } from '../../core/game/index.js'
 
 import Apple from '../objects/apple.js'
+import Platform from '../objects/platform.js'
 import Player from '../objects/player.js'
 import RainbowDash from '../objects/rainbow-dash.js'
 import Solid from '../objects/solid.js'
@@ -21,15 +22,19 @@ class Room0 extends GameRoom {
   init() {
     super.init()
 
+    room0.instanceCreate(Platform, 350, 400)
+
     room0.instanceCreate(Apple)
     room0.instanceCreate(Apple)
     room0.instanceCreate(Apple)
     room0.instanceCreate(Apple)
     room0.instanceCreate(Apple)
+
     // TODO: this throws DOMException when trying to execute `drawImage`
     //       maybe we don't handle objects with no image?
     room0.instanceCreate(Solid)
     room0.instanceCreate(RainbowDash)
+
     room0.instanceCreate(Player, 100, 573)
   }
 }
