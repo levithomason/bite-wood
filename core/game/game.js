@@ -74,6 +74,13 @@ class Game {
     const timestamp = Date.now()
     const timeSinceTick = timestamp - this.lastTickTimestamp
 
+    // TODO: This is a hacky way of ensuring 120hz displays tick at 60 FPS
+    //       A better way is to calc the number of frames that should be ticked.
+    //       since the last time they were drawn.
+    //       Example:
+    //         frames = Math.round((timeNow - lastTickTime) / 16.667)
+    //         for frames, tick()
+    //         draw()
     if (timeSinceTick >= 15) {
       this.lastTickTimestamp = timestamp
       this._step()
