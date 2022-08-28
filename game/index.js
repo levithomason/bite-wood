@@ -7,14 +7,21 @@ import state from '../core/state.js'
 // Game
 // ----------------------------------------
 
-// state
-state.addRoom(room0)
-state.addRoom(room1)
+const startButton = document.getElementById('start-button')
+startButton.addEventListener('click', start)
 
-// drawing
-const drawing = new GameDrawing(state.room.width, state.room.height)
-document.body.append(drawing.canvas)
+function start() {
+  startButton.parentElement.removeChild(startButton)
 
-// game
-const game = new Game(state, drawing)
-game.start()
+  // state
+  state.addRoom(room0)
+  state.addRoom(room1)
+
+  // drawing
+  const drawing = new GameDrawing(state.room.width, state.room.height)
+  document.body.append(drawing.canvas)
+
+  // game
+  const game = new Game(state, drawing)
+  game.start()
+}
