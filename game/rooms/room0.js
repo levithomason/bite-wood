@@ -22,7 +22,7 @@ class Room0 extends GameRoom {
   init() {
     super.init()
 
-    room0.instanceCreate(Platform, 350, 400)
+    room0.instanceCreate(Platform, 350, 450)
 
     room0.instanceCreate(Apple)
     room0.instanceCreate(Apple)

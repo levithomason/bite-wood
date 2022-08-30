@@ -3,7 +3,7 @@ import { GameImage, GameObject, GameSprite } from '../../core/game/index.js'
 import state from '../../core/state.js'
 
 // ----------------------------------------
-// Player
+// Solid
 // ----------------------------------------
 const width = Math.round(Math.random() * 80) + 20
 const height = Math.round(Math.random() * 80) + 20

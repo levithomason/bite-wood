@@ -7,6 +7,8 @@ import state from '../../core/state.js'
 // ----------------------------------------
 const width = 100
 const height = 78
+const groundThickness = 50
+
 const sprPlatform = new GameSprite({
   image: new GameImage(`../game/images/background.png`),
   frameCount: 1,
@@ -14,6 +16,9 @@ const sprPlatform = new GameSprite({
   frameHeight: height,
   offsetX: 90,
   offsetY: 600 - height,
+  boundingBoxTop: groundThickness,
+  boundingBoxHeight: height - groundThickness,
+  insertionY: groundThickness,
 })
 
 class Platform extends GameObject {

@@ -217,11 +217,11 @@ export default class GameDrawing {
     }
 
     this.saveSettings()
-    this._ctx.setLineDash([1, 3])
-    this._ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)'
+    this._ctx.setLineDash([1, 2])
+    this._ctx.strokeStyle = 'rgba(255, 255, 255, 0.33)'
     _drawLines()
     this._ctx.lineDashOffset = 1
-    this._ctx.strokeStyle = 'rgba(0, 0, 0, 0.75)'
+    this._ctx.strokeStyle = 'rgba(0, 0, 0, 0.33)'
     _drawLines()
 
     this.loadSettings()
