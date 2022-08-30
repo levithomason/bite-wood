@@ -8,6 +8,7 @@ import state from '../../core/state.js'
 const width = Math.round(Math.random() * 80) + 20
 const height = Math.round(Math.random() * 80) + 20
 const spriteConfig = {
+  image: new GameImage(),
   frameCount: 1,
   frameWidth: width,
   frameHeight: height,
@@ -15,15 +16,9 @@ const spriteConfig = {
   insertionY: height / 2,
 }
 
-const sprSolid = new GameSprite({
-  image: new GameImage(`https://via.placeholder.com/${width}x${height}/444`),
-  ...spriteConfig,
-})
+const sprSolid = new GameSprite(spriteConfig)
 
-const sprSolidColliding = new GameSprite({
-  image: new GameImage(`https://via.placeholder.com/${width}x${height}/F00`),
-  ...spriteConfig,
-})
+const sprSolidColliding = new GameSprite(spriteConfig)
 
 class Solid extends GameObject {
   static displayName = 'objSolid'

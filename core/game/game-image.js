@@ -1,25 +1,30 @@
 export default class GameImage {
   constructor(src) {
     this.element = new Image()
-    this.element.src = src
 
     this.handleLoad = this.handleLoad.bind(this)
     this.handleError = this.handleError.bind(this)
 
-    this.element.onload = this.handleLoad.bind(this)
-    this.element.onerror = this.handleError.bind(this)
+    if (src) {
+      this.element.src = src
+      this.element.onload = this.handleLoad
+      this.element.onerror = this.handleError
+    }
   }
 
   get width() {
-    return this.element.clientWidth
+    return this.element.naturalWidth
   }
 
   get height() {
-    return this.element.clientHeight
+    return this.element.naturalHeight
   }
 
   handleLoad() {
-    console.debug('GameImage loaded:', this.element.src)
+    console.debug(
+      `GameImage loaded, ${this.width}x${this.height},`,
+      this.element.src,
+    )
   }
 
   handleError() {
