@@ -76,10 +76,10 @@ export default class GameRoom {
   /**
    * @param {number} x
    * @param {number} y
-   * @param {GameObject} Constructor
+   * @param {GameObject} GameObject
    */
-  instanceCreate(Constructor, x = this.width / 2, y = this.height / 2) {
-    const object = new Constructor({ x, y })
+  instanceCreate(GameObject, x = this.width / 2, y = this.height / 2) {
+    const object = new GameObject({ x, y })
 
     this.objects.push(object)
   }
@@ -108,10 +108,7 @@ export default class GameRoom {
     this.backgroundMusic = audio
   }
 
-  // This is separated from draw() so that if you override the draw() method
-  // in a subclass, you can easily draw the default room contents.  Otherwise,
-  // the subclass needs to duplicate this logic.
-  drawDefault(drawing) {
+  draw(drawing) {
     if (this.backgroundColor) {
       drawing.fill(this.backgroundColor)
     }
@@ -119,9 +116,5 @@ export default class GameRoom {
     if (this.backgroundImage) {
       drawing.image(this.backgroundImage)
     }
-  }
-
-  draw(drawing) {
-    this.drawDefault(drawing)
   }
 }

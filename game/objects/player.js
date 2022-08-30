@@ -17,7 +17,9 @@ const boundingBoxR = {
   boundingBoxWidth: 28,
   boundingBoxHeight: 41,
 }
-export const imgPlayerR = new GameImage('../game/images/my-littlepony-right.png')
+export const imgPlayerR = new GameImage(
+  '../game/images/my-littlepony-right.png',
+)
 export const imgPlayerL = new GameImage('../game/images/my-littlepony-left.png')
 export const sprPlayerIdleR = new GameSprite({
   image: imgPlayerR,
@@ -104,12 +106,10 @@ class Player extends GameObject {
                 self.friction = 0
               }
             },
+
             // remove friction when walking
             self => {
-              if (
-                state.keys.active.ArrowRight ||
-                state.keys.active.ArrowLeft
-              ) {
+              if (state.keys.active.ArrowRight || state.keys.active.ArrowLeft) {
                 self.friction = 0
                 self.hspeed =
                   Math.sign(self.hspeed) *
@@ -148,20 +148,11 @@ class Player extends GameObject {
             actions: [
               self => {
                 const speed =
-                  utils.distance(
-                    self.x,
-                    self.y,
-                    state.mouse.x,
-                    state.mouse.y,
-                  ) / 500
+                  utils.distance(self.x, self.y, state.mouse.x, state.mouse.y) /
+                  500
 
                 self.motionAdd(
-                  utils.direction(
-                    self.x,
-                    self.y,
-                    state.mouse.x,
-                    state.mouse.y,
-                  ),
+                  utils.direction(self.x, self.y, state.mouse.x, state.mouse.y),
                   Math.min(1, speed),
                 )
               },

@@ -20,7 +20,7 @@ class Room1 extends GameRoom {
   }
 
   draw(drawing) {
-    this.drawDefault(drawing)
+    super.draw(drawing)
 
     const starCount = state.room.width * state.room.height * room1.density
 
