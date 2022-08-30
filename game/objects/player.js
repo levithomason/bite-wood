@@ -1,6 +1,7 @@
 import { GameImage, GameSprite, GameObject } from '../../core/game/index.js'
 import state from '../../core/state.js'
 import * as utils from '../../core/math.js'
+import * as collision from '../../core/collision.js'
 
 // ----------------------------------------
 // Player
@@ -100,7 +101,7 @@ class Player extends GameObject {
           actions: [
             // add friction when on the ground
             self => {
-              if (self.y >= state.room.height) {
+              if (collision.onBottom(self, 'solid')) {
                 self.friction = state.physics.friction
               } else {
                 self.friction = 0
@@ -164,7 +165,7 @@ class Player extends GameObject {
           ArrowUp: {
             actions: [
               self => {
-                if (self.y >= state.room.height) {
+                if (collision.onBottom(self, 'solid')) {
                   self.motionAdd(state.physics.DIRECTION_UP, self.jump)
                 }
               },

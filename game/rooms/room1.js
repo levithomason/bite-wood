@@ -42,7 +42,7 @@ class Room1 extends GameRoom {
     }
 
     room1.stars.forEach(star => {
-      drawing.setBorderColor('transparent')
+      drawing.setStrokeColor('transparent')
       drawing.setFillColor(`rgba(${star.r}, ${star.g}, ${star.b}, ${star.a})`)
       drawing.rectangle(star.x, star.y, star.size, star.size)
 

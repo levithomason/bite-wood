@@ -1,5 +1,6 @@
 import state from '../state.js'
 import * as utils from '../math.js'
+import * as collision from '../collision.js'
 
 export default class GameObject {
   /**
@@ -290,6 +291,15 @@ export default class GameObject {
       this.events.step.actions.forEach(action => {
         action(this, state)
       })
+    }
+
+    // stop on solid objects
+    if (
+      collision.objects(this, 'solid', o => {
+        return collision.onBottom(this, o)
+      })
+    ) {
+      this.vspeed = 0
     }
 
     // apply final calculated movement values

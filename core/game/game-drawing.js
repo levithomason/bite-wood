@@ -21,7 +21,7 @@ export default class GameDrawing {
     this.saveSettings = this.saveSettings.bind(this)
     this.loadSettings = this.loadSettings.bind(this)
     this.setColor = this.setColor.bind(this)
-    this.setBorderColor = this.setBorderColor.bind(this)
+    this.setStrokeColor = this.setStrokeColor.bind(this)
     this.setFillColor = this.setFillColor.bind(this)
     this.setLineWidth = this.setLineWidth.bind(this)
     this.clear = this.clear.bind(this)
@@ -53,10 +53,10 @@ export default class GameDrawing {
   // Color
   //
   setColor(color) {
-    this.setBorderColor(color)
+    this.setStrokeColor(color)
     this.setFillColor(color)
   }
-  setBorderColor(color) {
+  setStrokeColor(color) {
     this._ctx.strokeStyle = color
   }
 
@@ -67,6 +67,9 @@ export default class GameDrawing {
   //
   // Line
   //
+  /**
+   * @param {number} width
+   */
   setLineWidth(width) {
     this._ctx.lineWidth = width
   }
@@ -243,10 +246,10 @@ export default class GameDrawing {
     this.saveSettings()
 
     // bounding box
-    if (collision.objects(object, 'any')) {
-      this.setBorderColor('#F00')
+    if (collision.objects(object)) {
+      this.setStrokeColor('#F00')
     } else {
-      this.setBorderColor('#FF0')
+      this.setStrokeColor('#FF0')
     }
     this.setFillColor('transparent')
     this.rectangle(
@@ -261,7 +264,7 @@ export default class GameDrawing {
     )
 
     // sprite frame
-    this.setBorderColor('#555')
+    this.setStrokeColor('#555')
     this._ctx.setLineDash([2, 2])
     this.rectangle(
       x - sprite.insertionX * sprite.scaleX,
@@ -273,7 +276,7 @@ export default class GameDrawing {
 
     // insertion point
     this.setLineWidth(3)
-    this.setBorderColor('#F00')
+    this.setStrokeColor('#F00')
     this.line(x - 10, y, x + 10, y)
     this.line(x, y - 10, x, y + 10)
 
@@ -283,8 +286,8 @@ export default class GameDrawing {
       this.arrow(x, y, x + object.hspeed * 10, y + object.vspeed * 10)
     }
 
-    this.setColor('#000')
     // text values
+    this.setColor('#000')
     this._ctx.font = '12px monospace'
     this._ctx.textAlign = 'left'
     const lines = [
@@ -304,8 +307,8 @@ export default class GameDrawing {
     lines.reverse().forEach((line, i) => {
       this.text(
         line,
-        x - sprite.insertionX,
-        y - sprite.frameHeight - sprite.insertionY - 4 - i * 14,
+        x - sprite.insertionX * sprite.scaleX,
+        y - sprite.insertionY * sprite.scaleY - 4 - i * 14,
       )
     })
     this.loadSettings()
@@ -323,7 +326,7 @@ export default class GameDrawing {
     this.arrow(x, y, x + vector.x, y + vector.y)
 
     // 90° box
-    this.setBorderColor('black')
+    this.setStrokeColor('black')
     this.setFillColor('transparent')
     this.rectangle(
       x + vector.x + 10 * -Math.sign(vector.x),

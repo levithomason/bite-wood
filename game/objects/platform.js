@@ -31,6 +31,26 @@ class Platform extends GameObject {
       y: y,
       maxSpeed: 0,
       acceleration: 0,
+      solid: true,
+      events: {
+        draw: {
+          actions: [
+            (self, state, drawing) => {
+              if (state.debug) {
+                drawing.setLineWidth(4)
+                drawing.setFillColor('transparent')
+                drawing.setStrokeColor('magenta')
+                drawing.rectangle(
+                  self.x,
+                  self.y,
+                  self.sprite.boundingBoxWidth,
+                  self.sprite.boundingBoxHeight,
+                )
+              }
+            },
+          ],
+        },
+      },
     })
   }
 }
