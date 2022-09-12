@@ -1,0 +1,23 @@
+@import '../public/css/global.css';
+
+/****************************
+        Sprite Editor
+****************************/
+.sprite-editor {
+  display: grid;
+  grid-gap: var(--macro-space-outside);
+  justify-content: center;
+  grid-template:
+    'header        header       header        ' auto
+    'drawing-tools action-tools action-tools  ' auto
+    'drawing-tools stage        color-swatches' 1fr
+    'drawing-tools frames       color-swatches' auto
+    'files         files        files         ' auto /
+    auto 1fr auto;
+  padding: var(--macro-space-inside);
+  color: #fff;
+  text-shadow: -1px -1px 0 #0003, 1px -1px 0 #0003, -1px 1px 0 #0003,
+    1px 1px 0 #0003;
+  background: var(--ui-bg);
+  user-select: none;
+}
