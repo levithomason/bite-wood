@@ -7,8 +7,6 @@ document.body.appendChild(mountNode)
 function gameEditor() {
   const play = () => {
     const iframe = document.getElementById('game-iframe')
-    console.log(iframe)
-    window.iframe = iframe
     // TODO: need to define window API for controlling game
     // TODO: need to prevent multiple starts, which starts multiple loops currently
     iframe.contentWindow.window.start()
