@@ -5,18 +5,21 @@ mountNode.id = 'root'
 document.body.appendChild(mountNode)
 
 function gameEditor() {
-  const play = () => {
-    const iframe = document.getElementById('game-iframe')
-    // TODO: need to define window API for controlling game
-    // TODO: need to prevent multiple starts, which starts multiple loops currently
-    iframe.contentWindow.window.start()
+  const playPopout = () => {
+    window.open(
+      // TODO: need to know what url:port we're on programmatically
+      'http://127.0.0.1:4321/game',
+      '_blank',
+      // TODO: need to know game size programmatically
+      'popup,noopener,noreferrer,width=800,height=600',
+    )
   }
 
   return html`
     <div class="game-editor">
       <div class="toolbar">
         <h1>Game Editor</h1>
-        <button @click="${play}">Play</button>
+        <button @click="${playPopout}">Popout</button>
       </div>
       <div class="assets">
         Sprites

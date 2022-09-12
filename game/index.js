@@ -7,12 +7,12 @@ import state from '../core/state.js'
 // Game
 // ----------------------------------------
 
-document.addEventListener('keydown', start)
+const startButton = document.getElementById('start-button')
+startButton.addEventListener('click', start)
 
 function start() {
-  // remove start message
-  document.body.innerHTML = ''
-  document.removeEventListener('keydown', start)
+  startButton.removeEventListener('keydown', start)
+  startButton.parentElement.removeChild(startButton)
 
   // state
   state.addRoom(room0)
