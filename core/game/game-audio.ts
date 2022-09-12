@@ -1,4 +1,6 @@
 export default class GameAudio {
+  element: HTMLAudioElement;
+
   constructor(src) {
     this.element = new Audio(src)
 

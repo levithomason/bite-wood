@@ -1,6 +1,17 @@
 import { inRange } from '../math.js'
+import GameImage from './game-image.js'
+import GameObject from './game-object.js'
+import GameAudio from './game-audio'
 
 export default class GameRoom {
+  width: number
+  height: number
+  objects: GameObject[]
+  initialized: boolean
+  backgroundColor: string
+  backgroundImage: GameImage
+  backgroundMusic: GameAudio
+
   constructor(width = 800, height = 600) {
     this.width = width
     this.height = height
@@ -27,7 +38,7 @@ export default class GameRoom {
   instanceCount(object) {
     return !object
       ? this.objects.length
-      : this.objects.filter(o => o.displayName === object.displayName).length
+      : this.objects.filter(o => o ? o.displayName === object.displayName : undefined ).length
   }
 
   /**
@@ -67,9 +78,12 @@ export default class GameRoom {
   }
 
   /** @param {GameObject} object */
-  instanceExists(object) {
+  instanceExists(object: GameObject) {
     return this.objects.some(o => {
-      return o.displayName === object.displayName
+      if(o){
+        return o.displayName === object.displayName
+      }
+      return false
     })
   }
 

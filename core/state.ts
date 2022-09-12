@@ -1,4 +1,24 @@
+import GameImage from './game/game-image'
+import GameObject from './game/game-object'
+import GameRoom from './game/game-room'
 import * as utils from './math.js'
+
+interface GameState {
+  setRoomIndex(index: number): boolean
+  addRoom: (room: GameRoom) => void
+  nextRoom: () => boolean
+  prevRoom: () => boolean
+  isFirstRoom: () => boolean
+  isLastRoom: () => boolean
+  debug: boolean
+  isPlaying: boolean
+  rooms: GameRoom[]
+  room: GameRoom | undefined
+  roomIndex: number
+  physics: any // TODO: super hacky, needs rework
+  keys: any // TODO: Rework input system
+  mouse: any // TODO: Rework input system
+}
 
 /**
  * @property {GameObject[]} room.objects
@@ -10,18 +30,20 @@ import * as utils from './math.js'
  * @property {number} mouse.x
  * @property {number} mouse.y
  */
-const state = {
+const state: GameState = {
   debug: false,
   isPlaying: true,
 
   rooms: [],
   roomIndex: -1,
   get room() {
-    return state.rooms[state.roomIndex]
+    if (state.rooms && state.rooms[state.roomIndex]) {
+      return state.rooms[state.roomIndex]
+    }
   },
 
   /** @param {GameRoom} room */
-  addRoom(room) {
+  addRoom(room: GameRoom): void {
     state.rooms.push(room)
 
     if (state.rooms.length === 1) {
@@ -34,12 +56,12 @@ const state = {
    * @param {number} index
    * @returns {boolean}
    */
-  setRoomIndex(index) {
+  setRoomIndex(index: number): boolean {
     const nextIndex = utils.clamp(index, 0, state.rooms.length - 1)
     const didChange = nextIndex !== state.roomIndex
 
     if (didChange) {
-      const persistedObjects = []
+      const persistedObjects: GameObject[] = []
 
       if (state.room) {
         state.room.objects = state.room.objects.filter(object => {
@@ -71,7 +93,7 @@ const state = {
    * Returns true if the room changed.
    * @returns {boolean}
    */
-  nextRoom() {
+  nextRoom(): boolean {
     return state.setRoomIndex(state.roomIndex + 1)
   },
 
@@ -79,17 +101,17 @@ const state = {
    * Returns true if the room changed.
    * @returns {boolean}
    */
-  prevRoom() {
+  prevRoom(): boolean {
     return state.setRoomIndex(state.roomIndex - 1)
   },
 
   /** @returns {boolean} */
-  isFirstRoom() {
+  isFirstRoom(): boolean {
     return state.roomIndex === 0
   },
 
   /** @returns {boolean} */
-  isLastRoom() {
+  isLastRoom(): boolean {
     return state.roomIndex === state.rooms.length - 1
   },
 
@@ -130,11 +152,10 @@ const state = {
 //
 // Play/Pause
 //
-
 export const play = () => {
   state.isPlaying = true
 
-  if (state.room.backgroundMusic) {
+  if (state?.room?.backgroundMusic) {
     state.room.backgroundMusic.play()
   }
 }
@@ -142,7 +163,7 @@ export const play = () => {
 export const pause = () => {
   state.isPlaying = false
 
-  if (state.room.backgroundMusic) {
+  if (state?.room?.backgroundMusic) {
     state.room.backgroundMusic.pause()
   }
 }
@@ -150,9 +171,8 @@ export const pause = () => {
 //
 // Keyboard
 //
-
 /** @param {KeyboardEvent} e */
-const handleKeyDown = e => {
+const handleKeyDown = (e: KeyboardEvent) => {
   state.keys.active[e.key] = true
 
   // ensure keydown only fires once per game step
@@ -180,7 +200,7 @@ const handleKeyDown = e => {
 }
 
 /** @param {KeyboardEvent} e */
-const handleKeyUp = e => {
+const handleKeyUp = (e: KeyboardEvent) => {
   state.keys.up[e.key] = true
 
   // since key events are handled on game step we can only safely remove
@@ -195,7 +215,6 @@ document.addEventListener('keyup', handleKeyUp)
 //
 // Mouse
 //
-
 const MOUSE_BUTTON = {
   0: 'left',
   1: 'middle',
@@ -206,7 +225,7 @@ const MOUSE_BUTTON = {
 }
 
 /** @param {MouseEvent} e */
-const setMousePosition = e => {
+const setMousePosition = (e: MouseEvent) => {
   // TODO: this doesn't let the mouse work outside of the canvas
   // In order to track the mouse position outside of the canvas, we'd need to add the
   // offset position of the canvas to the pageX/Y.  The canvas can be placed anywhere
@@ -225,12 +244,12 @@ const setMousePosition = e => {
 }
 
 /** @param {MouseEvent} e */
-const handleMouseMove = e => {
+const handleMouseMove = (e: MouseEvent) => {
   setMousePosition(e)
 }
 
 /** @param {MouseEvent} e */
-const handleMouseDown = e => {
+const handleMouseDown = (e: MouseEvent) => {
   e.preventDefault()
   const button = MOUSE_BUTTON[e.button]
 
@@ -253,7 +272,7 @@ const handleMouseDown = e => {
 }
 
 /** @param {MouseEvent} e */
-const handleMouseUp = e => {
+const handleMouseUp = (e: MouseEvent) => {
   e.preventDefault()
   const button = MOUSE_BUTTON[e.button]
 
@@ -271,6 +290,8 @@ document.addEventListener('mousemove', handleMouseMove)
 document.addEventListener('mousedown', handleMouseDown)
 document.addEventListener('mouseup', handleMouseUp)
 
+// TODO: Global state usage
+// @ts-ignore
 window.state = state
 
 export default state

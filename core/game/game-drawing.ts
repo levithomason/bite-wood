@@ -1,9 +1,13 @@
 import * as collision from '../collision.js'
+import GameObject from './game-object.js';
 
 ///////////////////////////////////////////
 
 export default class GameDrawing {
-  constructor(width, height) {
+  canvas: HTMLCanvasElement;
+  _ctx: CanvasRenderingContext2D;
+
+  constructor(width: string, height: string) {
     if (typeof width === 'undefined' || typeof height === 'undefined') {
       throw new Error('GameDrawing constructor missing width or height.')
     }
@@ -11,7 +15,7 @@ export default class GameDrawing {
     this.canvas.setAttribute('width', width)
     this.canvas.setAttribute('height', height)
 
-    this._ctx = this.canvas.getContext('2d')
+    this._ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D
     // render pixelated images
     this._ctx.imageSmoothingEnabled = false
 
@@ -230,7 +234,7 @@ export default class GameDrawing {
     this.loadSettings()
   }
 
-  objectDebug(object) {
+  objectDebug(object: GameObject) {
     const {
       sprite,
       x,
@@ -246,12 +250,14 @@ export default class GameDrawing {
     this.saveSettings()
 
     // bounding box
-    if (collision.objects(object)) {
+    if (collision.objects(object, 'solid')) {
       this.setStrokeColor('#F00')
     } else {
       this.setStrokeColor('#FF0')
     }
     this.setFillColor('transparent')
+    //
+    sprite &&
     this.rectangle(
       x -
         sprite.insertionX * sprite.scaleX +

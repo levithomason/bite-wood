@@ -1,4 +1,6 @@
 export default class GameImage {
+  element: HTMLImageElement;
+
   constructor(src) {
     this.element = new Image()
 

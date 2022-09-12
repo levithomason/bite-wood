@@ -1,8 +1,29 @@
+import GameImage  from './game-image'
+
 /**
  * A GameSprite takes a GameImage and adds additional information to manage
  * scale, insertion point, offset, bounding box, and animating frames.
  */
 export default class GameSprite {
+  image: GameImage
+  scaleX: number
+  scaleY: number
+  insertionX: number
+  insertionY: number
+  offsetX: number
+  offsetY: number
+  boundingBoxTop: number
+  boundingBoxLeft: number
+  boundingBoxHeight: number
+  boundingBoxWidth: number
+  frameWidth: number
+  frameHeight: number
+  frameCount: number
+  frameIndex: number
+  stepsPerFrame: number
+  rtl: boolean
+  stepsThisFrame: number
+
   /**
    * @param options
    * @param {GameImage} options.image - A GameImage instance.

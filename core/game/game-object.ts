@@ -1,41 +1,28 @@
 import state from '../state.js'
 import * as utils from '../math.js'
 import * as collision from '../collision.js'
+import GameSprite from './game-sprite'
+import GameEventHooks from './game-events'
 
 export default class GameObject {
-  /**
-   * @param {GameSprite} sprite
-   * @param {boolean} [persist=false] - Determines whether or not this object should still exist when the room changes.
-   * @param {boolean} [solid=true]
-   *
-   * @param {number} [x=0]
-   * @param {number} [y=0]
-   * @param {number} [acceleration =02]
-   * @param {number} [gravity=0]
-   * @param {number} [gravityDirection = state.physics.gravity.direction]
-   * @param {number} [friction=0]
-   * @param {number} [speed=0]
-   * @param {number} [direction=0]
-   *
-   * @param {object} events
-   * @param {object} events.create
-   * @param {function[]} events.create.actions
-   * @param {object} events.draw
-   * @param {function[]} events.draw.actions
-   * @param {object} events.keyActive
-   * @param {object} events.keyDown
-   * @param {object} events.keyUp
-   * @param {object} events.mouseActive
-   * @param {object} events.mouseDown
-   * @param {object} events.mouseup
-   * @param {object} events.step
-   * @param {function[]} events.step.actions
-   *
-   * @param {object} ...properties
-   */
+  persist: boolean
+  sprite: GameSprite | undefined
+  solid: boolean
+  x: number
+  y: number
+  acceleration: number
+  friction: number
+  gravity: number
+  gravityDirection: number
+  _vector: utils.Vector
+  events: GameEventHooks
+  startX: number
+  startY: number
+  displayName: string
+
   constructor({
     persist = false,
-    sprite,
+    sprite = undefined,
     solid = true,
     x = 0,
     y = 0,
@@ -45,9 +32,10 @@ export default class GameObject {
     friction = 0,
     speed = 0,
     direction = 0,
-    events = {},
+    events,
+    displayName = "Unknown",
     ...properties
-  } = {}) {
+  }) {
     this.persist = persist
     this.sprite = sprite
     this.solid = solid
@@ -59,6 +47,7 @@ export default class GameObject {
     this.gravityDirection = gravityDirection
     this._vector = new utils.Vector(direction, speed)
     this.events = events
+    this.displayName = displayName
 
     Object.keys(properties).forEach(property => {
       this[property] = properties[property]
@@ -85,10 +74,6 @@ export default class GameObject {
 
   toJSON() {
     return JSON.stringify({ ...this, events: null }, null, 2)
-  }
-
-  get displayName() {
-    return this.constructor.displayName
   }
 
   get speed() {
@@ -124,25 +109,32 @@ export default class GameObject {
   }
 
   get boundingBoxTop() {
-    return (
-      this.y -
-      this.sprite.insertionY * this.sprite.scaleY +
-      this.sprite.boundingBoxTop * this.sprite.scaleY
-    )
+    if(this.sprite){
+      return (
+        this.y -
+        this.sprite.insertionY * this.sprite.scaleY +
+        this.sprite.boundingBoxTop * this.sprite.scaleY
+      )
+    } 
   }
 
   get boundingBoxLeft() {
-    return (
-      this.x -
-      this.sprite.insertionX * this.sprite.scaleX +
-      this.sprite.boundingBoxLeft * this.sprite.scaleX
-    )
+    if(this.sprite){
+      return (
+        this.x -
+        this.sprite.insertionX * this.sprite.scaleX +
+        this.sprite.boundingBoxLeft * this.sprite.scaleX
+      )
+    }
   }
 
   get boundingBoxRight() {
-    return (
-      this.boundingBoxLeft + this.sprite.boundingBoxWidth * this.sprite.scaleX
-    )
+    if(this.sprite){
+      return (
+        this.boundingBoxLeft + this.sprite.boundingBoxWidth * this.sprite.scaleX
+      )
+    }
+    console.warn(`${this.displayName}: Attempted to get bounding box on object with no sprite`)
   }
 
   get boundingBoxBottom() {
@@ -168,7 +160,7 @@ export default class GameObject {
     this._vector.add(direction, speed)
   }
 
-  setSprite(sprite) {
+  setSprite(sprite: GameSprite) {
     if (sprite === this.sprite) return
 
     this.sprite = sprite
