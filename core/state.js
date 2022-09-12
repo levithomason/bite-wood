@@ -231,7 +231,6 @@ const handleMouseMove = e => {
 
 /** @param {MouseEvent} e */
 const handleMouseDown = e => {
-  e.preventDefault()
   const button = MOUSE_BUTTON[e.button]
 
   // the position hasn't been set if the user hasn't moved the mouse yet
@@ -254,7 +253,6 @@ const handleMouseDown = e => {
 
 /** @param {MouseEvent} e */
 const handleMouseUp = e => {
-  e.preventDefault()
   const button = MOUSE_BUTTON[e.button]
 
   // the position hasn't been set if the user hasn't moved the mouse yet
