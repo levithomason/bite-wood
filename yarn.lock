@@ -1173,6 +1173,11 @@ toidentifier@1.0.1:
   resolved "https://domoreexp.pkgs.visualstudio.com/_packaging/npm-mirror/npm/registry/toidentifier/-/toidentifier-1.0.1.tgz#3be34321a88a820ed1bd80dfaa33e479fbb8dd35"
   integrity sha1-O+NDIaiKgg7RvYDfqjPkefu43TU=
 
+typescript@^4.9.0-dev.20220824:
+  version "4.9.0-dev.20220824"
+  resolved "https://domoreexp.pkgs.visualstudio.com/_packaging/npm-mirror/npm/registry/typescript/-/typescript-4.9.0-dev.20220824.tgz#ffa21c0005e36d6f2a4398eee5c3c9208bad41e5"
+  integrity sha1-/6IcAAXjbW8qQ5ju5cPJIIutQeU=
+
 union-value@^1.0.0:
   version "1.0.1"
   resolved "https://domoreexp.pkgs.visualstudio.com/_packaging/npm-mirror/npm/registry/union-value/-/union-value-1.0.1.tgz#0b6fe7b835aecda61c6ea4d4f02c14221e109847"
