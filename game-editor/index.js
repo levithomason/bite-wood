@@ -4,14 +4,14 @@ const mountNode = document.createElement('div')
 mountNode.id = 'root'
 document.body.appendChild(mountNode)
 
-function levelEditor() {
+function gameEditor() {
   return html`
-    <h1>Level Editor</h1>
+    <h1>Game Editor</h1>
   `
 }
 
 export const init = () => {
-  return render(levelEditor(), mountNode)
+  return render(gameEditor(), mountNode)
 }
 
 init()
