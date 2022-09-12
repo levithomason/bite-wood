@@ -1,16 +1,16 @@
-export const toDegrees = radians => (radians * 180) / Math.PI
+export const toDegrees = (radians: number) => (radians * 180) / Math.PI
 
-export const toRadians = degrees => (degrees * Math.PI) / 180
+export const toRadians = (degrees: number) => (degrees * Math.PI) / 180
 
-export const distance = (x1, y1, x2 = 0, y2 = 0) => {
+export const distance = (x1: number, y1: number, x2 = 0, y2 = 0) => {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
 }
 
-export const direction = (x1, y1, x2 = 0, y2 = 0) => {
+export const direction = (x1: number, y1: number, x2 = 0, y2 = 0) => {
   return toDegrees(Math.atan2(y2 - y1, x2 - x1))
 }
 
-export const clamp = (val, min, max) => {
+export const clamp = (val: number, min: number, max: number) => {
   return Math.max(min, Math.min(max, val))
 }
 
@@ -18,13 +18,18 @@ export const random = (max = 1, min = 0) => {
   return (max - min) * Math.random() + min
 }
 
-export const inRange = (val, x = 1, y = 0) => {
+export const inRange = (val: number, x = 1, y = 0) => {
   const lower = Math.min(x, y)
   const upper = Math.max(x, y)
   return val >= lower && val < upper
 }
 
 export class Vector {
+  _angle: number
+  _hypotenuse: number
+  _adjacent: number
+  _opposite: number
+
   constructor(direction = 0, magnitude = 0) {
     this._angle = toRadians(direction)
     this._hypotenuse = magnitude
@@ -74,7 +79,7 @@ export class Vector {
     this._hypotenuse = distance(this.x, this.y)
   }
 
-  add(direction, magnitude) {
+  add(direction: number, magnitude: number) {
     const vector = new Vector(direction, magnitude)
 
     this.x += vector.x

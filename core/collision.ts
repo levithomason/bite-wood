@@ -9,13 +9,21 @@ import state from './state.js'
  * @returns {boolean}
  */
 export const point = (x: number, y: number, object: GameObject): boolean => {
-  if(object.sprite) { 
-  return (
-    x >= object.boundingBoxLeft &&
-    x <= object.boundingBoxRight &&
-    y >= object.boundingBoxTop &&
-    y <= object.boundingBoxBottom
-  )} 
+  if (
+    object &&
+    object.sprite &&
+    object.boundingBoxLeft &&
+    object.boundingBoxRight &&
+    object.boundingBoxTop &&
+    object.boundingBoxBottom
+  ) {
+    return (
+      x >= object.boundingBoxLeft &&
+      x <= object.boundingBoxRight &&
+      y >= object.boundingBoxTop &&
+      y <= object.boundingBoxBottom
+    )
+  }
   return false
 }
 
@@ -26,13 +34,22 @@ export const point = (x: number, y: number, object: GameObject): boolean => {
  * @returns {boolean}
  */
 export const onTop = (self: GameObject, other: GameObject): boolean => {
-  if(self.sprite && other.sprite){
-  return (
-    self.boundingBoxTop <= other.boundingBoxBottom &&
-    self.boundingBoxTop >= other.boundingBoxTop
-  )}
-    console.warn("Tried to calculate 'onTop' collision with object missing sprite")
-    return false
+  if (
+    self.sprite &&
+    self.boundingBoxTop &&
+    other.sprite &&
+    other.boundingBoxTop &&
+    other.boundingBoxBottom
+  ) {
+    return (
+      self.boundingBoxTop <= other.boundingBoxBottom &&
+      self.boundingBoxTop >= other.boundingBoxTop
+    )
+  }
+  console.warn(
+    "Tried to calculate 'onTop' collision with object missing sprite",
+  )
+  return false
 }
 /**
  * Checks if the bottom side of an object is colliding with some other object.
@@ -41,12 +58,21 @@ export const onTop = (self: GameObject, other: GameObject): boolean => {
  * @returns {boolean}
  */
 export const onBottom = (self: GameObject, other: GameObject): boolean => {
-  if(self.sprite && other.sprite){
-  return (
-    self.boundingBoxBottom >= other.boundingBoxTop &&
-    self.boundingBoxBottom <= other.boundingBoxBottom
-  )} 
-  console.warn("Tried to calculate 'onBottom' collision with object missing sprite")
+  if (
+    self.sprite &&
+    self.boundingBoxBottom &&
+    other.sprite &&
+    other.boundingBoxTop &&
+    other.boundingBoxBottom
+  ) {
+    return (
+      self.boundingBoxBottom >= other.boundingBoxTop &&
+      self.boundingBoxBottom <= other.boundingBoxBottom
+    )
+  }
+  console.warn(
+    "Tried to calculate 'onBottom' collision with object missing sprite",
+  )
   return false
 }
 /**
@@ -56,12 +82,21 @@ export const onBottom = (self: GameObject, other: GameObject): boolean => {
  * @returns {boolean}
  */
 export const onLeft = (self: GameObject, other: GameObject): boolean => {
-  if(self.sprite && other.sprite){
-  return (
-    self.boundingBoxLeft <= other.boundingBoxRight &&
-    self.boundingBoxLeft >= other.boundingBoxLeft
-  )} 
-  console.warn("Tried to calculate 'onLeft' collision with object missing sprite")
+  if (
+    self.sprite &&
+    other.sprite &&
+    self.boundingBoxLeft &&
+    other.boundingBoxRight &&
+    other.boundingBoxLeft
+  ) {
+    return (
+      self.boundingBoxLeft <= other.boundingBoxRight &&
+      self.boundingBoxLeft >= other.boundingBoxLeft
+    )
+  }
+  console.warn(
+    "Tried to calculate 'onLeft' collision with object missing sprite",
+  )
   return false
 }
 /**
@@ -71,10 +106,17 @@ export const onLeft = (self: GameObject, other: GameObject): boolean => {
  * @returns {boolean}
  */
 export const onRight = (self: GameObject, other: GameObject): boolean => {
-  return (
-    self.boundingBoxRight >= other.boundingBoxLeft &&
-    self.boundingBoxRight <= other.boundingBoxRight
-  )
+  if (
+    self.boundingBoxRight &&
+    other.boundingBoxRight &&
+    other.boundingBoxLeft
+  ) {
+    return (
+      self.boundingBoxRight >= other.boundingBoxLeft &&
+      self.boundingBoxRight <= other.boundingBoxRight
+    )
+  }
+  return false
 }
 
 /**
@@ -84,12 +126,16 @@ export const onRight = (self: GameObject, other: GameObject): boolean => {
  * @param {Function} [cb] - A callback for custom logic in determining if a collision has occurred. It is called with two arguments: self, other.
  * @returns {boolean}
  */
-export const objects = (self: GameObject, other: 'any' | 'solid' | string, cb: Function | undefined): boolean => {
+export const objects = (
+  self: GameObject,
+  other: 'any' | 'solid' | string,
+  cb: Function | undefined,
+): boolean => {
   const withAny = typeof other === 'undefined'
   const withSolid = other === 'solid'
   const displayName = !withAny && !withSolid ? other : ''
 
-  return state.room.objects.some((object: GameObject) => {
+  return !!state?.room?.objects.some((object: GameObject) => {
     // TODO: introduce object ids so as not to rely on instance equality, could be over network
     if (self === object) return false
 

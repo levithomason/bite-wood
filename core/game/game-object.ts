@@ -33,7 +33,7 @@ export default class GameObject {
     speed = 0,
     direction = 0,
     events,
-    displayName = "Unknown",
+    displayName = 'Unknown',
     ...properties
   }) {
     this.persist = persist
@@ -63,7 +63,7 @@ export default class GameObject {
     this.motionAdd = this.motionAdd.bind(this)
 
     if (events.create && events.create.actions) {
-      events.create.actions.forEach(action => {
+      events.create.actions.forEach((action) => {
         action(this, state)
       })
     }
@@ -109,46 +109,59 @@ export default class GameObject {
   }
 
   get boundingBoxTop() {
-    if(this.sprite){
+    if (this.sprite) {
       return (
         this.y -
         this.sprite.insertionY * this.sprite.scaleY +
         this.sprite.boundingBoxTop * this.sprite.scaleY
       )
-    } 
+    }
+    console.warn(
+      `${this.displayName}: Tried to get boundingBoxTop from object with no sprite`,
+    )
   }
 
   get boundingBoxLeft() {
-    if(this.sprite){
+    if (this.sprite) {
       return (
         this.x -
         this.sprite.insertionX * this.sprite.scaleX +
         this.sprite.boundingBoxLeft * this.sprite.scaleX
       )
     }
+    console.warn(
+      `${this.displayName}: Tried to get boundingBoxLeft from object with no sprite`,
+    )
   }
 
   get boundingBoxRight() {
-    if(this.sprite){
+    if (this.sprite && this.boundingBoxLeft) {
       return (
         this.boundingBoxLeft + this.sprite.boundingBoxWidth * this.sprite.scaleX
       )
     }
-    console.warn(`${this.displayName}: Attempted to get bounding box on object with no sprite`)
-  }
-
-  get boundingBoxBottom() {
-    return (
-      this.boundingBoxTop + this.sprite.boundingBoxHeight * this.sprite.scaleY
+    console.warn(
+      `${this.displayName}: Tried to get boundingBoxRight from object with no sprite`,
     )
   }
 
-  moveTo(x, y) {
+  get boundingBoxBottom() {
+    if (this.sprite && this.boundingBoxTop) {
+      return (
+        this.boundingBoxTop + this.sprite.boundingBoxHeight * this.sprite.scaleY
+      )
+    }
+    console.warn(
+      `${this.displayName}: Tried to get boundingBoxBottom from object with no sprite`,
+    )
+  }
+
+  moveTo(x: number, y: number) {
     this.x = x
     this.y = y
   }
 
-  move(direction, distance) {
+  move(direction: number, distance: number) {
     const newX = this.x + distance * Math.cos((direction * Math.PI) / 180)
     const newY = this.y + distance * Math.sin((direction * Math.PI) / 180)
 
@@ -156,7 +169,7 @@ export default class GameObject {
     this.y = newY
   }
 
-  motionAdd(direction, speed) {
+  motionAdd(direction: number, speed: number) {
     this._vector.add(direction, speed)
   }
 
@@ -175,7 +188,7 @@ export default class GameObject {
         .filter(key => state.keys.down[key] !== null)
         .forEach(key => {
           if (this.events.keyDown[key] && this.events.keyDown[key].actions) {
-            this.events.keyDown[key].actions.forEach(action => {
+            this.events.keyDown[key].actions.forEach((action) => {
               action(this, state)
             })
           }
@@ -189,7 +202,7 @@ export default class GameObject {
     if (this.events.keyActive) {
       Object.keys(state.keys.active).forEach(key => {
         if (this.events.keyActive[key] && this.events.keyActive[key].actions) {
-          this.events.keyActive[key].actions.forEach(action => {
+          this.events.keyActive[key].actions.forEach((action) => {
             action(this, state)
           })
         }
@@ -200,7 +213,7 @@ export default class GameObject {
     if (this.events.keyUp) {
       Object.keys(state.keys.up).forEach(key => {
         if (this.events.keyUp[key] && this.events.keyUp[key].actions) {
-          this.events.keyUp[key].actions.forEach(action => {
+          this.events.keyUp[key].actions.forEach((action) => {
             action(this, state)
           })
         }
@@ -219,7 +232,7 @@ export default class GameObject {
             this.events.mouseDown[key] &&
             this.events.mouseDown[key].actions
           ) {
-            this.events.mouseDown[key].actions.forEach(action => {
+            this.events.mouseDown[key].actions.forEach((action) => {
               action(this, state)
             })
           }
@@ -236,7 +249,7 @@ export default class GameObject {
           this.events.mouseActive[button] &&
           this.events.mouseActive[button].actions
         ) {
-          this.events.mouseActive[button].actions.forEach(action => {
+          this.events.mouseActive[button].actions.forEach((action) => {
             action(this, state)
           })
         }
@@ -250,7 +263,7 @@ export default class GameObject {
           this.events.mouseUp[button] &&
           this.events.mouseUp[button].actions
         ) {
-          this.events.mouseUp[button].actions.forEach(action => {
+          this.events.mouseUp[button].actions.forEach((action) => {
             action(this, state)
           })
         }
@@ -287,7 +300,7 @@ export default class GameObject {
 
     // stop on solid objects
     if (
-      collision.objects(this, 'solid', o => {
+      collision.objects(this, 'solid', (o: GameObject) => {
         return collision.onBottom(this, o)
       })
     ) {
