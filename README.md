@@ -9,8 +9,6 @@ yarn
 yarn start
 ```
 
-## API
+## Design Diagram
 
-### Game
-
-The game is loop and needs only a canvas to draw to.
+See the `diagram.drawio` file.
