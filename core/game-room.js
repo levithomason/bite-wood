@@ -10,7 +10,7 @@ export class GameRoom {
     /** @type {GameObject[]} */
     this.objects = []
 
-    this.init = this.init.bind(this)
+    this.create = this.create.bind(this)
 
     this.instanceCreate = this.instanceCreate.bind(this)
     this.instanceCount = this.instanceCount.bind(this)
@@ -23,8 +23,8 @@ export class GameRoom {
     this.draw = this.draw.bind(this)
   }
 
-  init() {
-    this.objects.forEach(object => object.init())
+  create() {
+    this.objects.forEach(object => object.create())
     this.initialized = true
   }
 
@@ -101,8 +101,10 @@ export class GameRoom {
     x = this.randomXPosition(),
     y = this.randomYPosition(),
   ) {
-    const object = new GameObject({ x, y })
-    object.init()
+    const object = new GameObject()
+    object.x = x
+    object.y = y
+    object.create()
 
     this.objects.push(object)
   }

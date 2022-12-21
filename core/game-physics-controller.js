@@ -10,7 +10,7 @@ class GamePhysics {
     this.gravity = new utils.Vector(this.DIRECTION_DOWN, 0.4)
     this.terminalVelocity = 15
 
-    this.friction = 0.3
+    this.friction = 0.2
   }
 }
 

@@ -98,7 +98,7 @@ export class Game {
       // objects - continue drawing if the room fails
       gameRooms.currentRoom.objects.forEach(object => {
         try {
-          object.draw?.(object, gameDrawing)
+          object.draw?.(gameDrawing)
         } catch (err) {
           console.error('Failed to draw object:', err)
         }

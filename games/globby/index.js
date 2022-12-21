@@ -33,8 +33,8 @@ gameRooms.addRoom(room)
 //   //   // })
 //   // }
 //
-//   draw(self, drawing) {
-//     super.draw(self, drawing)
+//   draw(drawing) {
+//     super.draw(drawing)
 //
 //     drawing.rectangle(this.x, this.y, Ground.width, Ground.height)
 //   }
@@ -50,24 +50,23 @@ class Globby extends GameObject {
     this.strokeWidth = 8
 
     // physics
-    // this.friction = 0.1
+    this.friction = 0.1
     // this.gravity = gamePhysics.gravity
   }
 
-  draw(self, drawing) {
-    super.draw(self, drawing)
+  draw(drawing) {
+    super.draw(drawing)
 
     drawing.setLineWidth(this.strokeWidth)
     drawing.setFillColor('#ddd')
     drawing.setStrokeColor('#fff')
-    drawing.circle(this.x, this.y, this.size)
-    // drawing.ellipse(
-    //   this.x - this.size,
-    //   this.y - this.size - this.strokeWidth,
-    //   this.size, // this.size * Math.max(1, Math.pow((this.speed * 2) / this.maxSpeed, 1)),
-    //   this.size,
-    //   toRadians(this.direction),
-    // )
+    drawing.ellipse(
+      this.x - this.size,
+      this.y - this.size - this.strokeWidth,
+      this.size * Math.max(1, Math.pow((this.speed * 2) / this.maxSpeed, 0.5)),
+      this.size,
+      toRadians(this.direction),
+    )
   }
 
   step() {

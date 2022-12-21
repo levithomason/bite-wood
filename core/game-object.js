@@ -2,12 +2,16 @@ import * as collision from './collision.js'
 import { gameKeyboard } from './game-keyboard-controller.js'
 import { gameMouse } from './game-mouse-controller.js'
 import { gamePhysics } from './game-physics-controller.js'
-import { gameRooms } from './game-rooms.js'
 import { gameState } from './game-state-controller.js'
 import { Vector } from './math.js'
 
 /**
- * @typedef {function} Action
+ * @typedef {function} GameObjectAction
+ * @param {GameObject} self
+ */
+
+/**
+ * @typedef {function} GameDrawingAction
  * @param {GameObject} self
  */
 
@@ -20,25 +24,22 @@ export class GameObject {
    * @param {number} [x=0]
    * @param {number} [y=0]
    * @param {number} [acceleration=0]
-   * @param {number} [gravity=gamePhysics.gravity.magnitude]
-   * @param {number} [gravityDirection =gamePhysics.gravity.direction]
+   * @param {Vector} [gravity=gamePhysics.gravity]
    * @param {number} [friction=0]
    * @param {number} [speed=0]
    * @param {number} [direction=0]
    *
    * @param {object} events
    * @param {object} events.create
-   * @param {Action[]} events.create.actions
-   * @param {object} events.draw
-   * @param {Action[]} events.draw.actions
-   * @param {object} events.keyActive
-   * @param {object} events.keyDown
-   * @param {object} events.keyUp
-   * @param {object} events.mouseActive
-   * @param {object} events.mouseDown
-   * @param {object} events.mouseUp
-   * @param {object} events.step
-   * @param {Action[]} events.step.actions
+   * @param {GameObjectAction} events.create
+   * @param {GameDrawingAction} events.draw
+   * @param {GameObjectAction} events.keyActive
+   * @param {GameObjectAction} events.keyDown
+   * @param {GameObjectAction} events.keyUp
+   * @param {GameObjectAction} events.mouseActive
+   * @param {GameObjectAction} events.mouseDown
+   * @param {GameObjectAction} events.mouseUp
+   * @param {GameObjectAction} events.step
    *
    * @param {object} ...properties
    */
@@ -49,9 +50,8 @@ export class GameObject {
     x = 0,
     y = 0,
     acceleration = 0,
-    gravity = gamePhysics.gravity.magnitude,
-    gravityDirection = gamePhysics.gravity.direction,
-    friction = 0,
+    gravity = gamePhysics.gravity,
+    friction = gamePhysics.friction,
     speed = 0,
     direction = 0,
     events = {},
@@ -65,7 +65,6 @@ export class GameObject {
     this.acceleration = acceleration
     this.friction = friction
     this.gravity = gravity
-    this.gravityDirection = gravityDirection
     this._vector = new Vector(direction, speed)
     this.events = events
 
@@ -74,7 +73,7 @@ export class GameObject {
       this[property] = properties[property]
     })
 
-    this.init = this.init.bind(this)
+    this.create = this.create.bind(this)
     this.moveTo = this.moveTo.bind(this)
     this.move = this.move.bind(this)
     this.motionAdd = this.motionAdd.bind(this)
@@ -158,10 +157,8 @@ export class GameObject {
   /**
    * Called when the object is created in the room.
    */
-  init() {
-    this.events.create?.actions?.forEach(action => {
-      action(this)
-    })
+  create() {
+    this.events?.create?.(this)
   }
 
   moveTo(x, y) {
@@ -201,9 +198,7 @@ export class GameObject {
     // keyDown
     if (this.events.keyDown) {
       Object.keys(gameKeyboard.down).forEach(key => {
-        this.events.keyDown?.[key]?.actions.forEach(action => {
-          action(this)
-        })
+        this.events.keyDown?.[key]?.(this)
         // keydown should only register for one step
         // remember which we've handled so we don't handle them again
         gameKeyboard.down[key] = null
@@ -213,18 +208,14 @@ export class GameObject {
     // keyActive
     if (this.events.keyActive) {
       Object.keys(gameKeyboard.active).forEach(key => {
-        this.events.keyActive?.[key]?.actions.forEach(action => {
-          action(this)
-        })
+        this.events.keyActive?.[key]?.(this)
       })
     }
 
     // keyUp
     if (this.events.keyUp) {
       Object.keys(gameKeyboard.up).forEach(key => {
-        this.events.keyUp?.[key]?.actions.forEach(action => {
-          action(this)
-        })
+        this.events.keyUp?.[key]?.(this)
 
         // keyup events should only fire for one step
         delete gameKeyboard.up[key]
@@ -236,9 +227,7 @@ export class GameObject {
       Object.keys(gameMouse.down)
         .filter(button => gameMouse.down[button] !== null)
         .forEach(key => {
-          this.events.mouseDown?.[key]?.actions.forEach(action => {
-            action(this)
-          })
+          this.events.mouseDown?.[key]?.(this)
           // keydown should only register for one step
           // remember which we've handled so we don't handle them again
           gameMouse.down[key] = null
@@ -248,23 +237,22 @@ export class GameObject {
     // mouseActive
     if (this.events.mouseActive) {
       Object.keys(gameMouse.active).forEach(button => {
-        this.events.mouseActive?.[button]?.actions.forEach(action => {
-          action(this)
-        })
+        this.events.mouseActive?.[button]?.(this)
       })
     }
 
     // mouseUp
     if (this.events.mouseUp) {
       Object.keys(gameMouse.up).forEach(button => {
-        this.events.mouseUp?.[button]?.actions.forEach(action => {
-          action(this)
-        })
+        this.events.mouseUp?.[button]?.(this)
 
         // keyup events should only fire for one step
         delete gameMouse.up[button]
       })
     }
+
+    // step
+    this.events.step?.(this)
 
     //
     // Sprite
@@ -274,27 +262,10 @@ export class GameObject {
       this.sprite.step()
     }
 
-    // //
-    // // Physics
-    // //
     //
-    // // apply gravity
-    // if (this.y < gameRooms.currentRoom.height) {
-    //   this.motionAdd(this.gravityDirection, this.gravity)
-    // }
+    // Physics
+    //
 
-    // // terminal velocity
-    // this.vspeed = Math.min(this.vspeed, gamePhysics.terminalVelocity)
-
-    // // apply friction
-    // this.hspeed = this.hspeed * (1 - this.friction)
-    //
-    // if (this.events.step && this.events.step.actions) {
-    //   this.events.step.actions.forEach(action => {
-    //     action(this)
-    //   })
-    // }
-    //
     // // stop on solid objects
     // if (
     //   collision.objects(this, 'solid', o => {
@@ -304,48 +275,31 @@ export class GameObject {
     //   this.vspeed = 0
     // }
 
-    // //
-    // // Movement
-    // //
+    //
+    // Movement
+    //
 
     // apply final calculated movement values
     this.move(this.direction, this.speed)
 
-    // // TODO: if ! solid collision below:
-    // //   moveToCollisionPoint()
-    // //   keep outside solid objects!
-    // //   this is the same as moving outside the room and stopping / moving back to room edge
-    //
-    // // keep in room
-    // if (this.x < 0 && gameRooms.isFirstRoom()) {
-    //   this.hspeed = 0
-    //   this.x = 0
-    // } else if (this.x > gameRooms.currentRoom.width && gameRooms.isLastRoom()) {
-    //   this.hspeed = 0
-    //   this.x = gameRooms.currentRoom.width
-    // }
-    //
-    // if (this.y > gameRooms.currentRoom.height && this.vspeed > 0) {
-    //   this.vspeed = 0
-    //   this.y = gameRooms.currentRoom.height
-    // }
+    // TODO: if ! solid collision below:
+    //   moveToCollisionPoint()
+    //   keep outside solid objects!
+    //   this is the same as moving outside the room and stopping / moving back to room edge
   }
 
   /**
    * This method should draw the object. Called on every tick of the loop.
    *
-   * @param {GameObject} self
    * @param {GameDrawing} drawing
    */
-  draw(self, drawing) {
+  draw(drawing) {
     if (this.sprite) {
       drawing.sprite(this.sprite, this.x, this.y)
     }
 
     if (gameState.isPlaying) {
-      this.events?.draw?.actions.forEach(action => {
-        action(this, drawing)
-      })
+      this.events?.draw?.(drawing)
     }
   }
 }

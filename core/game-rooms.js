@@ -63,7 +63,7 @@ class GameRooms {
 
       if (this.currentRoom) {
         if (!this.currentRoom.initialized) {
-          this.currentRoom.init()
+          this.currentRoom.create()
         }
         this.currentRoom.objects = this.currentRoom.objects.concat(
           persistedObjects,

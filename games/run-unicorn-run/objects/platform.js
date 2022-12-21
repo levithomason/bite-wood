@@ -27,34 +27,29 @@ const sprPlatform = new GameSprite({
 class Platform extends GameObject {
   static displayName = 'objPlatform'
 
-  constructor({ x, y }) {
+  constructor() {
     super({
       sprite: sprPlatform,
-      x: x,
-      y: y,
       maxSpeed: 0,
       acceleration: 0,
       solid: true,
-      events: {
-        draw: {
-          actions: [
-            (self, drawing) => {
-              if (gameState.debug) {
-                drawing.setLineWidth(4)
-                drawing.setFillColor('transparent')
-                drawing.setStrokeColor('magenta')
-                drawing.rectangle(
-                  self.x,
-                  self.y,
-                  self.sprite.boundingBoxWidth,
-                  self.sprite.boundingBoxHeight,
-                )
-              }
-            },
-          ],
-        },
-      },
     })
+  }
+
+  draw(drawing) {
+    super.draw(drawing)
+
+    if (gameState.debug) {
+      drawing.setLineWidth(4)
+      drawing.setFillColor('transparent')
+      drawing.setStrokeColor('magenta')
+      drawing.rectangle(
+        this.x,
+        this.y,
+        this.sprite.boundingBoxWidth,
+        this.sprite.boundingBoxHeight,
+      )
+    }
   }
 }
 

@@ -58,36 +58,30 @@ export const sprRainbowDashFlyL = new GameSprite({
 class RainbowDash extends GameObject {
   static displayName = 'objRainbowDash'
 
-  constructor({ x = 300, y = 200 }) {
+  create() {
+    super.create()
+
+    this.x = 300
+    this.y = 200
+  }
+
+  step() {
+    super.step()
+
+    if (this.x >= gameRooms.currentRoom.width) {
+      this.setSprite(sprRainbowDashFlyL)
+      this.hspeed = -this.hspeed
+    } else if (this.x <= 0) {
+      this.setSprite(sprRainbowDashFlyR)
+      this.hspeed = -this.hspeed
+    }
+  }
+
+  constructor() {
     super({
       sprite: sprRainbowDashFlyL,
-      x: x,
-      y: y,
       speed: 4,
       direction: 180,
-      events: {
-        create: {
-          actions: [
-            self => {
-              self.x = 300
-              self.y = 200
-            },
-          ],
-        },
-        step: {
-          actions: [
-            self => {
-              if (self.x >= gameRooms.currentRoom.width) {
-                self.setSprite(sprRainbowDashFlyL)
-                self.hspeed = -self.hspeed
-              } else if (self.x <= 0) {
-                self.setSprite(sprRainbowDashFlyR)
-                self.hspeed = -self.hspeed
-              }
-            },
-          ],
-        },
-      },
     })
   }
 }

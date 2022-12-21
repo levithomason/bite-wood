@@ -152,58 +152,62 @@ const actions = {
 }
 
 /**
- * Transforms an object of JSON actions into an object of function actions:
+ * Transforms an object of JSON actions into a function call.
  *
  * in : { moveTo: { x: 10, y: 20 } }
- * out: [actions.moveTo({ 10, 20 })]
+ * out: () => {
+ *        actions.moveTo({ 10, 20 })
+ *      }
  *
  * @param actionsObj
- * @returns {*[]}
+ * @returns {() => void}
  */
 const resolveActions = (actionsObj = {}) => {
-  return Object.keys(actionsObj).map(name => {
-    const params = actionsObj[name]
+  const entries = Object.entries(actionsObj)
 
-    if (!actions[name]) {
-      debugger
-    }
+  return () => {
+    entries.forEach(([name, params]) => {
+      if (!actions[name]) {
+        throw new Error(`resolveActions encountered unknown action: ${name}`)
+      }
 
-    return actions[name](params)
-  })
+      return actions[name](params)
+    })
+  }
 }
 
 class Apple extends GameObject {
   static displayName = 'objApple'
 
-  constructor({ x, y }) {
+  constructor() {
     super({
       sprite: sprApple,
-      x: x,
-      y: y,
+      // x: x,
+      // y: y,
 
+      // TODO: this isn't being set because room.instanceCreate doesn't know
+      //       that it needs to set x and y on instantiation.
       // so we can bounce around our starting point
-      startX: x,
-      startY: y,
+      // startX: x,
+      // startY: y,
 
       speed: 0.2,
       gravity: 0.01,
       friction: 0.001,
       events: {
-        create: {
-          actions: resolveActions({
-            setVariableToRandom: {
-              name: 'direction',
-              min: 180,
-              max: 360,
-            },
-            moveToRandom: {
-              paddingLeft: 0.25,
-              paddingRight: 0.1,
-              paddingTop: 0.5,
-              paddingBottom: 0.1,
-            },
-          }),
-        },
+        create: resolveActions({
+          setVariableToRandom: {
+            name: 'direction',
+            min: 180,
+            max: 360,
+          },
+          moveToRandom: {
+            paddingLeft: 0.25,
+            paddingRight: 0.1,
+            paddingTop: 0.5,
+            paddingBottom: 0.1,
+          },
+        }),
 
         // collision: {
         //   objPlayer: {
@@ -225,43 +229,37 @@ class Apple extends GameObject {
         //   },
         // },
 
-        step: {
-          actions: resolveActions({
-            moveToward: {
-              x: 'self.startX',
-              y: 'self.startY',
-              speed:
-                'Math.pow(utils.distance(self.x, self.y, self.startX, self.startY), 3) * 0.001',
-            },
+        step: resolveActions({
+          moveToward: {
+            x: 'self.startX',
+            y: 'self.startY',
+            speed:
+              'Math.pow(utils.distance(self.x, self.y, self.startX, self.startY), 3) * 0.001',
+          },
 
-            ifCollisionObject: {
-              other: 'objPlayer',
-              trueActions: {
-                soundPlay: {
-                  name: 'sndEatApple',
-                },
-                instanceDestroy: {
-                  object: 'self',
-                },
+          ifCollisionObject: {
+            other: 'objPlayer',
+            trueActions: {
+              soundPlay: {
+                name: 'sndEatApple',
+              },
+              instanceDestroy: {
+                object: 'self',
               },
             },
-          }),
+          },
 
-          // [
           //   // die on collision with player
-          //   (self) => {
-          //     if (collision.objects(self, Player)) {
-          //       sndEatApple.play()
-          //       gameRooms.currentRoom.instanceDestroy(self)
+          //   if (collision.objects(self, Player)) {
+          //     sndEatApple.play()
+          //     gameRooms.currentRoom.instanceDestroy(self)
           //
-          //       // go to next room on all apples collected
-          //       if (!gameRooms.currentRoom.instanceExists(Apple)) {
-          //         gameRooms.nextRoom()
-          //       }
+          //     // go to next room on all apples collected
+          //     if (!gameRooms.currentRoom.instanceExists(Apple)) {
+          //       gameRooms.nextRoom()
           //     }
-          //   },
-          // ],
-        },
+          //   }
+        }),
       },
     })
   }

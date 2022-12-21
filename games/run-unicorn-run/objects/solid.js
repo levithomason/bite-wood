@@ -28,35 +28,33 @@ const sprSolidColliding = new GameSprite(spriteConfig)
 class Solid extends GameObject {
   static displayName = 'objSolid'
 
-  constructor({ x = 300, y = 600 - Math.random() * height * 2 }) {
+  constructor() {
     super({
       sprite: sprSolid,
-      x: x,
-      y: y,
       maxSpeed: 0,
       acceleration: 0,
-      events: {
-        step: {
-          actions: [
-            self => {
-              if (!gameState.debug) {
-                // TODO: introduce 'active' and .deactivate() to temp remove instances from the game
-                self.moveTo(-999, -999)
-                return
-              }
-
-              self.moveTo(gameMouse.x, gameMouse.y)
-
-              if (collision.objects(self, 'any')) {
-                self.setSprite(sprSolidColliding)
-              } else {
-                self.setSprite(sprSolid)
-              }
-            },
-          ],
-        },
-      },
     })
+
+    this.x = 300
+    this.y = 600 - Math.random() * height * 2
+  }
+
+  step() {
+    super.step()
+
+    if (!gameState.debug) {
+      // TODO: introduce 'active' and .deactivate() to temp remove instances from the game
+      this.moveTo(-999, -999)
+      return
+    }
+
+    this.moveTo(gameMouse.x, gameMouse.y)
+
+    if (collision.objects(this, 'any')) {
+      this.setSprite(sprSolidColliding)
+    } else {
+      this.setSprite(sprSolid)
+    }
   }
 }
 

@@ -94,135 +94,124 @@ export const sprPlayerWalkL = new GameSprite({
 class Player extends GameObject {
   static displayName = 'objPlayer'
 
-  constructor({ x = 100, y = 573 }) {
+  constructor() {
     super({
       persist: true,
       sprite: sprPlayerIdleR,
-      x: x,
-      y: y,
       acceleration: 0.5,
-      friction: gamePhysics.friction,
-      gravity: gamePhysics.gravity.magnitude,
-      gravityDirection: gamePhysics.gravity.direction,
       jump: 12,
       maxSpeed: 4,
       events: {
-        step: {
-          actions: [
-            // add friction when on the ground
-            self => {
-              if (collision.onBottom(self, 'solid')) {
-                self.friction = gamePhysics.friction
-              } else {
-                self.friction = 0
-              }
-            },
-
-            // remove friction when walking
-            self => {
-              if (
-                gameKeyboard.active.ArrowRight ||
-                gameKeyboard.active.ArrowLeft
-              ) {
-                self.friction = 0
-                self.hspeed =
-                  Math.sign(self.hspeed) *
-                  Math.min(Math.abs(self.hspeed), self.maxSpeed)
-              }
-            },
-            // go to next/prev room on room edge
-            self => {
-              if (self.x >= gameRooms.currentRoom.width) {
-                if (gameRooms.nextRoom()) {
-                  self.x = self.hspeed
-                }
-              } else if (self.x <= 0) {
-                if (gameRooms.prevRoom()) {
-                  self.x = gameRooms.currentRoom.width + self.hspeed
-                }
-              }
-            },
-          ],
-        },
-
-        draw: {
-          actions: [
-            (self, drawing) => {
-              if (gameMouse.down.left) {
-                drawing.setLineWidth(2)
-                drawing.setColor('#753')
-                drawing.arrow(self.x, self.y, gameMouse.x, gameMouse.y)
-              }
-            },
-          ],
-        },
-
         mouseActive: {
-          left: {
-            actions: [
-              self => {
-                const speed =
-                  utils.distance(self.x, self.y, gameMouse.x, gameMouse.y) / 500
+          left(self) {
+            const speed =
+              utils.distance(self.x, self.y, gameMouse.x, gameMouse.y) / 500
 
-                self.motionAdd(
-                  utils.direction(self.x, self.y, gameMouse.x, gameMouse.y),
-                  Math.min(1, speed),
-                )
-              },
-            ],
+            self.motionAdd(
+              utils.direction(self.x, self.y, gameMouse.x, gameMouse.y),
+              Math.min(1, speed),
+            )
           },
         },
 
         keyDown: {
-          ArrowUp: {
-            actions: [
-              self => {
-                if (collision.onBottom(self, 'solid')) {
-                  self.motionAdd(gamePhysics.DIRECTION_UP, self.jump)
-                }
-              },
-            ],
+          ArrowUp(self) {
+            if (collision.onBottom(self, 'solid')) {
+              self.motionAdd(gamePhysics.DIRECTION_UP, self.jump)
+            }
           },
         },
 
         keyUp: {
-          ArrowRight: {
-            actions: [
-              self => {
-                self.setSprite(sprPlayerIdleR)
-              },
-            ],
+          ArrowRight(self) {
+            self.setSprite(sprPlayerIdleR)
           },
-          ArrowLeft: {
-            actions: [
-              self => {
-                self.setSprite(sprPlayerIdleL)
-              },
-            ],
+          ArrowLeft(self) {
+            self.setSprite(sprPlayerIdleL)
           },
         },
 
         keyActive: {
-          ArrowRight: {
-            actions: [
-              self => {
-                self.setSprite(sprPlayerWalkR)
-                self.motionAdd(gamePhysics.DIRECTION_RIGHT, self.acceleration)
-              },
-            ],
+          ArrowRight(self) {
+            self.setSprite(sprPlayerWalkR)
+            self.motionAdd(gamePhysics.DIRECTION_RIGHT, self.acceleration)
           },
 
-          ArrowLeft: {
-            actions: [
-              self => {
-                self.setSprite(sprPlayerWalkL)
-                self.motionAdd(gamePhysics.DIRECTION_LEFT, self.acceleration)
-              },
-            ],
+          ArrowLeft(self) {
+            self.setSprite(sprPlayerWalkL)
+            self.motionAdd(gamePhysics.DIRECTION_LEFT, self.acceleration)
           },
         },
       },
     })
+
+    this.x = 100
+    this.y = 573
+  }
+
+  step() {
+    super.step()
+
+    //
+    // Gravity
+    //
+
+    // apply gravity if above floor bottom
+    if (this.y < gameRooms.currentRoom.height) {
+      this.motionAdd(this.gravity.direction, this.gravity.magnitude)
+    }
+
+    // terminal velocity & max speed
+    this.vspeed = Math.min(this.vspeed, gamePhysics.terminalVelocity)
+
+    //
+    // Walking
+    //
+
+    // walking
+    if (gameKeyboard.active.ArrowRight || gameKeyboard.active.ArrowLeft) {
+      self.friction = 0
+      self.hspeed =
+        Math.sign(self.hspeed) * Math.min(Math.abs(self.hspeed), self.maxSpeed)
+    }
+
+    // apply friction
+    this.hspeed = this.hspeed * (1 - this.friction)
+
+    // go to next/prev room on room edge
+    if (self.x >= gameRooms.currentRoom.width) {
+      if (gameRooms.nextRoom()) {
+        self.x = self.hspeed
+      }
+    } else if (self.x <= 0) {
+      if (gameRooms.prevRoom()) {
+        self.x = gameRooms.currentRoom.width + self.hspeed
+      }
+    }
+
+    // keep in room
+    if (this.x < 0 && gameRooms.isFirstRoom()) {
+      this.hspeed = 0
+      this.x = 0
+    } else if (this.x > gameRooms.currentRoom.width && gameRooms.isLastRoom()) {
+      this.hspeed = 0
+      this.x = gameRooms.currentRoom.width
+    }
+
+    if (this.y > gameRooms.currentRoom.height && this.vspeed > 0) {
+      this.vspeed = 0
+      this.y = gameRooms.currentRoom.height
+    }
+  }
+
+  draw(drawing) {
+    super.draw(drawing)
+
+    if (gameMouse.down.left) {
+      drawing.setLineWidth(2)
+      drawing.setColor('#753')
+      drawing.arrow(this.x, this.y, gameMouse.x, gameMouse.y)
+    }
   }
 }
 

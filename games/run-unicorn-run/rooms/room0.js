@@ -25,8 +25,8 @@ export default class Room0 extends GameRoom {
    * This method is called when the room is loaded in the game.
    * It should create all the objects the room needs.
    */
-  init() {
-    super.init()
+  create() {
+    super.create()
 
     this.instanceCreate(Platform, 350, 450)
 
