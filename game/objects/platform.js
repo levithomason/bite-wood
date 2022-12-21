@@ -1,6 +1,9 @@
-import * as collision from '../../core/collision.js'
-import { GameImage, GameObject, GameSprite } from '../../core/game/index.js'
-import state from '../../core/state.js'
+import {
+  GameImage,
+  GameObject,
+  GameSprite,
+  gameState,
+} from '../../core/game/index.js'
 
 // ----------------------------------------
 // Player
@@ -35,8 +38,8 @@ class Platform extends GameObject {
       events: {
         draw: {
           actions: [
-            (self, state, drawing) => {
-              if (state.debug) {
+            (self, drawing) => {
+              if (gameState.debug) {
                 drawing.setLineWidth(4)
                 drawing.setFillColor('transparent')
                 drawing.setStrokeColor('magenta')

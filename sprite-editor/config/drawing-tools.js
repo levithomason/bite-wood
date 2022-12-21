@@ -1,5 +1,6 @@
 import * as imageDataUtils from '../lib/image-data-utils.js'
 import { setState } from '../state-manager.js'
+import { distance } from '../../core/math.js'
 
 const DRAWING_TOOLS = {
   eraser: {

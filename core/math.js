@@ -18,9 +18,14 @@ export const random = (max = 1, min = 0) => {
   return (max - min) * Math.random() + min
 }
 
-export const inRange = (val, x = 1, y = 0) => {
-  const lower = Math.min(x, y)
-  const upper = Math.max(x, y)
+/**
+ * Returns true if `val` is greater than or equal to `lower` and less than `upper`.
+ * @param {number} val
+ * @param {number} lower
+ * @param {number} upper
+ * @return {boolean}
+ */
+export const inRange = (val, lower, upper) => {
   return val >= lower && val < upper
 }
 

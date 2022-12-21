@@ -1,8 +1,16 @@
+const NUM_CHANNELS = 4
+
+// TODO: midpoint circle
+// https://codepen.io/sdvg/pen/bGweeM?editors=0010
+
+// TODO: midpoint circle
+// https://codepen.io/sdvg/pen/bGweeM?editors=0010
+
 export function clear(array) {
   return fill(array, 0, 0, 0, 0)
 }
 /**
- * @param {number|[]} lengthOrArray
+ * @param {number|Uint8ClampedArray} lengthOrArray
  * @return {Uint8ClampedArray}
  */
 export function arrayFrom(lengthOrArray) {
@@ -13,14 +21,14 @@ export function fill(array, r = 0, g = 0, b = 0, a = 255) {
   return mapPixels(array, () => [r, g, b, a])
 }
 
-export function xyToIndex(width, x, y) {
-  return (y * width + x) * 4
+export function xyToIndex(imageWidth, x, y) {
+  return (y * imageWidth + x) * NUM_CHANNELS
 }
 
 export function getPixel(array, width, x, y) {
   const i = xyToIndex(width, x, y)
   return [
-    array[i + 0], // r
+    array[i], // r
     array[i + 1], // g
     array[i + 2], // b
     array[i + 3], // a
@@ -52,7 +60,7 @@ export function drawPixel(array, width, x, y, [r, g, b, a]) {
 export function drawPixelMutate(array, width, x, y, [r, g, b, a]) {
   const i = xyToIndex(width, x, y)
 
-  array[i + 0] = r
+  array[i] = r
   array[i + 1] = g
   array[i + 2] = b
   array[i + 3] = a
@@ -115,10 +123,10 @@ export function mapPixels(array, cb = x => x) {
   const length = array.length
   const cloned = arrayFrom(length)
 
-  for (let i = 0; i < length; i += 4) {
+  for (let i = 0; i < length; i += NUM_CHANNELS) {
     const [r = 0, g = 0, b = 0, a = 0] = cb(
       [
-        array[i + 0], // r
+        array[i], // r
         array[i + 1], // g
         array[i + 2], // b
         array[i + 3], // a
@@ -127,7 +135,7 @@ export function mapPixels(array, cb = x => x) {
       array,
     )
 
-    cloned[i + 0] = r
+    cloned[i] = r
     cloned[i + 1] = g
     cloned[i + 2] = b
     cloned[i + 3] = a
@@ -143,10 +151,10 @@ export function pixelCount(width, height) {
 export function forEachPixel(array, cb) {
   const length = array.length
 
-  for (let i = 0; i < length; i += 4) {
+  for (let i = 0; i < length; i += NUM_CHANNELS) {
     cb(
       [
-        array[i + 0], // r
+        array[i], // r
         array[i + 1], // g
         array[i + 2], // b
         array[i + 3], // a

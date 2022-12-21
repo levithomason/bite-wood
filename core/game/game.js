@@ -1,78 +1,59 @@
+import { gameDrawing } from './game-drawing-controller.js'
+import { gameRooms } from './game-rooms.js'
+import { gameMouse } from './game-mouse-controller.js'
+import { gameState } from './game-state-controller.js'
+
+// Tracks whether the game loop is running
+let _isRunning = false
+
+// Tracks the time of the last tick in the game loop
+let _lastTickTimestamp = 0
+
+// Tracks the requestAnimationFrame timer
+let _raf = null
+
 /**
- * Runs the game loop
- *  - Steps all objects
- *  - Draws all objects
+ * Runs the game loop. Calls the step() and draw() methods on all objects.
  */
-class Game {
-  constructor(state, drawing) {
-    this.state = state
-    this.drawing = drawing
-    this.isStarted = false
-    this.lastTickTimestamp = 0
-
-    this._step = this._step.bind(this)
-    this._draw = this._draw.bind(this)
-    this._tick = this._tick.bind(this)
-
+export class Game {
+  /**
+   * @param {HTMLElement} [parentElement=document.body] - A DOM element where the canvas should be placed.
+   * @param {number} [width=800] - The width of the game in pixels.
+   * @param {number} [height=600] - The height of the game in pixels.
+   */
+  constructor(
+    { parentElement = document.body, width = 800, height = 600 } = {
+      parentElement: document.body,
+      width: 800,
+      height: 600,
+    },
+  ) {
     this.start = this.start.bind(this)
     this.stop = this.stop.bind(this)
+    this.tick = this.tick.bind(this)
+
+    this.step = this.step.bind(this)
+    this.draw = this.draw.bind(this)
+
+    gameDrawing.canvas.width = width
+    gameDrawing.canvas.height = height
+    parentElement.append(gameDrawing.canvas)
   }
 
-  _step() {
-    if (!this.state.isPlaying) return
-    if (!this.state.room) return
+  start() {
+    if (_isRunning) return
 
-    this.state.room.objects.forEach(object => {
-      try {
-        object?.step?.(object, this.state)
-      } catch (err) {
-        console.error('Failed to step object:', err)
-      }
-    })
+    _isRunning = true
+    this.tick()
   }
 
-  _draw() {
-    this.drawing.clear()
-
-    if (this.state.room) {
-      try {
-        this.state.room.draw?.(this.drawing)
-      } catch (err) {
-        console.error('Failed to draw room:', err)
-      }
-
-      this.state.room.objects.forEach(object => {
-        try {
-          object.draw?.(this.drawing)
-        } catch (err) {
-          console.error('Failed to draw object:', err)
-        }
-      })
-    }
-
-    if (this.state.debug) {
-      this.drawing.grid()
-      this.drawing.text(
-        `${this.state.mouse.x}, ${this.state.mouse.y}`,
-        this.state.mouse.x + 10,
-        this.state.mouse.y - 10,
-      )
-    }
-
-    if (!this.state.isPlaying) {
-      this.drawing.fill('rgba(0, 0, 0, 0.65)')
-      this.drawing.setColor('#fff')
-      this.drawing.text(
-        `PAUSED`,
-        this.state.room.width / 2 - 40,
-        this.state.room.height / 2,
-      )
-    }
+  stop() {
+    cancelAnimationFrame(_raf)
   }
 
-  _tick() {
+  tick() {
     const timestamp = Date.now()
-    const timeSinceTick = timestamp - this.lastTickTimestamp
+    const timeSinceTick = timestamp - _lastTickTimestamp
 
     // TODO: This is a hacky way of ensuring 120hz displays tick at 60 FPS
     //       A better way is to calc the number of frames that should be ticked.
@@ -82,24 +63,70 @@ class Game {
     //         for frames, tick()
     //         draw()
     if (timeSinceTick >= 15) {
-      this.lastTickTimestamp = timestamp
-      this._step()
-      this._draw()
+      _lastTickTimestamp = timestamp
+      this.step()
+      this.draw()
     }
 
-    this.raf = requestAnimationFrame(this._tick)
+    _raf = requestAnimationFrame(this.tick)
   }
 
-  start() {
-    if (this.isStarted) return
+  step() {
+    if (!gameState.isPlaying) return
+    if (!gameRooms.currentRoom) return
 
-    this.isStarted = true
-    this._tick()
+    gameRooms.currentRoom.objects.forEach(object => {
+      try {
+        object.step?.(object)
+      } catch (err) {
+        console.error('Failed to step object:', err)
+      }
+    })
   }
 
-  stop() {
-    cancelAnimationFrame(this.raf)
+  draw() {
+    gameDrawing.clear()
+
+    // room - continue drawing if the room fails
+    if (gameRooms.currentRoom) {
+      try {
+        gameRooms.currentRoom.draw?.(gameDrawing)
+      } catch (err) {
+        console.error('Failed to draw room:', err)
+      }
+
+      // objects - continue drawing if the room fails
+      gameRooms.currentRoom.objects.forEach(object => {
+        try {
+          object.draw?.(object, gameDrawing)
+        } catch (err) {
+          console.error('Failed to draw object:', err)
+        }
+
+        if (gameState.debug) {
+          gameDrawing.objectDebug(object)
+        }
+      })
+    }
+
+    // debug
+    if (gameState.debug) {
+      gameDrawing.text(
+        `${gameMouse.x}, ${gameMouse.y}`,
+        gameMouse.x + 10,
+        gameMouse.y - 10,
+      )
+    }
+
+    // paused
+    if (!gameState.isPlaying) {
+      gameDrawing.fill('rgba(0, 0, 0, 0.65)')
+      gameDrawing.setColor('#fff')
+      gameDrawing.text(
+        `PAUSED`,
+        gameRooms.currentRoom.width / 2 - 40,
+        gameRooms.currentRoom.height / 2,
+      )
+    }
   }
 }
-
-export default Game

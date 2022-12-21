@@ -2,9 +2,12 @@
   "name": "violet",
   "version": "1.0.0",
   "main": "game/index.js",
+  "type": "module",
   "license": "MIT",
   "scripts": {
-    "start": "live-server --port=4321"
+    "start": "live-server --port=4321",
+    "test": "yarn node --experimental-vm-modules --no-warnings $(yarn bin jest)",
+    "test:watch": "yarn test --watch"
   },
   "prettier": {
     "semi": false,
@@ -17,6 +20,10 @@
     "tinycolor2": "^1.4.1"
   },
   "devDependencies": {
+    "@jest/globals": "^29.3.1",
+    "jest": "^29.3.1",
+    "jest-canvas-mock": "^2.4.0",
+    "jest-environment-jsdom": "^29.3.1",
     "live-server": "^1.2.1",
     "prettier": "^1.16.0"
   }

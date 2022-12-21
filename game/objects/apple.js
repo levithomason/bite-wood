@@ -4,6 +4,7 @@ import {
   GameImage,
   GameObject,
   GameSprite,
+  gameRooms,
 } from '../../core/game/index.js'
 import * as utils from '../../core/math.js'
 
@@ -21,22 +22,26 @@ const sprApple = new GameSprite({
   insertionY: 12,
 })
 
-const sndEatApple = new GameAudio('../game/sounds/20269__koops__apple-crunch-06.wav')
+const sndEatApple = new GameAudio(
+  '../game/sounds/20269__koops__apple-crunch-06.wav',
+)
 
 /**
  * Evaluates action parameter values and invokes action.
  *
  * @param {function} cb
  * @param {object} opts
- * @param {boolean} opts.eval - Whether or not to eval action values.
+ * @param {boolean} opts.eval - Whether to eval action values.
  * @returns {function(*=): function(*=, *=): *}
  */
-const createAction = (cb, opts = {}) => (params = {}) => (self, state) => {
+const createAction = (cb, opts = {}) => (params = {}) => (
+  /** GameObject */ self,
+) => {
   const evaluatedParams = Object.keys(params).reduce((acc, key) => {
     let value = params[key]
 
-    // evaluate strings referencing 'self', 'state', math notation, and comparisons
-    // allows the user to supply values like 'self.x + 4' or 'state.room.width'
+    // evaluate strings referencing 'self', math notation, and comparisons
+    // allows the user to supply values like 'self.x + 4' or 'gameRooms.currentRoom.width'
     if (
       opts.eval !== false &&
       typeof value === 'string' &&
@@ -58,7 +63,7 @@ const createAction = (cb, opts = {}) => (params = {}) => (self, state) => {
   // console.log('evaluatedParams', evaluatedParams)
   // console.groupEnd()
 
-  cb(evaluatedParams, self, state)
+  cb(evaluatedParams, self)
 }
 
 const actions = {
@@ -72,20 +77,20 @@ const actions = {
   //
   // Control Flow
   //
-  if: createAction(({ condition, trueActions, falseActions }, self, state) => {
+  if: createAction(({ condition, trueActions, falseActions }, self) => {
     if (condition) {
-      resolveActions(trueActions).forEach(action => action(self, state))
+      resolveActions(trueActions).forEach(action => action(self))
     } else {
-      resolveActions(falseActions).forEach(action => action(self, state))
+      resolveActions(falseActions).forEach(action => action(self))
     }
   }),
 
   ifCollisionObject: createAction(
-    ({ other, trueActions, falseActions }, self, state) => {
+    ({ other, trueActions, falseActions }, self) => {
       if (collision.objects(self, other)) {
-        resolveActions(trueActions).forEach(action => action(self, state))
+        resolveActions(trueActions).forEach(action => action(self))
       } else {
-        resolveActions(falseActions).forEach(action => action(self, state))
+        resolveActions(falseActions).forEach(action => action(self))
       }
     },
   ),
@@ -108,9 +113,9 @@ const actions = {
     (
       { paddingTop = 0, paddingBottom = 0, paddingLeft = 0, paddingRight = 0 },
       self,
-      state,
+      game,
     ) => {
-      const { x, y } = state.room.randomPosition({
+      const { x, y } = gameRooms.currentRoom.randomPosition({
         paddingTop,
         paddingBottom,
         paddingLeft,
@@ -132,9 +137,9 @@ const actions = {
   //
   // Room
   //
-  instanceDestroy: createAction(({ object }, self, state) => {
+  instanceDestroy: createAction(({ object }, self) => {
     // TODO: probably want destroySelf as an action, how to make actions with no params?
-    state.room.instanceDestroy(object)
+    gameRooms.currentRoom.instanceDestroy(object)
   }),
 
   //
@@ -175,6 +180,11 @@ class Apple extends GameObject {
       sprite: sprApple,
       x: x,
       y: y,
+
+      // so we can bounce around our starting point
+      startX: x,
+      startY: y,
+
       speed: 0.2,
       gravity: 0.01,
       friction: 0.001,
@@ -239,14 +249,14 @@ class Apple extends GameObject {
 
           // [
           //   // die on collision with player
-          //   self => {
+          //   (self) => {
           //     if (collision.objects(self, Player)) {
           //       sndEatApple.play()
-          //       state.room.instanceDestroy(self)
+          //       gameRooms.currentRoom.instanceDestroy(self)
           //
           //       // go to next room on all apples collected
-          //       if (!state.room.instanceExists(Apple)) {
-          //         state.nextRoom()
+          //       if (!gameRooms.currentRoom.instanceExists(Apple)) {
+          //         gameRooms.nextRoom()
           //       }
           //     }
           //   },

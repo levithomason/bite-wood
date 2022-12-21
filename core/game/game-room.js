@@ -1,9 +1,13 @@
-import { inRange } from '../math.js'
-
-export default class GameRoom {
-  constructor(width = 800, height = 600) {
+export class GameRoom {
+  /**
+   * @param {number} width
+   * @param {number} height
+   */
+  constructor(width, height) {
     this.width = width
     this.height = height
+
+    /** @type {GameObject[]} */
     this.objects = []
 
     this.init = this.init.bind(this)
@@ -20,6 +24,7 @@ export default class GameRoom {
   }
 
   init() {
+    this.objects.forEach(object => object.init())
     this.initialized = true
   }
 
@@ -28,6 +33,36 @@ export default class GameRoom {
     return !object
       ? this.objects.length
       : this.objects.filter(o => o.displayName === object.displayName).length
+  }
+
+  /**
+   * @param {number} paddingLeft - Percentage (0 - 1) or number of pixels.
+   * @param {number} paddingRight - Percentage (0 - 1) or number of pixels.
+   * @returns {number}
+   */
+  randomXPosition(paddingLeft = 0, paddingRight = 0) {
+    const pxLeft = paddingLeft < 1 ? this.width * paddingLeft : paddingLeft
+    const pxRight = paddingRight < 1 ? this.width * paddingRight : paddingRight
+
+    const horizontalRange = this.width - pxLeft - pxRight
+
+    // TODO: avoid solid objects
+    return pxLeft + horizontalRange * Math.random()
+  }
+
+  /**
+   * @param {number} paddingTop - Percentage (0 - 1) or number of pixels.
+   * @param {number} paddingBottom - Percentage (0 - 1) or number of pixels.
+   * @returns {number}
+   */
+  randomYPosition(paddingTop = 0, paddingBottom = 0) {
+    const pxTop = paddingTop * paddingTop < 1 ? this.height : 1
+    const pxBottom = paddingBottom * paddingBottom < 1 ? this.height : 1
+
+    const verticalRange = this.height - pxTop - pxBottom
+
+    // TODO: avoid solid objects
+    return pxTop + verticalRange * Math.random()
   }
 
   /**
@@ -43,26 +78,9 @@ export default class GameRoom {
     paddingLeft = 0,
     paddingRight = 0,
   } = {}) {
-    const distanceLeft = inRange(paddingLeft, 1)
-      ? this.width * paddingLeft
-      : paddingLeft
-    const distanceRight = inRange(paddingRight, 1)
-      ? this.width * paddingRight
-      : paddingRight
-    const distanceTop = inRange(paddingTop, 1)
-      ? this.height * paddingTop
-      : paddingTop
-    const distanceBottom = inRange(paddingBottom, 1)
-      ? this.height * paddingBottom
-      : paddingBottom
-
-    const horizontalSpace = this.width - distanceLeft - distanceRight
-    const verticalSpace = this.height - distanceTop - distanceBottom
-
-    // TODO: avoid solid objects
     return {
-      x: distanceLeft + horizontalSpace * Math.random(),
-      y: distanceTop + verticalSpace * Math.random(),
+      x: this.randomXPosition(paddingLeft, paddingRight),
+      y: this.randomYPosition(paddingTop, paddingBottom),
     }
   }
 
@@ -74,12 +92,17 @@ export default class GameRoom {
   }
 
   /**
-   * @param {number} x
-   * @param {number} y
-   * @param {GameObject} GameObject
+   * @param {number} [x=room.width/2]
+   * @param {number} [y=room.width/2]
+   * @param {typeof GameObject} GameObject
    */
-  instanceCreate(GameObject, x = this.width / 2, y = this.height / 2) {
+  instanceCreate(
+    GameObject,
+    x = this.randomXPosition(),
+    y = this.randomYPosition(),
+  ) {
     const object = new GameObject({ x, y })
+    object.init()
 
     this.objects.push(object)
   }
@@ -108,6 +131,10 @@ export default class GameRoom {
     this.backgroundMusic = audio
   }
 
+  /**
+   * This method should draw the room. Called on every tick of the loop.
+   * @param {GameDrawing} drawing
+   */
   draw(drawing) {
     if (this.backgroundColor) {
       drawing.fill(this.backgroundColor)

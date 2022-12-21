@@ -1,28 +1,16 @@
-import { Game, GameDrawing } from '../core/game/index.js'
-import room0 from './rooms/room0.js'
-import room1 from './rooms/room1.js'
-import state from '../core/state.js'
+import { Game, gameRooms } from '../core/game/index.js'
+
+import Room0 from './rooms/room0.js'
+import Room1 from './rooms/room1.js'
 
 // ----------------------------------------
 // Game
 // ----------------------------------------
 
-const startButton = document.getElementById('start-button')
-startButton.addEventListener('click', start)
+// game
+const game = new Game()
 
-function start() {
-  startButton.removeEventListener('keydown', start)
-  startButton.parentElement.removeChild(startButton)
+gameRooms.addRoom(new Room0())
+gameRooms.addRoom(new Room1())
 
-  // state
-  state.addRoom(room0)
-  state.addRoom(room1)
-
-  // drawing
-  const drawing = new GameDrawing(state.room.width, state.room.height)
-  document.body.append(drawing.canvas)
-
-  // game
-  const game = new Game(state, drawing)
-  game.start()
-}
+game.start()

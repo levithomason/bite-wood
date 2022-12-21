@@ -1,4 +1,4 @@
-export default class GameAudio {
+export class GameAudio {
   constructor(src) {
     this.element = new Audio(src)
 

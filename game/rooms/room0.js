@@ -6,9 +6,9 @@ import Player from '../objects/player.js'
 import RainbowDash from '../objects/rainbow-dash.js'
 import Solid from '../objects/solid.js'
 
-class Room0 extends GameRoom {
+export default class Room0 extends GameRoom {
   constructor() {
-    super()
+    super(800, 600)
 
     this.backgroundImage = new GameImage('../game/images/background.png')
 
@@ -19,26 +19,24 @@ class Room0 extends GameRoom {
     this.backgroundMusic.loop = true
   }
 
+  /**
+   * This method is called when the room is loaded in the game.
+   * It should create all the objects the room needs.
+   */
   init() {
     super.init()
 
-    room0.instanceCreate(Platform, 350, 450)
+    this.instanceCreate(Platform, 350, 450)
 
-    room0.instanceCreate(Apple)
-    room0.instanceCreate(Apple)
-    room0.instanceCreate(Apple)
-    room0.instanceCreate(Apple)
-    room0.instanceCreate(Apple)
+    this.instanceCreate(Apple)
+    this.instanceCreate(Apple)
+    this.instanceCreate(Apple)
+    this.instanceCreate(Apple)
+    this.instanceCreate(Apple)
 
-    room0.instanceCreate(Solid)
-    room0.instanceCreate(RainbowDash)
+    this.instanceCreate(Solid)
+    this.instanceCreate(RainbowDash)
 
-    room0.instanceCreate(Player, 100, 573)
+    this.instanceCreate(Player, 100, 573)
   }
 }
-
-const room0 = new Room0()
-
-window.room0 = room0
-
-export default room0

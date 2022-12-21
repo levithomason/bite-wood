@@ -1,6 +1,11 @@
 import * as collision from '../../core/collision.js'
-import { GameImage, GameObject, GameSprite } from '../../core/game/index.js'
-import state from '../../core/state.js'
+import {
+  GameImage,
+  GameObject,
+  GameSprite,
+  gameMouse,
+  gameState,
+} from '../../core/game/index.js'
 
 // ----------------------------------------
 // Solid
@@ -34,13 +39,13 @@ class Solid extends GameObject {
         step: {
           actions: [
             self => {
-              if (!state.debug) {
+              if (!gameState.debug) {
                 // TODO: introduce 'active' and .deactivate() to temp remove instances from the game
                 self.moveTo(-999, -999)
                 return
               }
 
-              self.moveTo(state.mouse.x, state.mouse.y)
+              self.moveTo(gameMouse.x, gameMouse.y)
 
               if (collision.objects(self, 'any')) {
                 self.setSprite(sprSolidColliding)

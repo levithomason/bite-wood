@@ -1,4 +1,4 @@
-import state from './state.js'
+import { gameRooms } from './game/index.js'
 
 /**
  * Checks if a point is colliding with an object.
@@ -77,7 +77,7 @@ export const objects = (self, other, cb) => {
   const withSolid = other === 'solid'
   const displayName = !withAny && !withSolid ? other : ''
 
-  return state.room.objects.some(object => {
+  return gameRooms.currentRoom.objects.some(object => {
     // TODO: introduce object ids so as not to rely on instance equality, could be over network
     if (self === object) return false
 

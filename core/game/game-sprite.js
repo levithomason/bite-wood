@@ -2,7 +2,7 @@
  * A GameSprite takes a GameImage and adds additional information to manage
  * scale, insertion point, offset, bounding box, and animating frames.
  */
-export default class GameSprite {
+export class GameSprite {
   /**
    * @param options
    * @param {GameImage} options.image - A GameImage instance.

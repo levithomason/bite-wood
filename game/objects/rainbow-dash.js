@@ -1,5 +1,9 @@
-import { GameImage, GameSprite, GameObject } from '../../core/game/index.js'
-import state from '../../core/state.js'
+import {
+  GameImage,
+  GameSprite,
+  GameObject,
+  gameRooms,
+} from '../../core/game/index.js'
 
 // ----------------------------------------
 // RainbowDash
@@ -73,7 +77,7 @@ class RainbowDash extends GameObject {
         step: {
           actions: [
             self => {
-              if (self.x >= state.room.width) {
+              if (self.x >= gameRooms.currentRoom.width) {
                 self.setSprite(sprRainbowDashFlyL)
                 self.hspeed = -self.hspeed
               } else if (self.x <= 0) {

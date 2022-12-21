@@ -1,12 +1,11 @@
-import { GameAudio, GameRoom } from '../../core/game/index.js'
-import state from '../../core/state.js'
+import { GameAudio, GameRoom, gameRooms } from '../../core/game/index.js'
 
-class Room1 extends GameRoom {
+export default class Room1 extends GameRoom {
   constructor() {
-    super()
+    super(800, 600)
     this.backgroundColor = '#124'
     this.backgroundMusic = new GameAudio(
-      'http://soundimage.org/wp-content/uploads/2017/05/Hypnotic-Puzzle.mp3',
+      'https://soundimage.org/wp-content/uploads/2017/05/Hypnotic-Puzzle.mp3',
     )
     this.backgroundMusic.volume = 0.2
     this.backgroundMusic.loop = true
@@ -22,26 +21,29 @@ class Room1 extends GameRoom {
   draw(drawing) {
     super.draw(drawing)
 
-    const starCount = state.room.width * state.room.height * room1.density
+    const starCount =
+      gameRooms.currentRoom.width * gameRooms.currentRoom.height * this.density
 
     // add any new stars we need
-    while (room1.stars.length < starCount) {
-      room1.stars.push({
-        x: Math.round(Math.random() * state.room.width),
-        y: Math.round(Math.random() * Math.random() * state.room.height),
+    while (this.stars.length < starCount) {
+      this.stars.push({
+        x: Math.round(Math.random() * gameRooms.currentRoom.width),
+        y: Math.round(
+          Math.random() * Math.random() * gameRooms.currentRoom.height,
+        ),
         r: 200 + Math.random() * 55,
         g: 200 + Math.random() * 55,
         b: 200 + Math.random() * 55,
         a: 0,
-        size: Math.random() * room1.size,
+        size: Math.random() * this.size,
         max: Math.random(),
-        twinkle: Math.random() * room1.twinkle,
-        rate: room1.rate / 2 + (Math.random() * room1.rate - room1.rate / 2),
+        twinkle: Math.random() * this.twinkle,
+        rate: this.rate / 2 + (Math.random() * this.rate - this.rate / 2),
         dying: false,
       })
     }
 
-    room1.stars.forEach(star => {
+    this.stars.forEach(star => {
       drawing.setStrokeColor('transparent')
       drawing.setFillColor(`rgba(${star.r}, ${star.g}, ${star.b}, ${star.a})`)
       drawing.rectangle(star.x, star.y, star.size, star.size)
@@ -60,14 +62,8 @@ class Room1 extends GameRoom {
       star.b = 127 + ((star.b + star.twinkle) % 127)
     })
 
-    room1.stars = room1.stars.filter(star => {
+    this.stars = this.stars.filter(star => {
       return !(star.dying && star.a < 0.01)
     })
   }
 }
-
-const room1 = new Room1()
-
-window.room1 = room1
-
-export default room1

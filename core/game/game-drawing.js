@@ -1,8 +1,6 @@
 import * as collision from '../collision.js'
 
-///////////////////////////////////////////
-
-export default class GameDrawing {
+export class GameDrawing {
   constructor(width, height) {
     if (typeof width === 'undefined' || typeof height === 'undefined') {
       throw new Error('GameDrawing constructor missing width or height.')
@@ -12,11 +10,6 @@ export default class GameDrawing {
     this.canvas.setAttribute('height', height)
 
     this._ctx = this.canvas.getContext('2d')
-    // render pixelated images
-    this._ctx.imageSmoothingEnabled = false
-
-    // align coordinates to pixel centers instead of pixel grid lines (between pixels)
-    this._ctx.translate(0.5, 0.5)
 
     this.saveSettings = this.saveSettings.bind(this)
     this.loadSettings = this.loadSettings.bind(this)
@@ -50,26 +43,24 @@ export default class GameDrawing {
   }
 
   //
-  // Color
+  // Settings
   //
+  /** @param {string} color */
   setColor(color) {
     this.setStrokeColor(color)
     this.setFillColor(color)
   }
+  /** @param {string} color */
   setStrokeColor(color) {
     this._ctx.strokeStyle = color
   }
 
+  /** @param {string} color */
   setFillColor(color) {
     this._ctx.fillStyle = color
   }
 
-  //
-  // Line
-  //
-  /**
-   * @param {number} width
-   */
+  /** @param {number} width */
   setLineWidth(width) {
     this._ctx.lineWidth = width
   }
@@ -95,6 +86,7 @@ export default class GameDrawing {
    * @param {number} y
    */
   image(image, x = 0, y = 0) {
+    this._ctx.imageSmoothingEnabled = false
     this._ctx.drawImage(image.element, x, y)
   }
 
@@ -104,6 +96,7 @@ export default class GameDrawing {
    * @param {number} y
    */
   imageData(imageData, x = 0, y = 0) {
+    this._ctx.imageSmoothingEnabled = false
     this._ctx.putImageData(imageData, x, y)
   }
 
@@ -136,6 +129,7 @@ export default class GameDrawing {
   fill(color) {
     this.saveSettings()
     this.setColor(color)
+    this.setLineWidth(0)
     this.rectangle(0, 0, this.canvas.width, this.canvas.height)
     this.loadSettings()
   }
@@ -149,6 +143,20 @@ export default class GameDrawing {
     this._ctx.moveTo(x1, y1)
     this._ctx.lineTo(x2, y2)
     this._ctx.stroke()
+  }
+
+  circle(x, y, radius) {
+    this._ctx.beginPath()
+    this._ctx.arc(x, y, radius, 0, 2 * Math.PI)
+    this._ctx.stroke()
+    this._ctx.fill()
+  }
+
+  ellipse(x, y, radiusX, radiusY, rotation = 0) {
+    this._ctx.beginPath()
+    this._ctx.ellipse(x, y, radiusX, radiusY, rotation, 0, 2 * Math.PI)
+    this._ctx.stroke()
+    this._ctx.fill()
   }
 
   arrow(x1, y1, x2, y2) {
@@ -245,8 +253,10 @@ export default class GameDrawing {
 
     this.saveSettings()
 
+    this.setLineWidth(2)
+
     // bounding box
-    if (collision.objects(object)) {
+    if (collision.objects(object, 'any')) {
       this.setStrokeColor('#F00')
     } else {
       this.setStrokeColor('#FF0')
@@ -291,18 +301,20 @@ export default class GameDrawing {
     this._ctx.font = '12px monospace'
     this._ctx.textAlign = 'left'
     const lines = [
-      `x          = ${x.toFixed(2)}`,
-      `y          = ${y.toFixed(2)}`,
+      // `x          = ${x.toFixed(2)}`,
+      // `y          = ${y.toFixed(2)}`,
       `direction  = ${direction.toFixed(2)}`,
-      `speed      = ${speed.toFixed(2)}`,
-      `hspeed     = ${hspeed.toFixed(2)}`,
-      `vspeed     = ${vspeed.toFixed(2)}`,
+      `speed      = ${speed.toFixed(2)} (${hspeed.toFixed(2)}, ${vspeed.toFixed(
+        2,
+      )})`,
+      // `hspeed     = ${hspeed.toFixed(2)}`,
+      // `vspeed     = ${vspeed.toFixed(2)}`,
       `gravity    = ${gravity.toFixed(2)}`,
       `friction   = ${friction.toFixed(2)}`,
-      `boundingBoxTop    = ${object.boundingBoxTop.toFixed(2)}`,
-      `boundingBoxLeft   = ${object.boundingBoxLeft.toFixed(2)}`,
-      `boundingBoxBottom = ${object.boundingBoxBottom.toFixed(2)}`,
-      `boundingBoxRight  = ${object.boundingBoxRight.toFixed(2)}`,
+      // `boundingBoxTop    = ${object.boundingBoxTop.toFixed(2)}`,
+      // `boundingBoxLeft   = ${object.boundingBoxLeft.toFixed(2)}`,
+      // `boundingBoxBottom = ${object.boundingBoxBottom.toFixed(2)}`,
+      // `boundingBoxRight  = ${object.boundingBoxRight.toFixed(2)}`,
     ]
     lines.reverse().forEach((line, i) => {
       this.text(

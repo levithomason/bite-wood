@@ -1,5 +1,13 @@
-import { GameImage, GameSprite, GameObject } from '../../core/game/index.js'
-import state from '../../core/state.js'
+import {
+  GameImage,
+  GameSprite,
+  GameObject,
+  gamePhysics,
+  gameMouse,
+  gameRooms,
+  gameKeyboard,
+} from '../../core/game/index.js'
+
 import * as utils from '../../core/math.js'
 import * as collision from '../../core/collision.js'
 
@@ -91,9 +99,9 @@ class Player extends GameObject {
       x: x,
       y: y,
       acceleration: 0.5,
-      friction: state.physics.friction,
-      gravity: state.physics.gravity.magnitude,
-      gravityDirection: state.physics.gravity.direction,
+      friction: gamePhysics.friction,
+      gravity: gamePhysics.gravity.magnitude,
+      gravityDirection: gamePhysics.gravity.direction,
       jump: 12,
       maxSpeed: 4,
       events: {
@@ -102,7 +110,7 @@ class Player extends GameObject {
             // add friction when on the ground
             self => {
               if (collision.onBottom(self, 'solid')) {
-                self.friction = state.physics.friction
+                self.friction = gamePhysics.friction
               } else {
                 self.friction = 0
               }
@@ -110,7 +118,10 @@ class Player extends GameObject {
 
             // remove friction when walking
             self => {
-              if (state.keys.active.ArrowRight || state.keys.active.ArrowLeft) {
+              if (
+                gameKeyboard.active.ArrowRight ||
+                gameKeyboard.active.ArrowLeft
+              ) {
                 self.friction = 0
                 self.hspeed =
                   Math.sign(self.hspeed) *
@@ -119,13 +130,13 @@ class Player extends GameObject {
             },
             // go to next/prev room on room edge
             self => {
-              if (self.x >= state.room.width) {
-                if (state.nextRoom()) {
+              if (self.x >= gameRooms.currentRoom.width) {
+                if (gameRooms.nextRoom()) {
                   self.x = self.hspeed
                 }
               } else if (self.x <= 0) {
-                if (state.prevRoom()) {
-                  self.x = state.room.width + self.hspeed
+                if (gameRooms.prevRoom()) {
+                  self.x = gameRooms.currentRoom.width + self.hspeed
                 }
               }
             },
@@ -134,11 +145,11 @@ class Player extends GameObject {
 
         draw: {
           actions: [
-            (self, state, drawing) => {
-              if (state.mouse.down.left) {
+            (self, drawing) => {
+              if (gameMouse.down.left) {
                 drawing.setLineWidth(2)
                 drawing.setColor('#753')
-                drawing.arrow(self.x, self.y, state.mouse.x, state.mouse.y)
+                drawing.arrow(self.x, self.y, gameMouse.x, gameMouse.y)
               }
             },
           ],
@@ -149,11 +160,10 @@ class Player extends GameObject {
             actions: [
               self => {
                 const speed =
-                  utils.distance(self.x, self.y, state.mouse.x, state.mouse.y) /
-                  500
+                  utils.distance(self.x, self.y, gameMouse.x, gameMouse.y) / 500
 
                 self.motionAdd(
-                  utils.direction(self.x, self.y, state.mouse.x, state.mouse.y),
+                  utils.direction(self.x, self.y, gameMouse.x, gameMouse.y),
                   Math.min(1, speed),
                 )
               },
@@ -166,7 +176,7 @@ class Player extends GameObject {
             actions: [
               self => {
                 if (collision.onBottom(self, 'solid')) {
-                  self.motionAdd(state.physics.DIRECTION_UP, self.jump)
+                  self.motionAdd(gamePhysics.DIRECTION_UP, self.jump)
                 }
               },
             ],
@@ -195,7 +205,7 @@ class Player extends GameObject {
             actions: [
               self => {
                 self.setSprite(sprPlayerWalkR)
-                self.motionAdd(state.physics.DIRECTION_RIGHT, self.acceleration)
+                self.motionAdd(gamePhysics.DIRECTION_RIGHT, self.acceleration)
               },
             ],
           },
@@ -204,7 +214,7 @@ class Player extends GameObject {
             actions: [
               self => {
                 self.setSprite(sprPlayerWalkL)
-                self.motionAdd(state.physics.DIRECTION_LEFT, self.acceleration)
+                self.motionAdd(gamePhysics.DIRECTION_LEFT, self.acceleration)
               },
             ],
           },

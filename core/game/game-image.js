@@ -1,4 +1,4 @@
-export default class GameImage {
+export class GameImage {
   constructor(src) {
     this.element = new Image()
 
