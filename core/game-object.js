@@ -12,7 +12,7 @@ import { Vector } from './math.js'
 
 /**
  * @typedef {function} GameDrawingAction
- * @param {GameObject} self
+ * @param {GameDrawing} self
  */
 
 export class GameObject {
