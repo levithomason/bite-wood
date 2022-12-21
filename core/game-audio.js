@@ -1,4 +1,10 @@
 export class GameAudio {
+  /** @type boolean */
+  loop
+
+  /** @type number */
+  volume
+
   constructor(src) {
     this.element = new Audio(src)
 
@@ -6,6 +12,7 @@ export class GameAudio {
     this.pause = this.pause.bind(this)
   }
 
+  /** @type boolean */
   get loop() {
     return this.element.loop
   }

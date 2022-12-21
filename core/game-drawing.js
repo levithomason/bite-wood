@@ -186,6 +186,13 @@ export class GameDrawing {
     this._ctx.strokeRect(x, y, w, h)
   }
 
+  roundedRectangle(x, y, w, h, radii) {
+    this._ctx.beginPath()
+    this._ctx.roundRect(x, y, w, h, radii)
+    this._ctx.fill()
+    this._ctx.stroke()
+  }
+
   polygon(vertices) {
     const [start, ...rest] = vertices
 

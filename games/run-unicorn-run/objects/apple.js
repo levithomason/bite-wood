@@ -113,7 +113,6 @@ const actions = {
     (
       { paddingTop = 0, paddingBottom = 0, paddingLeft = 0, paddingRight = 0 },
       self,
-      game,
     ) => {
       const { x, y } = gameRooms.currentRoom.randomPosition({
         paddingTop,

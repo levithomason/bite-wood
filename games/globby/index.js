@@ -20,30 +20,61 @@ const room = new Room(800, 600)
 
 gameRooms.addRoom(room)
 
-// class Ground extends GameObject {
-//   static width = 100
-//   static height = 20
-//
-//   // constructor() {
-//   //   super()
-//   //   // this.solid = true
-//   //   // this.sprite = new GameSprite({
-//   //   //   boundingBoxHeight: 20,
-//   //   //   boundingBoxLeft: 0,
-//   //   // })
-//   // }
-//
-//   draw(drawing) {
-//     super.draw(drawing)
-//
-//     drawing.rectangle(this.x, this.y, Ground.width, Ground.height)
-//   }
-// }
-// room.instanceCreate(Ground, 0, room.height - Ground.height)
+class Block extends GameObject {
+  static width = 100
+  static height = 100
+  draw(drawing) {
+    super.draw(drawing)
+
+    drawing.setLineWidth(2)
+    drawing.setFillColor('transparent')
+    drawing.setStrokeColor('coral')
+    drawing.roundedRectangle(this.x, this.y, Block.width, Block.height)
+  }
+}
+room.instanceCreate(Block, 200, 200)
+room.instanceCreate(Block, 200, 300)
+room.instanceCreate(Block, 300, 200)
+room.instanceCreate(Block, 300, 300)
+
+class Bullet extends GameObject {
+  create() {
+    this.speed = 10
+  }
+
+  step() {
+    super.step()
+
+    if (this.isOutsideRoom()) {
+      room.instanceDestroy(this)
+    }
+  }
+
+  draw(drawing) {
+    super.draw(drawing)
+
+    drawing.setStrokeColor('mediumvioletred')
+    drawing.setFillColor('mediumvioletred')
+    drawing.circle(this.x, this.y, 4)
+  }
+}
 
 class Globby extends GameObject {
   constructor() {
-    super()
+    super({
+      events: {
+        keyDown: {
+          ' ': () => {
+            const bullet = gameRooms.currentRoom.instanceCreate(
+              Bullet,
+              this.x,
+              this.y,
+            )
+            bullet.direction = this.direction
+          },
+        },
+      },
+    })
     this.size = 20
     this.acceleration = 0.3
     this.maxSpeed = 4
@@ -61,11 +92,27 @@ class Globby extends GameObject {
     drawing.setFillColor('#ddd')
     drawing.setStrokeColor('#fff')
     drawing.ellipse(
-      this.x - this.size,
-      this.y - this.size - this.strokeWidth,
+      this.x,
+      this.y,
       this.size * Math.max(1, Math.pow((this.speed * 2) / this.maxSpeed, 0.5)),
       this.size,
       toRadians(this.direction),
+    )
+
+    // eyes
+    drawing.setLineWidth(2)
+    drawing.setFillColor('white')
+    drawing.setStrokeColor('#888')
+    const eyeDistanceFromCenter = this.size + Math.pow(this.speed * 5, 0.8)
+    drawing.circle(
+      this.x + eyeDistanceFromCenter * Math.cos(toRadians(this.direction + 30)),
+      this.y + eyeDistanceFromCenter * Math.sin(toRadians(this.direction + 30)),
+      5,
+    )
+    drawing.circle(
+      this.x + eyeDistanceFromCenter * Math.cos(toRadians(this.direction - 30)),
+      this.y + eyeDistanceFromCenter * Math.sin(toRadians(this.direction - 30)),
+      5,
     )
   }
 
@@ -94,7 +141,7 @@ class Globby extends GameObject {
   }
 }
 
-room.instanceCreate(Globby, 400, 400)
+room.instanceCreate(Globby, 100, 550)
 
 const game = new Game()
 game.start()

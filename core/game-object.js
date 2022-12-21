@@ -1,9 +1,9 @@
-import * as collision from './collision.js'
 import { gameKeyboard } from './game-keyboard-controller.js'
 import { gameMouse } from './game-mouse-controller.js'
 import { gamePhysics } from './game-physics-controller.js'
 import { gameState } from './game-state-controller.js'
 import { Vector } from './math.js'
+import { gameRooms } from './game-rooms.js'
 
 /**
  * @typedef {function} GameObjectAction
@@ -200,8 +200,8 @@ export class GameObject {
       Object.keys(gameKeyboard.down).forEach(key => {
         this.events.keyDown?.[key]?.(this)
         // keydown should only register for one step
-        // remember which we've handled so we don't handle them again
-        gameKeyboard.down[key] = null
+        // TODO: buggy response to keydown, need queues, see TODO.md
+        delete gameKeyboard.down[key]
       })
     }
 
@@ -266,7 +266,13 @@ export class GameObject {
     // Physics
     //
 
-    // // stop on solid objects
+    // TODO: this requires having a bounding box at all times to compute collision.
+    //       currently, only sprites have bounding boxes.
+    //       GameObject should have a bounding box, and it should defer to the sprite's bounding box if present.
+    //       This way, objects can have collisions without sprites, such as when custom drawing an object with GameDrawing.
+    // stop on solid objects
+    // TODO: this is naive and shouldn't assume platformer (collision on bottom, stop vspeed)
+    //       should instead check collisions on all sides and stop each direction if appropriate
     // if (
     //   collision.objects(this, 'solid', o => {
     //     return collision.onBottom(this, o)
@@ -301,5 +307,16 @@ export class GameObject {
     if (gameState.isPlaying) {
       this.events?.draw?.(drawing)
     }
+  }
+
+  // TODO: this (like step collision check) needs bounding box apart from the sprite
+  //       see step physics regarding staying outside solid objects
+  isOutsideRoom() {
+    return (
+      this.x < 0 ||
+      this.y < 0 ||
+      this.x > gameRooms.currentRoom.width ||
+      this.y > gameRooms.currentRoom.height
+    )
   }
 }
