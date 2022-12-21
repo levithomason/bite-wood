@@ -1,7 +1,7 @@
 {
   "name": "violet",
   "version": "1.0.0",
-  "main": "game/index.js",
+  "main": "games/run-unicorn-run/index.js",
   "type": "module",
   "license": "MIT",
   "scripts": {
