@@ -104,6 +104,8 @@ class Globby extends GameObject {
     drawing.setFillColor('white')
     drawing.setStrokeColor('#888')
     const eyeDistanceFromCenter = this.size + Math.pow(this.speed * 5, 0.8)
+    // TODO: add util for calculating a point from distance and direction:
+    //       toPoint(distance, direction)
     drawing.circle(
       this.x + eyeDistanceFromCenter * Math.cos(toRadians(this.direction + 30)),
       this.y + eyeDistanceFromCenter * Math.sin(toRadians(this.direction + 30)),
