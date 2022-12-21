@@ -249,6 +249,7 @@ export class GameDrawing {
     this.loadSettings()
   }
 
+  /** @param {GameObject} object */
   objectDebug(object) {
     const {
       sprite,
@@ -309,7 +310,7 @@ export class GameDrawing {
 
     // text values
     this.setColor('#000')
-    this.setFontSize(12)
+    this.setFontSize(14)
     this._ctx.textAlign = 'left'
     const lines = [
       // `x          = ${x.toFixed(2)}`,
@@ -320,7 +321,7 @@ export class GameDrawing {
       )})`,
       // `hspeed     = ${hspeed.toFixed(2)}`,
       // `vspeed     = ${vspeed.toFixed(2)}`,
-      `gravity    = ${gravity.toFixed(2)}`,
+      `gravity    = ${gravity.magnitude.toFixed(2)}`,
       `friction   = ${friction.toFixed(2)}`,
       // `boundingBoxTop    = ${object.boundingBoxTop.toFixed(2)}`,
       // `boundingBoxLeft   = ${object.boundingBoxLeft.toFixed(2)}`,

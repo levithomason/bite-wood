@@ -61,6 +61,9 @@ img,
 canvas {
   image-rendering: pixelated;
 
+  /* disable font anti-aliasing */
+  -webkit-font-smoothing: none;
+
   /* animate sizes smoothly */
   transition: width 100ms, height 100ms;
   transition-timing-function: var(--timing-function-bounce);

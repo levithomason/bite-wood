@@ -6,7 +6,7 @@ import {
   GameSprite,
   gameRooms,
 } from '../../../core/index.js'
-import * as utils from '../../../core/math.js'
+import * as math from '../../../core/math.js'
 
 // ----------------------------------------
 // Player
@@ -71,7 +71,7 @@ const actions = {
   // Variables
   //
   setVariableToRandom: createAction(({ name, min, max }, self) => {
-    self[name] = utils.random(max, min)
+    self[name] = math.random(max, min)
   }),
 
   //
@@ -104,7 +104,7 @@ const actions = {
   }),
 
   moveToward: createAction(({ x, y, speed = 1 }, self) => {
-    const direction = utils.direction(self.x, self.y, self.startX, self.startY)
+    const direction = math.direction(self.x, self.y, self.startX, self.startY)
 
     self.motionAdd(direction, speed)
   }),
@@ -191,7 +191,7 @@ class Apple extends GameObject {
       // startY: y,
 
       speed: 0.2,
-      gravity: 0.01,
+      gravity: new math.Vector(0, 0),
       friction: 0.001,
       events: {
         create: resolveActions({
@@ -233,7 +233,7 @@ class Apple extends GameObject {
             x: 'self.startX',
             y: 'self.startY',
             speed:
-              'Math.pow(utils.distance(self.x, self.y, self.startX, self.startY), 3) * 0.001',
+              'Math.pow(math.distance(self.x, self.y, self.startX, self.startY), 3) * 0.001',
           },
 
           ifCollisionObject: {
