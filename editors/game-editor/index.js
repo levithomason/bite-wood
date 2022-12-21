@@ -8,7 +8,7 @@ function gameEditor() {
   const playPopout = () => {
     window.open(
       // TODO: need to know what url:port we're on programmatically
-      'http://127.0.0.1:4321/run-unicorn-run',
+      'http://127.0.0.1:4321/games/run-unicorn-run',
       '_blank',
       // TODO: need to know game size programmatically
       'popup,noopener,noreferrer,width=800,height=600',

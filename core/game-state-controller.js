@@ -44,3 +44,19 @@ class GameState {
 export const gameState = new GameState()
 window.biteWood = window.biteWood || {}
 window.gameState = gameState
+
+//
+// Pause/Play on window blur/focus
+// This is to help understand when you're accidentally pushing keys and
+// you're not playing due to focus being in another window.
+//
+let pausedOnBlur = false
+window.addEventListener('blur', () => {
+  pausedOnBlur = true
+  gameState.pause()
+})
+window.addEventListener('focus', () => {
+  if (pausedOnBlur) {
+    gameState.play()
+  }
+})

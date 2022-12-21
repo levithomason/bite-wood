@@ -60,6 +60,10 @@ export class GameDrawing {
     this._ctx.fillStyle = color
   }
 
+  setFontSize(size) {
+    this._ctx.font = `${size}px Pixellari, monospace`
+  }
+
   /** @param {number} width */
   setLineWidth(width) {
     this._ctx.lineWidth = width
@@ -305,7 +309,7 @@ export class GameDrawing {
 
     // text values
     this.setColor('#000')
-    this._ctx.font = '12px monospace'
+    this.setFontSize(12)
     this._ctx.textAlign = 'left'
     const lines = [
       // `x          = ${x.toFixed(2)}`,

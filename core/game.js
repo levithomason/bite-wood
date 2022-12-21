@@ -120,8 +120,9 @@ export class Game {
 
     // paused
     if (!gameState.isPlaying) {
-      gameDrawing.fill('rgba(0, 0, 0, 0.65)')
+      gameDrawing.fill('rgba(16, 16, 16, 0.5)')
       gameDrawing.setColor('#fff')
+      gameDrawing.setFontSize(18)
       gameDrawing.text(
         `PAUSED`,
         gameRooms.currentRoom.width / 2 - 40,

@@ -26,7 +26,7 @@ class GameKeyboard {
     // on the first step, the key is handled
     // future steps will skip the handled keys
     // the step that handles KeyUp will remove it from key down
-    // see the GameObject.invokeKeyboardEvents() method
+    // see the GameObject step method
     // once removed, we know if is safe to mark it true again
     if (!this.down.hasOwnProperty(e.key)) {
       this.down[e.key] = true

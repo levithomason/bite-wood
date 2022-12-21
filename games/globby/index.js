@@ -7,7 +7,13 @@ import {
   gameRooms,
   GameSprite,
 } from '../../core/index.js'
-import { direction, distance, toRadians } from '../../core/math.js'
+import {
+  direction,
+  distance,
+  offsetX,
+  offsetY,
+  toRadians,
+} from '../../core/math.js'
 
 class Room extends GameRoom {
   draw(drawing) {
@@ -21,15 +27,15 @@ const room = new Room(800, 600)
 gameRooms.addRoom(room)
 
 class Block extends GameObject {
-  static width = 100
-  static height = 100
+  static width = 50
+  static height = 50
   draw(drawing) {
     super.draw(drawing)
 
     drawing.setLineWidth(2)
     drawing.setFillColor('transparent')
     drawing.setStrokeColor('coral')
-    drawing.roundedRectangle(this.x, this.y, Block.width, Block.height)
+    drawing.roundedRectangle(this.x, this.y, Block.width, Block.height, 4)
   }
 }
 room.instanceCreate(Block, 200, 200)
@@ -53,8 +59,8 @@ class Bullet extends GameObject {
   draw(drawing) {
     super.draw(drawing)
 
-    drawing.setStrokeColor('mediumvioletred')
-    drawing.setFillColor('mediumvioletred')
+    drawing.setStrokeColor('coral')
+    drawing.setFillColor('coral')
     drawing.circle(this.x, this.y, 4)
   }
 }
@@ -67,15 +73,23 @@ class Globby extends GameObject {
           ' ': () => {
             const bullet = gameRooms.currentRoom.instanceCreate(
               Bullet,
-              this.x,
-              this.y,
+              offsetX(
+                this.x,
+                this.getElongatedSize() + this.strokeWidth,
+                this.direction,
+              ),
+              offsetY(
+                this.y,
+                this.getElongatedSize() + this.strokeWidth,
+                this.direction,
+              ),
             )
             bullet.direction = this.direction
           },
         },
       },
     })
-    this.size = 20
+    this.size = 10
     this.acceleration = 0.3
     this.maxSpeed = 4
     this.strokeWidth = 8
@@ -94,27 +108,56 @@ class Globby extends GameObject {
     drawing.ellipse(
       this.x,
       this.y,
-      this.size * Math.max(1, Math.pow((this.speed * 2) / this.maxSpeed, 0.5)),
+      this.getElongatedSize(),
       this.size,
       toRadians(this.direction),
     )
 
     // eyes
+    const eyeDist = this.size + Math.pow(this.speed * 5, 0.6)
+    const eyeGap = 50 * (1 - this.speed / (this.maxSpeed * 2))
+    const eyeSize = 6
+
+    // whites
     drawing.setLineWidth(2)
     drawing.setFillColor('white')
     drawing.setStrokeColor('#888')
-    const eyeDistanceFromCenter = this.size + Math.pow(this.speed * 5, 0.8)
-    // TODO: add util for calculating a point from distance and direction:
-    //       toPoint(distance, direction)
+
     drawing.circle(
-      this.x + eyeDistanceFromCenter * Math.cos(toRadians(this.direction + 30)),
-      this.y + eyeDistanceFromCenter * Math.sin(toRadians(this.direction + 30)),
-      5,
+      offsetX(this.x, eyeDist, this.direction - eyeGap),
+      offsetY(this.y, eyeDist, this.direction - eyeGap),
+      eyeSize,
     )
     drawing.circle(
-      this.x + eyeDistanceFromCenter * Math.cos(toRadians(this.direction - 30)),
-      this.y + eyeDistanceFromCenter * Math.sin(toRadians(this.direction - 30)),
-      5,
+      offsetX(this.x, eyeDist, this.direction + eyeGap),
+      offsetY(this.y, eyeDist, this.direction + eyeGap),
+      eyeSize,
+    )
+
+    // pupils
+    const eyePupilSize = eyeSize * 0.5
+    const eyePupilDist = Math.pow(eyeDist, 1.05)
+    const eyePupilGap = Math.pow(eyeGap, 0.9)
+
+    drawing.setLineWidth(0)
+    drawing.setFillColor('#284')
+
+    drawing.setStrokeColor('transparent')
+    drawing.circle(
+      offsetX(this.x, eyePupilDist, this.direction - eyePupilGap),
+      offsetY(this.y, eyePupilDist, this.direction - eyePupilGap),
+      eyePupilSize,
+    )
+    drawing.circle(
+      offsetX(this.x, eyePupilDist, this.direction + eyePupilGap),
+      offsetY(this.y, eyePupilDist, this.direction + eyePupilGap),
+      eyePupilSize,
+    )
+  }
+
+  getElongatedSize() {
+    return (
+      this.size * Math.max(1, Math.pow((this.speed * 2) / this.maxSpeed, 0.3))
     )
   }
 
