@@ -18,9 +18,36 @@ export const random = (max = 1, min = 0) => {
   return (max - min) * Math.random() + min
 }
 
-export const inRange = (val, x = 1, y = 0) => {
-  const lower = Math.min(x, y)
-  const upper = Math.max(x, y)
+/**
+ * Returns a new x value based on a starting x, distance, and direction.
+ * @param {number} startX
+ * @param {number} distance
+ * @param {number} direction - In degrees.
+ * @return {number}
+ */
+export const offsetX = (startX, distance, direction) => {
+  return startX + distance * Math.cos(toRadians(direction))
+}
+
+/**
+ * Returns a new x value based on a starting x, distance, and direction.
+ * @param {number} startY
+ * @param {number} distance
+ * @param {number} direction - In degrees.
+ * @return {number}
+ */
+export const offsetY = (startY, distance, direction) => {
+  return startY + distance * Math.sin(toRadians(direction))
+}
+
+/**
+ * Returns true if `val` is greater than or equal to `lower` and less than `upper`.
+ * @param {number} val
+ * @param {number} lower
+ * @param {number} upper
+ * @return {boolean}
+ */
+export const inRange = (val, lower, upper) => {
   return val >= lower && val < upper
 }
 

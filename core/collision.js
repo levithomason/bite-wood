@@ -1,4 +1,4 @@
-import state from './state.js'
+import { gameRooms } from './game-rooms.js'
 
 /**
  * Checks if a point is colliding with an object.
@@ -68,7 +68,7 @@ export const onRight = (self, other) => {
 /**
  * Checks if an object is colliding with some other object.
  * @param {GameObject} self
- * @param {'any'|'solid'|string} other - If string, object display name.
+ * @param {'any'|'solid'|string} other - If set to string, collisions only happen when the other object's displayName matches the string.
  * @param {Function} [cb] - A callback for custom logic in determining if a collision has occurred. It is called with two arguments: self, other.
  * @returns {boolean}
  */
@@ -77,7 +77,7 @@ export const objects = (self, other, cb) => {
   const withSolid = other === 'solid'
   const displayName = !withAny && !withSolid ? other : ''
 
-  return state.room.objects.some(object => {
+  return gameRooms.currentRoom.objects.some(object => {
     // TODO: introduce object ids so as not to rely on instance equality, could be over network
     if (self === object) return false
 
