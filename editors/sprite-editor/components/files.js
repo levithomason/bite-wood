@@ -37,13 +37,13 @@ function files(state) {
 
         // TODO: make canvas component, we're drawing data inline a lot
         const canvas = document.createElement('canvas')
-        canvas.width = state.width
-        canvas.height = state.height
+        canvas.width = spriteState.width
+        canvas.height = spriteState.height
 
         const imageData = new ImageData(
           spriteState.frames[0],
-          state.width,
-          state.height,
+          spriteState.width,
+          spriteState.height,
         )
 
         const ctx = canvas.getContext('2d')

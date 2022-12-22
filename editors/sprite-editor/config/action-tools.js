@@ -4,7 +4,7 @@ import SETTINGS from './settings.js'
 import { actions, setState } from '../state-manager.js'
 
 const ACTION_TOOLS = {
-  clear: state => ({
+  clear: /** State */ state => ({
     key: 'clear',
     icon: 'times-circle',
     label: 'Clear',
@@ -17,7 +17,7 @@ const ACTION_TOOLS = {
     },
   }),
 
-  grid: state => ({
+  grid: /** State */ state => ({
     key: 'grid',
     icon: 'th',
     label: 'Grid',
@@ -27,7 +27,31 @@ const ACTION_TOOLS = {
     },
   }),
 
-  undo: state => ({
+  resize: /** State */ state => ({
+    key: 'resize',
+    icon: 'expand-alt',
+    label: 'resize',
+    onClick: e => {
+      // TODO: validate numbers only
+      const w = prompt('Width of the NEW IMAGE:').trim()
+      const h = prompt('Height of the NEW IMAGE:').trim()
+
+      if (!w || !h) {
+        return
+      }
+
+      const width = Number(w)
+      const height = Number(h)
+
+      setState({
+        width,
+        height,
+        frames: [imageDataUtils.arrayFrom(width * height * 4)],
+      })
+    },
+  }),
+
+  undo: /** State */ state => ({
     key: 'undo',
     icon: 'undo',
     badge: state.undos.length,
@@ -37,7 +61,7 @@ const ACTION_TOOLS = {
     },
   }),
 
-  redo: state => ({
+  redo: /** State */ state => ({
     key: 'redo',
     icon: 'redo',
     badge: state.redos.length,
@@ -47,7 +71,7 @@ const ACTION_TOOLS = {
     },
   }),
 
-  export: state => ({
+  export: /** State */ state => ({
     key: 'export',
     icon: 'file-export',
     label: 'Export',
@@ -71,7 +95,7 @@ const ACTION_TOOLS = {
     },
   }),
 
-  zoomIn: state => ({
+  zoomIn: /** State */ state => ({
     key: 'zoomIn',
     icon: 'search-plus',
     disabled: state.scale >= SETTINGS.MAX_ZOOM,
@@ -80,7 +104,7 @@ const ACTION_TOOLS = {
     },
   }),
 
-  zoomOut: state => ({
+  zoomOut: /** State */ state => ({
     key: 'zoomOut',
     icon: 'search-minus',
     disabled: state.scale <= SETTINGS.MIN_ZOOM,

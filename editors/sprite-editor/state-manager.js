@@ -37,6 +37,7 @@ export class State {
     this.tool = DRAWING_TOOLS.pencil.key
     this.color = [0, 0, 0, 255]
     this.scale = 16
+    this.showGrid = false
     this.width = SETTINGS.DEFAULT_WIDTH
     this.height = SETTINGS.DEFAULT_HEIGHT
     this.frameIndexDrawing = 0
@@ -187,7 +188,10 @@ actions.deleteAllFrames = (state, index) => {
 
 actions.addUndo = state => {
   setState({
-    undos: [getUndoRedoRecord(state), ...state.undos],
+    undos: [getUndoRedoRecord(state), ...state.undos].slice(
+      0,
+      SETTINGS.MAX_UNDOS,
+    ),
   })
   console.log('addUndo', getState().undos)
 }

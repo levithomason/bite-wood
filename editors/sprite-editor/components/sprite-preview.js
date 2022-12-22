@@ -64,7 +64,7 @@ function spritePreview(state) {
       <input
         class="speed-control"
         type="range"
-        value="${state.previewFPS}"
+        .value="${state.previewFPS}"
         min="1"
         max="30"
         @input=${handleSpeedChange}

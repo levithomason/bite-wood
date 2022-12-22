@@ -15,7 +15,7 @@ function actionTool(
     >
       ${icon !== undefined
         ? html`
-            <i class="fas fa-fw fa-${icon}"></i>
+            <i class="fa-sharp fas fa-fw fa-${icon}"></i>
           `
         : ''}
       ${label !== undefined
@@ -46,6 +46,9 @@ function actionTools(state) {
       <div class="tool-group">
         ${actionTool(state, ACTION_TOOLS.clear(state))}
         ${actionTool(state, ACTION_TOOLS.grid(state))}
+      </div>
+      <div class="tool-group">
+        ${actionTool(state, ACTION_TOOLS.resize(state))}
       </div>
       <div class="tool-group">
         ${actionTool(state, ACTION_TOOLS.export(state))}

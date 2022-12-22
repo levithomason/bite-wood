@@ -92,12 +92,12 @@ function gridCanvas(state) {
   ctx.fillStyle = 'rgba(127, 127, 127)'
 
   // horizontals
-  for (let i = 0; i < width - 1; i += cellSize) {
+  for (let i = 0; i < height - 1; i += cellSize) {
     ctx.fillRect(0, i + cellSize, width, 1)
   }
 
   // verticals
-  for (let i = 0; i < height - 1; i += cellSize) {
+  for (let i = 0; i < width - 1; i += cellSize) {
     ctx.fillRect(i + cellSize, 0, 1, height)
   }
 

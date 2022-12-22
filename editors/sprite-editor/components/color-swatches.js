@@ -42,7 +42,7 @@ function colorSwatches(state) {
   const hues = 16
   const step = deg / hues
 
-  const tints = 2
+  const tints = 4
   const shades = 8
   const variants = tints + shades + 1
 
