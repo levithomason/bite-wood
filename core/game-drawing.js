@@ -85,13 +85,16 @@ export class GameDrawing {
   // Images
   //
   /**
-   * @param {GameImage} image
+   * @param {GameImage|HTMLImageElement|HTMLCanvasElement} image
    * @param {number} x
    * @param {number} y
    */
   image(image, x = 0, y = 0) {
+    // GameImage has an element property, otherwise this is an image/canvas.
+    const drawable = image.element || image
+
     this._ctx.imageSmoothingEnabled = false
-    this._ctx.drawImage(image.element, x, y)
+    this._ctx.drawImage(drawable, x, y)
   }
 
   /**

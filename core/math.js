@@ -10,12 +10,51 @@ export const direction = (x1, y1, x2 = 0, y2 = 0) => {
   return toDegrees(Math.atan2(y2 - y1, x2 - x1))
 }
 
+/**
+ * Returns `min` when `val` is less than `min` and `max` when `val` is greater than `max.
+ * @param val
+ * @param min
+ * @param max
+ * @return {number}
+ */
 export const clamp = (val, min, max) => {
   return Math.max(min, Math.min(max, val))
 }
 
+/**
+ * Returns a random number between `max` and `min`.
+ * @param {number} [max=1]
+ * @param {number} [min=0]
+ * @return {number}
+ */
 export const random = (max = 1, min = 0) => {
   return (max - min) * Math.random() + min
+}
+
+/**
+ * Returns 0 when `val <= min` and 1 when `val >= max`.
+ * @param {number} val
+ * @param {number} min
+ * @param {number} max
+ * @return {number}
+ */
+export const normalize = (val, min, max) => {
+  return clamp((val - min) / (max - min), 0, 1)
+}
+
+/**
+ * Scales the `val` from the range o1-o2 to n1-n2. Returns a number clamped to n1-n2.
+ * @param {number} val - The current value
+ * @param {number} min - The original lower bound
+ * @param {number} max - The original upper bound
+ * @param {number} newMin - The new lower bound
+ * @param {number} newMax - The new upper bound
+ * @return {number}
+ */
+export const scale = (val, min, max, newMin, newMax) => {
+  const percent = normalize(val, min, max)
+  const newRange = newMax - newMin
+  return newMin + newRange * percent
 }
 
 /**

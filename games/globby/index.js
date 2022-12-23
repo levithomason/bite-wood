@@ -6,14 +6,20 @@ import {
   gamePhysics,
   gameRooms,
   GameSprite,
+  GameDrawing,
+  GameImage,
 } from '../../core/index.js'
 import {
+  clamp,
   direction,
   distance,
+  normalize,
   offsetX,
   offsetY,
+  scale,
   toRadians,
 } from '../../core/math.js'
+import { loadState } from '../../editors/sprite-editor/storage-manager.js'
 
 class Room extends GameRoom {
   draw(drawing) {
@@ -187,6 +193,70 @@ class Globby extends GameObject {
 }
 
 room.instanceCreate(Globby, 100, 550)
+
+class Fuego extends GameObject {
+  constructor() {
+    super()
+    const state = loadState()
+
+    this.width = state.width
+    this.height = state.height
+    this.frame0 = new ImageData(
+      new Uint8ClampedArray(state.frames[0]),
+      this.width,
+      this.height,
+    )
+    this.frame1 = new ImageData(
+      new Uint8ClampedArray(state.frames[1]),
+      this.width,
+      this.height,
+    )
+    this.frame2 = new ImageData(
+      new Uint8ClampedArray(state.frames[2]),
+      this.width,
+      this.height,
+    )
+
+    this.drawing = new GameDrawing(this.width, this.height)
+    this.drawing.imageData(this.frame1, 0, 0)
+  }
+
+  draw(drawing) {
+    super.draw(drawing)
+
+    drawing.image(this.drawing.canvas, this.x, this.y)
+  }
+  step() {
+    super.step()
+
+    const globby = gameRooms.currentRoom.objects.find(object => {
+      return object instanceof Globby
+    })
+
+    const distanceToGlobby = distance(this.x, this.y, globby.x, globby.y)
+    const directionToGlobby = direction(this.x, this.y, globby.x, globby.y)
+
+    // accelerate toward player
+    // slowly when far away, quickly when close
+    const distanceMotionAddSlowdown = scale(distanceToGlobby, 100, 200, 0, 0.18)
+    this.motionAdd(directionToGlobby, 0.2 - distanceMotionAddSlowdown)
+
+    // limit max speed
+    // slow when far away, fast when close
+    const distanceMaxSpeedSlowdown = scale(distanceToGlobby, 100, 200, 0, 2)
+    const maxSpeed = 2.25 - distanceMaxSpeedSlowdown
+    this.speed = Math.min(this.speed, maxSpeed)
+
+    // show attack frame when close
+    const attackDistance = 100
+    if (distanceToGlobby < attackDistance) {
+      this.drawing.imageData(this.frame2, 0, 0)
+    } else {
+      this.drawing.imageData(this.frame1, 0, 0)
+    }
+  }
+}
+room.instanceCreate(Fuego, room.width - 100, 100)
 
 const game = new Game()
 game.start()
