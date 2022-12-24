@@ -10,7 +10,7 @@ class Room extends GameRoom {
   draw(drawing) {
     super.draw(drawing)
 
-    drawing.setColor('#fff')
+    drawing.setFillColor('#fff')
     const headerFontSize = 24
     const headerBottomMargin = 8
     const itemFontSize = 21

@@ -26,7 +26,6 @@ export class GameObject {
    * @param {GameSprite} sprite
    * @param {boolean} [persist=false] - Determines whether this object should still exist when the room changes.
    * @param {boolean} [solid=true]
-   *
    * @param {number} [x=0]
    * @param {number} [y=0]
    * @param {number} [acceleration=0]
@@ -34,20 +33,18 @@ export class GameObject {
    * @param {number} [friction=gamePhysics.friction]
    * @param {number} [speed=0]
    * @param {number} [direction=0]
-   *
-   * @param {object} events
-   * @param {GameObjectAction} events.create
-   * @param {GameObjectAction} events.destroy
-   * @param {GameObjectAction} events.create
-   * @param {GameDrawingAction} events.draw
-   * @param {GameObjectAction} events.keyActive
-   * @param {GameObjectAction} events.keyDown
-   * @param {GameObjectAction} events.keyUp
-   * @param {GameObjectAction} events.mouseActive
-   * @param {GameObjectAction} events.mouseDown
-   * @param {GameObjectAction} events.mouseUp
-   * @param {GameObjectAction} events.step
-   *
+   * @param {object} [events={}]
+   * @param {GameObjectAction} [events.create]
+   * @param {GameObjectAction} [events.destroy]
+   * @param {GameObjectAction} [events.create]
+   * @param {GameDrawingAction} [events.draw]
+   * @param {GameObjectAction} [events.keyActive]
+   * @param {GameObjectAction} [events.keyDown]
+   * @param {GameObjectAction} [events.keyUp]
+   * @param {GameObjectAction} [events.mouseActive]
+   * @param {GameObjectAction} [events.mouseDown]
+   * @param {GameObjectAction} [events.mouseUp]
+   * @param {GameObjectAction} [events.step]
    * @param {object} ...properties
    */
   constructor({
@@ -76,7 +73,7 @@ export class GameObject {
     this.events = events
 
     // assign any custom properties the developer passed in
-    Object.keys(properties).forEach(property => {
+    Object.keys(properties).forEach((property) => {
       this[property] = properties[property]
     })
 
@@ -213,7 +210,7 @@ export class GameObject {
 
     // keyDown
     if (this.events.keyDown) {
-      Object.keys(gameKeyboard.down).forEach(key => {
+      Object.keys(gameKeyboard.down).forEach((key) => {
         this.events.keyDown?.[key]?.(this)
         // keydown should only register for one step
         // TODO: buggy response to keydown, need queues, see TODO.md
@@ -223,14 +220,14 @@ export class GameObject {
 
     // keyActive
     if (this.events.keyActive) {
-      Object.keys(gameKeyboard.active).forEach(key => {
+      Object.keys(gameKeyboard.active).forEach((key) => {
         this.events.keyActive?.[key]?.(this)
       })
     }
 
     // keyUp
     if (this.events.keyUp) {
-      Object.keys(gameKeyboard.up).forEach(key => {
+      Object.keys(gameKeyboard.up).forEach((key) => {
         this.events.keyUp?.[key]?.(this)
 
         // keyup events should only fire for one step
@@ -241,8 +238,8 @@ export class GameObject {
     // mouseDown
     if (this.events.mouseDown) {
       Object.keys(gameMouse.down)
-        .filter(button => gameMouse.down[button] !== null)
-        .forEach(key => {
+        .filter((button) => gameMouse.down[button] !== null)
+        .forEach((key) => {
           this.events.mouseDown?.[key]?.(this)
           // keydown should only register for one step
           // remember which we've handled so we don't handle them again
@@ -252,14 +249,14 @@ export class GameObject {
 
     // mouseActive
     if (this.events.mouseActive) {
-      Object.keys(gameMouse.active).forEach(button => {
+      Object.keys(gameMouse.active).forEach((button) => {
         this.events.mouseActive?.[button]?.(this)
       })
     }
 
     // mouseUp
     if (this.events.mouseUp) {
-      Object.keys(gameMouse.up).forEach(button => {
+      Object.keys(gameMouse.up).forEach((button) => {
         this.events.mouseUp?.[button]?.(this)
 
         // keyup events should only fire for one step
@@ -312,7 +309,6 @@ export class GameObject {
 
   /**
    * This method should draw the object. Called on every tick of the loop.
-   *
    * @param {GameDrawing} drawing
    */
   draw(drawing) {

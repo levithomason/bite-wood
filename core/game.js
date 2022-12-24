@@ -75,7 +75,7 @@ export class Game {
     if (!gameState.isPlaying) return
     if (!gameRooms.currentRoom) return
 
-    gameRooms.currentRoom.objects.forEach(object => {
+    gameRooms.currentRoom.objects.forEach((object) => {
       try {
         object.step?.(object)
       } catch (err) {
@@ -96,7 +96,7 @@ export class Game {
       }
 
       // objects - continue drawing if the room fails
-      gameRooms.currentRoom.objects.forEach(object => {
+      gameRooms.currentRoom.objects.forEach((object) => {
         try {
           object.draw?.(gameDrawing)
         } catch (err) {
@@ -130,10 +130,8 @@ export class Game {
       // text
       gameDrawing.setFontFamily() // default
       gameDrawing.setFontSize(18)
-      gameDrawing.setColor('#fff')
+      gameDrawing.setFillColor('#fff')
       gameDrawing.setStrokeColor('#000')
-
-      gameDrawing.strokeText(text, x, y)
       gameDrawing.text(text, x, y)
     }
   }

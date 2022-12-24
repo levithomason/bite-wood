@@ -1,48 +1,41 @@
 import * as collision from './collision.js'
 
+/** Provides a canvas and helpful methods for drawing on it. */
 export class GameDrawing {
-  constructor(width, height) {
-    if (typeof width === 'undefined' || typeof height === 'undefined') {
-      throw new Error('GameDrawing constructor missing width or height.')
-    }
-    this.setCanvasWidth = this.setCanvasWidth.bind(this)
-    this.setCanvasHeight = this.setCanvasHeight.bind(this)
+  /** @type CanvasRenderingContext2D */
+  #ctx
 
-    this.saveSettings = this.saveSettings.bind(this)
-    this.loadSettings = this.loadSettings.bind(this)
-    this.setColor = this.setColor.bind(this)
-    this.setStrokeColor = this.setStrokeColor.bind(this)
-    this.setFillColor = this.setFillColor.bind(this)
-    this.setLineWidth = this.setLineWidth.bind(this)
-    this.clear = this.clear.bind(this)
-    this.image = this.image.bind(this)
-    this.imageData = this.imageData.bind(this)
-    this.sprite = this.sprite.bind(this)
-    this.fill = this.fill.bind(this)
-    this.pixel = this.pixel.bind(this)
-    this.line = this.line.bind(this)
-    this.arrow = this.arrow.bind(this)
-    this.rectangle = this.rectangle.bind(this)
-    this.polygon = this.polygon.bind(this)
-    this.text = this.text.bind(this)
-    this.textAlign = this.textAlign.bind(this)
-    this.grid = this.grid.bind(this)
-    this.objectDebug = this.objectDebug.bind(this)
-    this.vectorDebug = this.vectorDebug.bind(this)
+  constructor(width, height) {
+    if (typeof width === 'undefined') {
+      throw new Error('GameDrawing constructor missing width.')
+    }
+    if (typeof height === 'undefined') {
+      throw new Error('GameDrawing constructor missing height.')
+    }
 
     this.canvas = document.createElement('canvas')
-    this._ctx = this.canvas.getContext('2d')
+    this.#ctx = this.canvas.getContext('2d')
 
     this.setCanvasWidth(width)
     this.setCanvasHeight(height)
+
+    return this
   }
 
-  /**
-   * Sets the width of the canvas.
-   * @param {number} width
-   */
-  setCanvasWidth(width) {
-    this.canvas.setAttribute('width', width)
+  //
+  // Settings
+  //
+
+  /** Saves the current drawing settings, such as colors and widths. */
+  saveSettings() {
+    this.#ctx.save()
+    return this
+  }
+
+  /** Loads the previously saved drawing settings, such as colors and widths. */
+  loadSettings() {
+    this.#ctx.restore()
+    return this
   }
 
   /**
@@ -51,199 +44,169 @@ export class GameDrawing {
    */
   setCanvasHeight(height) {
     this.canvas.setAttribute('height', height)
+    return this
   }
 
-  saveSettings() {
-    this._ctx.save()
-  }
-
-  loadSettings() {
-    this._ctx.restore()
-  }
-
-  //
-  // Settings
-  //
-  /** @param {string} color */
-  setColor(color) {
-    this.setStrokeColor(color)
-    this.setFillColor(color)
-  }
-  /** @param {string} color */
-  setStrokeColor(color) {
-    this._ctx.strokeStyle = color
+  /**
+   * Sets the width of the canvas.
+   * @param {number} width
+   */
+  setCanvasWidth(width) {
+    this.canvas.setAttribute('width', width)
+    return this
   }
 
   /** @param {string} color */
   setFillColor(color) {
-    this._ctx.fillStyle = color
+    this.#ctx.fillStyle = color
+    return this
   }
 
-  setFontSize(size = 16) {
-    this._ctx.font = this._ctx.font.replace(/\d+px/, `${size}px`)
-  }
-
+  /**
+   * Sets font family, independent of font size.
+   * @param fontFamily
+   * @return {GameDrawing}
+   */
   setFontFamily(fontFamily = 'Pixellari, monospace') {
-    this._ctx.font = this._ctx.font.replace(/(\d+px).*/, `$1 ${fontFamily}`)
+    this.#ctx.font = this.#ctx.font.replace(/(\d+px).*/, `$1 ${fontFamily}`)
+    return this
   }
 
-  /** @param {number} width */
+  /**
+   * Sets font size, independent of font family.
+   * @param {number} size
+   * @return {GameDrawing}
+   */
+  setFontSize(size = 16) {
+    this.#ctx.font = this.#ctx.font.replace(/\d+px/, `${size}px`)
+    return this
+  }
+
+  /**
+   * @param {number} width
+   * @return {GameDrawing}
+   */
   setLineWidth(width) {
-    this._ctx.lineWidth = width
-  }
-
-  //
-  // Erase
-  //
-  clear(x1 = 0, y1 = 0, w = this.canvas.width, h = this.canvas.height) {
-    this._ctx.clearRect(x1, y1, w, h)
-  }
-
-  //
-  // Images
-  //
-  /**
-   * @param {GameImage|HTMLImageElement|HTMLCanvasElement} image
-   * @param {number} x
-   * @param {number} y
-   */
-  image(image, x = 0, y = 0) {
-    // GameImage has an element property, otherwise this is an image/canvas.
-    const drawable = image.element || image
-
-    this._ctx.imageSmoothingEnabled = false
-    this._ctx.drawImage(drawable, x, y)
+    this.#ctx.lineWidth = width
+    return this
   }
 
   /**
-   * @param {ImageData|CanvasImageData} imageData
-   * @param {number} x
-   * @param {number} y
+   * @param {string} color
+   * @return {GameDrawing}
    */
-  imageData(imageData, x = 0, y = 0) {
-    this._ctx.imageSmoothingEnabled = false
-    this._ctx.putImageData(imageData, x, y)
+  setStrokeColor(color) {
+    this.#ctx.strokeStyle = color
+    return this
   }
+
+  //
+  // Drawing
+  //
 
   /**
-   * @param {number} x
-   * @param {number} y
-   * @param {GameSprite} sprite
+   * Draws a line between two points with an arrow head of size arrowSize.
+   * @param {number} x1
+   * @param {number} y1
+   * @param {number} x2
+   * @param {number} y2
+   * @param {number} [arrowSize=6]
    */
-  sprite(sprite, x, y) {
-    const direction = sprite.rtl ? -1 : 1
-    const rtlWidth = sprite.frameWidth * direction
-    const rtlInsertionX = sprite.insertionX * direction
-
-    this._ctx.drawImage(
-      sprite.image.element,
-      sprite.offsetX + sprite.frameIndex * rtlWidth,
-      sprite.offsetY,
-      rtlWidth,
-      sprite.frameHeight,
-      x - rtlInsertionX * sprite.scaleX,
-      y - sprite.insertionY * sprite.scaleY,
-      rtlWidth * sprite.scaleX,
-      sprite.frameHeight * sprite.scaleY,
-    )
-  }
-
-  //
-  // Basic Shapes
-  //
-  fill(color) {
-    this.saveSettings()
-    this.setColor(color)
-    this.setLineWidth(0)
-    this.rectangle(0, 0, this.canvas.width, this.canvas.height)
-    this.loadSettings()
-  }
-
-  pixel(x, y) {
-    this._ctx.fillRect(x, y, 1, 1)
-  }
-
-  line(x1, y1, x2, y2) {
-    this._ctx.beginPath()
-    this._ctx.moveTo(x1, y1)
-    this._ctx.lineTo(x2, y2)
-    this._ctx.stroke()
-  }
-
-  circle(x, y, radius) {
-    this._ctx.beginPath()
-    this._ctx.arc(x, y, radius, 0, 2 * Math.PI)
-    this._ctx.stroke()
-    this._ctx.fill()
-  }
-
-  ellipse(x, y, radiusX, radiusY, rotation = 0) {
-    this._ctx.beginPath()
-    this._ctx.ellipse(x, y, radiusX, radiusY, rotation, 0, 2 * Math.PI)
-    this._ctx.stroke()
-    this._ctx.fill()
-  }
-
-  arrow(x1, y1, x2, y2) {
-    const size = 6 + this._ctx.lineWidth // length of head in pixels
+  arrow(x1, y1, x2, y2, arrowSize = 6) {
+    const size = arrowSize + this.#ctx.lineWidth // length of head in pixels
     const angle = Math.atan2(y2 - y1, x2 - x1)
 
     // line
     this.line(x1, y1, x2, y2)
 
     // arrow head
-    this._ctx.beginPath()
-    this._ctx.moveTo(x2, y2)
-    this._ctx.lineTo(
+    this.#ctx.beginPath()
+    this.#ctx.moveTo(x2, y2)
+    this.#ctx.lineTo(
       x2 - size * Math.cos(angle - Math.PI / 6),
       y2 - size * Math.sin(angle - Math.PI / 6),
     )
-    this._ctx.lineTo(
+    this.#ctx.lineTo(
       x2 - size * Math.cos(angle + Math.PI / 6),
       y2 - size * Math.sin(angle + Math.PI / 6),
     )
-    this._ctx.lineTo(x2, y2)
-    this._ctx.fill()
+    this.#ctx.lineTo(x2, y2)
+
+    // Intuition is for the arrow head color to match the stroke width.
+    // Temporarily copy the stroke color to the fill color to fill the arrow head.
+    const prevFill = this.#ctx.fillStyle
+    this.setFillColor(this.#ctx.strokeStyle)
+    this.#ctx.fill()
+    this.setFillColor(prevFill)
+
+    return this
   }
 
-  rectangle(x, y, w, h) {
-    this._ctx.fillRect(x, y, w, h)
-    this._ctx.strokeRect(x, y, w, h)
+  /**
+   * Strokes and fills a circle centered on x, y.
+   * @param {number} x
+   * @param {number} y
+   * @param {number} radius
+   */
+  circle(x, y, radius) {
+    this.#ctx.beginPath()
+    this.#ctx.arc(x, y, radius, 0, 2 * Math.PI)
+    this.#ctx.stroke()
+    this.#ctx.fill()
+
+    return this
   }
 
-  roundedRectangle(x, y, w, h, radii) {
-    this._ctx.beginPath()
-    this._ctx.roundRect(x, y, w, h, radii)
-    this._ctx.fill()
-    this._ctx.stroke()
+  /**
+   * Clears the entire canvas by default, or only the rectangle specified.
+   * @param {number} x1
+   * @param {number} y1
+   * @param {number} w
+   * @param {number} h
+   */
+  clear(x1 = 0, y1 = 0, w = this.canvas.width, h = this.canvas.height) {
+    this.#ctx.clearRect(x1, y1, w, h)
+
+    return this
   }
 
-  polygon(vertices) {
-    const [start, ...rest] = vertices
+  /**
+   * Strokes and fills an ellipse centered on x, y.
+   * @param x
+   * @param y
+   * @param radiusX
+   * @param radiusY
+   * @param rotation
+   */
+  ellipse(x, y, radiusX, radiusY, rotation = 0) {
+    this.#ctx.beginPath()
+    this.#ctx.ellipse(x, y, radiusX, radiusY, rotation, 0, 2 * Math.PI)
+    this.#ctx.stroke()
+    this.#ctx.fill()
 
-    this._ctx.beginPath()
-    this._ctx.moveTo(start[0], start[1])
-    rest.forEach(([x, y]) => this._ctx.lineTo(x, y))
-    this._ctx.fill()
-    this._ctx.stroke()
+    return this
   }
 
-  text(text, x, y) {
-    this._ctx.fillText(text, x, y)
+  /**
+   * Fills the entire canvas with a color.
+   * @param {string} color
+   */
+  fill(color) {
+    this.setFillColor(color)
+    this.#ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+
+    return this
   }
 
-  strokeText(text, x, y) {
-    this._ctx.strokeText(text, x, y)
-  }
-
-  textAlign(alignment) {
-    this._ctx.textAlign = alignment
-  }
-
-  //
-  // Complex Shapes
-  //
-
+  /**
+   * Draws a grid of horizontal and vertical lines.
+   * @param {number} [cellSize=16]
+   * @param {number} [x=0]
+   * @param {number} [y=0]
+   * @param {number} [width=this.canvas.width]
+   * @param {number} [height=this.canvas.height]
+   * @return {GameDrawing}
+   */
   grid(
     cellSize = 16,
     x = 0,
@@ -255,26 +218,184 @@ export class GameDrawing {
       // horizontals
       for (let i = 0; i < width; i += cellSize) {
         this.line(i, 0, i, height)
+
+        return this
       }
 
       // verticals
       for (let i = 0; i < height; i += cellSize) {
         this.line(0, i, width, i)
       }
+
+      return this
     }
 
+    this.pixel()
+
     this.saveSettings()
-    this._ctx.setLineDash([1, 2])
-    this._ctx.strokeStyle = 'rgba(255, 255, 255, 0.33)'
+    this.#ctx.setLineDash([1, 2])
+    this.setStrokeColor('rgba(255, 255, 255, 0.33)')
     _drawLines()
-    this._ctx.lineDashOffset = 1
-    this._ctx.strokeStyle = 'rgba(0, 0, 0, 0.33)'
+    this.#ctx.lineDashOffset = 1
+    this.setStrokeColor('rgba(0, 0, 0, 0.33)')
     _drawLines()
 
     this.loadSettings()
+
+    return this
   }
 
-  /** @param {GameObject} object */
+  /**
+   * Draws an image on top of the canvas at x, y.
+   * @param {GameImage | HTMLImageElement | HTMLCanvasElement} image
+   * @param {number} x
+   * @param {number} y
+   */
+  image(image, x = 0, y = 0) {
+    // GameImage has an element property, otherwise this is an image/canvas.
+    const drawable = image.element || image
+
+    this.#ctx.imageSmoothingEnabled = false
+    this.#ctx.drawImage(drawable, x, y)
+
+    return this
+  }
+
+  /**
+   * Places pixelated image data at x, y.
+   * @param {ImageData | CanvasImageData} imageData
+   * @param {number} x
+   * @param {number} y
+   */
+  imageData(imageData, x = 0, y = 0) {
+    this.#ctx.imageSmoothingEnabled = false
+    this.#ctx.putImageData(imageData, x, y)
+
+    return this
+  }
+
+  /**
+   * Strokes a line between two points.
+   * @param {number} x1
+   * @param {number} y1
+   * @param {number} x2
+   * @param {number} y2
+   */
+  line(x1, y1, x2, y2) {
+    this.#ctx.beginPath()
+    this.#ctx.moveTo(x1, y1)
+    this.#ctx.lineTo(x2, y2)
+    this.#ctx.stroke()
+
+    return this
+  }
+
+  /**
+   * Fills a single pixel.
+   * @param {number} x
+   * @param {number} y
+   */
+  pixel(x, y) {
+    this.#ctx.fillRect(x, y, 1, 1)
+
+    return this
+  }
+
+  /**
+   * Draws a sprite on top of the canvas at x, y. The current frame of the
+   * sprite is drawn at the current scale of the sprite.
+   * @param {GameSprite} sprite
+   * @param {number} x
+   * @param {number} y
+   * @return {GameDrawing}
+   */
+  sprite(sprite, x, y) {
+    const direction = sprite.rtl ? -1 : 1
+    const rtlWidth = sprite.frameWidth * direction
+    const rtlInsertionX = sprite.insertionX * direction
+
+    this.#ctx.drawImage(
+      sprite.image.element,
+      sprite.offsetX + sprite.frameIndex * rtlWidth,
+      sprite.offsetY,
+      rtlWidth,
+      sprite.frameHeight,
+      x - rtlInsertionX * sprite.scaleX,
+      y - sprite.insertionY * sprite.scaleY,
+      rtlWidth * sprite.scaleX,
+      sprite.frameHeight * sprite.scaleY,
+    )
+
+    return this
+  }
+
+  /**
+   * Strokes and fills a rectangle at x, y with a width and height.
+   * @param {number} x
+   * @param {number} y
+   * @param {number} w
+   * @param {number} h
+   */
+  rectangle(x, y, w, h) {
+    this.#ctx.fillRect(x, y, w, h)
+    this.#ctx.strokeRect(x, y, w, h)
+
+    return this
+  }
+
+  roundedRectangle(x, y, w, h, radii) {
+    this.#ctx.beginPath()
+    this.#ctx.roundRect(x, y, w, h, radii)
+    this.#ctx.fill()
+    this.#ctx.stroke()
+
+    return this
+  }
+
+  /**
+   * Draws a polygon using an array of x, y coordinates as vertices.
+   * @param {[number, number][]} vertices - A 2d array of vertices: [[x1, y1], [x2, y2], ...]
+   * @return {GameDrawing}
+   */
+  polygon(vertices) {
+    const [start, ...rest] = vertices
+
+    this.#ctx.beginPath()
+    this.#ctx.moveTo(start[0], start[1])
+    rest.forEach(([x, y]) => this.#ctx.lineTo(x, y))
+    this.#ctx.fill()
+    this.#ctx.stroke()
+
+    return this
+  }
+
+  text(text, x, y) {
+    this.#ctx.fillText(text, x, y)
+
+    return this
+  }
+
+  strokeText(text, x, y) {
+    this.#ctx.strokeText(text, x, y)
+
+    return this
+  }
+
+  /**
+   * Sets the text alignment for drawing text.
+   * @param {CanvasTextAlign} alignment
+   * @return {GameDrawing}
+   */
+  textAlign(alignment) {
+    this.#ctx.textAlign = alignment
+    return this
+  }
+
+  /**
+   * Draws a debug view of a GameObject.
+   * @param {GameObject} object
+   * @return {GameDrawing}
+   */
   objectDebug(object) {
     const {
       name,
@@ -313,14 +434,14 @@ export class GameDrawing {
 
     // sprite frame
     this.setStrokeColor('#555')
-    this._ctx.setLineDash([2, 2])
+    this.#ctx.setLineDash([2, 2])
     this.rectangle(
       x - sprite.insertionX * sprite.scaleX,
       y - sprite.insertionY * sprite.scaleY,
       sprite.frameWidth * sprite.scaleX,
       sprite.frameHeight * sprite.scaleY,
     )
-    this._ctx.setLineDash([])
+    this.#ctx.setLineDash([])
 
     // insertion point
     this.setLineWidth(3)
@@ -330,12 +451,14 @@ export class GameDrawing {
 
     // vector
     if (object.speed) {
-      this.setColor('#0F0')
+      this.setStrokeColor('#0F0')
       this.arrow(x, y, x + object.hspeed * 10, y + object.vspeed * 10)
+
+      return this
     }
 
     // text values
-    this.setColor('#000')
+    this.setFillColor('#000')
     this.setFontSize(12)
     this.setFontFamily('monospace')
     const lines = [
@@ -364,8 +487,17 @@ export class GameDrawing {
       )
     })
     this.loadSettings()
+
+    return this
   }
 
+  /**
+   * Draws a debug view of a Vector.
+   * @param {number} x
+   * @param {number} y
+   * @param {Vector} vector
+   * @return {GameDrawing}
+   */
   vectorDebug(x, y, vector) {
     this.saveSettings()
 
@@ -374,7 +506,7 @@ export class GameDrawing {
     // opposite
     this.line(x + vector.x, y, x + vector.x, y + vector.y)
     // hypotenuse
-    this.setColor('red')
+    this.setStrokeColor('red')
     this.arrow(x, y, x + vector.x, y + vector.y)
 
     // 90° box
@@ -396,7 +528,7 @@ export class GameDrawing {
       y + vector.y / 2,
     )
 
-    this.setColor('black')
+    this.setFillColor('black')
     this.text(
       'x ' + Math.round(vector.x),
       x + vector.x / 2,
@@ -414,5 +546,7 @@ export class GameDrawing {
     )
 
     this.loadSettings()
+
+    return this
   }
 }

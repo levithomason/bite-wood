@@ -22,10 +22,7 @@ import {
 import { loadState } from '../../editors/sprite-editor/storage-manager.js'
 
 class Room extends GameRoom {
-  draw(drawing) {
-    super.draw(drawing)
-    drawing.fill('#223')
-  }
+  backgroundColor = '#223'
 }
 
 const room = new Room(800, 600)
@@ -229,7 +226,7 @@ class Fuego extends GameObject {
   step() {
     super.step()
 
-    const globby = gameRooms.currentRoom.objects.find(object => {
+    const globby = gameRooms.currentRoom.objects.find((object) => {
       return object instanceof Globby
     })
 

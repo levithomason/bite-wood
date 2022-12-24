@@ -211,7 +211,7 @@ class Player extends GameObject {
 
     if (gameMouse.down.left) {
       drawing.setLineWidth(2)
-      drawing.setColor('#753')
+      drawing.setStrokeColor('#753')
       drawing.arrow(this.x, this.y, gameMouse.x, gameMouse.y)
     }
   }

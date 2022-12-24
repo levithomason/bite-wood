@@ -21,7 +21,7 @@ class Room extends GameRoom {
   draw(drawing) {
     super.draw(drawing)
 
-    drawing.setColor('white')
+    drawing.setFillColor('white')
     drawing.setFontSize(21)
     drawing.textAlign('center')
     drawing.text(
