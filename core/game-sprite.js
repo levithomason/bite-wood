@@ -3,28 +3,30 @@
  * scale, insertion point, offset, bounding box, and animating frames.
  */
 export class GameSprite {
+  static instances = []
+
   /**
    * @param options
    * @param {GameImage} options.image - A GameImage instance.
-   * @param {number} options.scaleX=1 - What scale
-   * @param {number} options.scaleY=1 - What scale
-   * @param {number} options.insertionX - The distance along the X axis the image should be drawn from the top left.
-   * @param {number} options.insertionY - The distance along the Y axis the image should be drawn from the top left.
-   * @param {number} options.offsetX
-   * @param {number} options.offsetY
-   * @param {number} options.boundingBoxTop - How many pixels into the top of the image an object can come before being
+   * @param {number} [options.scaleX=1] - What scale
+   * @param {number} [options.scaleY=1] - What scale
+   * @param {number} [options.insertionX=0] - The distance along the X axis the image should be drawn from the top left.
+   * @param {number} [options.insertionY=0] - The distance along the Y axis the image should be drawn from the top left.
+   * @param {number} [options.offsetX=0]
+   * @param {number} [options.offsetY=0]
+   * @param {number} [options.boundingBoxTop=0] - How many pixels into the top of the image an object can come before being
    * considered a collision.
-   * @param {number} options.boundingBoxLeft - How many pixels into the left of the image an object can come before
+   * @param {number} [options.boundingBoxLeft=0] - How many pixels into the left of the image an object can come before
    * being considered a collision.
    * @param {number} options.boundingBoxWidth - How wide the collision box starting from boundingBoxLeft.
    * @param {number} options.boundingBoxHeight - How tall the collision box starting from boundingBoxTop.
    * @param {number} options.frameWidth - If this is a sprite strip, the width of a single frame in the strip.
    * @param {number} options.frameHeight - If this is a sprite strip, the width of a single frame in the strip.
-   * @param {number} options.frameCount - The number of frames in the sprite total.
-   * @param {number} options.frameIndex - Zero based index of the current sprite frame.
-   * @param {number} options.stepsPerFrame - Effectively the animation speed. How many game steps should take place
+   * @param {number} [options.frameCount=1] - The number of frames in the sprite total.
+   * @param {number} [options.frameIndex=0] - Zero based index of the current sprite frame.
+   * @param {number} [options.stepsPerFrame=1] - Effectively the animation speed. How many game steps should take place
    * before incrementing to the next sprite frame.
-   * @param {boolean} options.rtl - "Right to left" defines whether this sprite should be drawn right to left, opposed
+   * @param {boolean} [options.rtl=false] - "Right to left" defines whether this sprite should be drawn right to left, opposed
    * to left to right. This results in reversing the frames and mirroring the images. Useful for taking a "run left"
    * sprite and creating a "run right", for example.
    */
@@ -69,6 +71,8 @@ export class GameSprite {
 
     this.stepsThisFrame = 0
     this.step = this.step.bind(this)
+
+    GameSprite.instances.push(this)
   }
 
   step() {

@@ -43,7 +43,7 @@ class GameState {
 
 export const gameState = new GameState()
 window.biteWood = window.biteWood || {}
-window.gameState = gameState
+window.biteWood.gameState = gameState
 
 //
 // Pause/Play on window blur/focus

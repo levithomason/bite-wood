@@ -56,7 +56,7 @@ export const sprRainbowDashFlyL = new GameSprite({
 })
 
 class RainbowDash extends GameObject {
-  static displayName = 'objRainbowDash'
+  static name = 'objRainbowDash'
 
   create() {
     super.create()
@@ -85,7 +85,5 @@ class RainbowDash extends GameObject {
     })
   }
 }
-
-window.RainbowDash = RainbowDash
 
 export default RainbowDash

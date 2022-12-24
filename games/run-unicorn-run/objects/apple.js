@@ -176,7 +176,7 @@ const resolveActions = (actionsObj = {}) => {
 }
 
 class Apple extends GameObject {
-  static displayName = 'objApple'
+  static name = 'objApple'
 
   constructor() {
     super({
@@ -263,7 +263,5 @@ class Apple extends GameObject {
     })
   }
 }
-
-window.Apple = Apple
 
 export default Apple

@@ -10,8 +10,8 @@ import {
 // ----------------------------------------
 // Solid
 // ----------------------------------------
-const width = Math.round(Math.random() * 80) + 20
-const height = Math.round(Math.random() * 80) + 20
+const width = 60
+const height = 60
 const spriteConfig = {
   image: new GameImage(),
   frameCount: 1,
@@ -26,7 +26,7 @@ const sprSolid = new GameSprite(spriteConfig)
 const sprSolidColliding = new GameSprite(spriteConfig)
 
 class Solid extends GameObject {
-  static displayName = 'objSolid'
+  static name = 'objSolid'
 
   constructor() {
     super({
@@ -57,7 +57,5 @@ class Solid extends GameObject {
     }
   }
 }
-
-window.Solid = Solid
 
 export default Solid

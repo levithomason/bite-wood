@@ -35,8 +35,8 @@ export class Game {
     this.step = this.step.bind(this)
     this.draw = this.draw.bind(this)
 
-    gameDrawing.canvas.width = width
-    gameDrawing.canvas.height = height
+    gameDrawing.setCanvasWidth(width)
+    gameDrawing.setCanvasHeight(height)
     parentElement.append(gameDrawing.canvas)
   }
 
@@ -120,14 +120,21 @@ export class Game {
 
     // paused
     if (!gameState.isPlaying) {
+      const x = gameRooms.currentRoom.width / 2 - 40
+      const y = gameRooms.currentRoom.height / 2
+      const text = `PAUSED`
+
+      // backdrop
       gameDrawing.fill('rgba(16, 16, 16, 0.5)')
-      gameDrawing.setColor('#fff')
+
+      // text
+      gameDrawing.setFontFamily() // default
       gameDrawing.setFontSize(18)
-      gameDrawing.text(
-        `PAUSED`,
-        gameRooms.currentRoom.width / 2 - 40,
-        gameRooms.currentRoom.height / 2,
-      )
+      gameDrawing.setColor('#fff')
+      gameDrawing.setStrokeColor('#000')
+
+      gameDrawing.strokeText(text, x, y)
+      gameDrawing.text(text, x, y)
     }
   }
 }

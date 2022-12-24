@@ -1,4 +1,6 @@
 export class GameRoom {
+  static instances = []
+
   /**
    * @param {number} width
    * @param {number} height
@@ -21,6 +23,8 @@ export class GameRoom {
     this.setBackgroundImage = this.setBackgroundImage.bind(this)
 
     this.draw = this.draw.bind(this)
+
+    GameRoom.instances.push(this)
   }
 
   create() {
@@ -32,7 +36,7 @@ export class GameRoom {
   instanceCount(object) {
     return !object
       ? this.objects.length
-      : this.objects.filter(o => o.displayName === object.displayName).length
+      : this.objects.filter(o => o.name === object.name).length
   }
 
   /**
@@ -87,7 +91,7 @@ export class GameRoom {
   /** @param {GameObject} object */
   instanceExists(object) {
     return this.objects.some(o => {
-      return o.displayName === object.displayName
+      return o.name === object.name
     })
   }
 
@@ -150,3 +154,6 @@ export class GameRoom {
     }
   }
 }
+
+window.biteWood = window.biteWood || {}
+window.biteWood.GameRoom = GameRoom

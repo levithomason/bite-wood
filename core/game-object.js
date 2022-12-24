@@ -31,7 +31,7 @@ export class GameObject {
    * @param {number} [y=0]
    * @param {number} [acceleration=0]
    * @param {Vector} [gravity=gamePhysics.gravity]
-   * @param {number} [friction=0]
+   * @param {number} [friction=gamePhysics.friction]
    * @param {number} [speed=0]
    * @param {number} [direction=0]
    *
@@ -91,8 +91,8 @@ export class GameObject {
     GameObject.instances.push(this)
   }
 
-  get displayName() {
-    return this.constructor.displayName
+  get name() {
+    return this.constructor.name
   }
 
   get speed() {
@@ -336,3 +336,6 @@ export class GameObject {
     )
   }
 }
+
+window.biteWood = window.biteWood || {}
+window.biteWood.GameObject = GameObject

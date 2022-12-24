@@ -42,7 +42,6 @@ class GameKeyboard {
         break
       case '`':
         gameState.debug = !gameState.debug
-        console.debug('toggle debug', gameState.debug)
         break
     }
   }

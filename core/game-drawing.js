@@ -5,11 +5,8 @@ export class GameDrawing {
     if (typeof width === 'undefined' || typeof height === 'undefined') {
       throw new Error('GameDrawing constructor missing width or height.')
     }
-    this.canvas = document.createElement('canvas')
-    this.canvas.setAttribute('width', width)
-    this.canvas.setAttribute('height', height)
-
-    this._ctx = this.canvas.getContext('2d')
+    this.setCanvasWidth = this.setCanvasWidth.bind(this)
+    this.setCanvasHeight = this.setCanvasHeight.bind(this)
 
     this.saveSettings = this.saveSettings.bind(this)
     this.loadSettings = this.loadSettings.bind(this)
@@ -32,6 +29,28 @@ export class GameDrawing {
     this.grid = this.grid.bind(this)
     this.objectDebug = this.objectDebug.bind(this)
     this.vectorDebug = this.vectorDebug.bind(this)
+
+    this.canvas = document.createElement('canvas')
+    this._ctx = this.canvas.getContext('2d')
+
+    this.setCanvasWidth(width)
+    this.setCanvasHeight(height)
+  }
+
+  /**
+   * Sets the width of the canvas.
+   * @param {number} width
+   */
+  setCanvasWidth(width) {
+    this.canvas.setAttribute('width', width)
+  }
+
+  /**
+   * Sets the height of the canvas.
+   * @param {number} height
+   */
+  setCanvasHeight(height) {
+    this.canvas.setAttribute('height', height)
   }
 
   saveSettings() {
@@ -60,8 +79,12 @@ export class GameDrawing {
     this._ctx.fillStyle = color
   }
 
-  setFontSize(size) {
-    this._ctx.font = `${size}px Pixellari, monospace`
+  setFontSize(size = 16) {
+    this._ctx.font = this._ctx.font.replace(/\d+px/, `${size}px`)
+  }
+
+  setFontFamily(fontFamily = 'Pixellari, monospace') {
+    this._ctx.font = this._ctx.font.replace(/(\d+px).*/, `$1 ${fontFamily}`)
   }
 
   /** @param {number} width */
@@ -72,12 +95,7 @@ export class GameDrawing {
   //
   // Erase
   //
-  clear(
-    x1 = 0,
-    y1 = 0,
-    w = this._ctx.canvas.width,
-    h = this._ctx.canvas.height,
-  ) {
+  clear(x1 = 0, y1 = 0, w = this.canvas.width, h = this.canvas.height) {
     this._ctx.clearRect(x1, y1, w, h)
   }
 
@@ -214,6 +232,10 @@ export class GameDrawing {
     this._ctx.fillText(text, x, y)
   }
 
+  strokeText(text, x, y) {
+    this._ctx.strokeText(text, x, y)
+  }
+
   textAlign(alignment) {
     this._ctx.textAlign = alignment
   }
@@ -226,8 +248,8 @@ export class GameDrawing {
     cellSize = 16,
     x = 0,
     y = 0,
-    width = this._ctx.canvas.width,
-    height = this._ctx.canvas.height,
+    width = this.canvas.width,
+    height = this.canvas.height,
   ) {
     const _drawLines = () => {
       // horizontals
@@ -255,6 +277,7 @@ export class GameDrawing {
   /** @param {GameObject} object */
   objectDebug(object) {
     const {
+      name,
       sprite,
       x,
       y,
@@ -313,23 +336,25 @@ export class GameDrawing {
 
     // text values
     this.setColor('#000')
-    this.setFontSize(14)
-    this._ctx.textAlign = 'left'
+    this.setFontSize(12)
+    this.setFontFamily('monospace')
     const lines = [
+      `${name}`,
       // `x          = ${x.toFixed(2)}`,
       // `y          = ${y.toFixed(2)}`,
-      `direction  = ${direction.toFixed(2)}`,
-      `speed      = ${speed.toFixed(2)} (${hspeed.toFixed(2)}, ${vspeed.toFixed(
+      `direction   = ${direction.toFixed(2)}`,
+      `speed       = ${speed.toFixed(2)} (${hspeed.toFixed(
         2,
-      )})`,
-      // `hspeed     = ${hspeed.toFixed(2)}`,
-      // `vspeed     = ${vspeed.toFixed(2)}`,
-      `gravity    = ${gravity.magnitude.toFixed(2)}`,
-      `friction   = ${friction.toFixed(2)}`,
-      // `boundingBoxTop    = ${object.boundingBoxTop.toFixed(2)}`,
-      // `boundingBoxLeft   = ${object.boundingBoxLeft.toFixed(2)}`,
-      // `boundingBoxBottom = ${object.boundingBoxBottom.toFixed(2)}`,
-      // `boundingBoxRight  = ${object.boundingBoxRight.toFixed(2)}`,
+      )}, ${vspeed.toFixed(2)})`,
+      `gravity     = ${gravity.magnitude.toFixed(2)}`,
+      `friction    = ${friction.toFixed(2)}`,
+      `boundingBox = ${object.boundingBoxTop.toFixed(
+        2,
+      )}, ${object.boundingBoxRight.toFixed(
+        2,
+      )}, ${object.boundingBoxBottom.toFixed(
+        2,
+      )}, ${object.boundingBoxLeft.toFixed(2)}`,
     ]
     lines.reverse().forEach((line, i) => {
       this.text(

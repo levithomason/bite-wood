@@ -25,7 +25,7 @@ const sprPlatform = new GameSprite({
 })
 
 class Platform extends GameObject {
-  static displayName = 'objPlatform'
+  static name = 'objPlatform'
 
   constructor() {
     super({
@@ -52,7 +52,5 @@ class Platform extends GameObject {
     }
   }
 }
-
-window.Platform = Platform
 
 export default Platform

@@ -1,7 +1,7 @@
 @import url(../../node_modules/normalize.css/normalize.css);
-@import url(/public/fonts/Pixellari/web/stylesheet.css);
-@import url(/public/css/slider.css);
-@import url(/public/css/button.css);
+@import url(../fonts/Pixellari/web/stylesheet.css);
+@import url(./slider.css);
+@import url(./button.css);
 
 :root {
   --color-brand: rgb(86, 140, 120);
@@ -40,8 +40,6 @@
 
 html,
 body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
   font-family: Pixellari, monospace;
   color: #fff;
@@ -60,9 +58,6 @@ body {
 img,
 canvas {
   image-rendering: pixelated;
-
-  /* disable font anti-aliasing */
-  -webkit-font-smoothing: none;
 
   /* animate sizes smoothly */
   transition: width 100ms, height 100ms;

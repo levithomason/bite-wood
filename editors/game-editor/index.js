@@ -36,7 +36,7 @@ function gameEditor() {
         <!-- TODO: need to know what url:port we're on programmatically -->
         <iframe
           id="game-iframe"
-          src="./../../games/run-unicorn-run/index.html"
+          src="../../games/run-unicorn-run/index.html"
           width="800"
           height="600"
         ></iframe>

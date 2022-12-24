@@ -68,14 +68,14 @@ export const onRight = (self, other) => {
 /**
  * Checks if an object is colliding with some other object.
  * @param {GameObject} self
- * @param {'any'|'solid'|string} other - If set to string, collisions only happen when the other object's displayName matches the string.
+ * @param {'any'|'solid'|string} other - If set to string, collisions only happen when the other object's name matches the string.
  * @param {Function} [cb] - A callback for custom logic in determining if a collision has occurred. It is called with two arguments: self, other.
  * @returns {boolean}
  */
 export const objects = (self, other, cb) => {
   const withAny = typeof other === 'undefined'
   const withSolid = other === 'solid'
-  const displayName = !withAny && !withSolid ? other : ''
+  const name = !withAny && !withSolid ? other : ''
 
   return gameRooms.currentRoom.objects.some(object => {
     // TODO: introduce object ids so as not to rely on instance equality, could be over network
@@ -92,7 +92,7 @@ export const objects = (self, other, cb) => {
 
     // Default logic
     if (withSolid && !object.solid) return false
-    if (!withAny && displayName !== object.displayName) return false
+    if (!withAny && name !== object.name) return false
 
     return isColliding
   })

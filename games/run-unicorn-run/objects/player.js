@@ -92,7 +92,7 @@ export const sprPlayerWalkL = new GameSprite({
 })
 
 class Player extends GameObject {
-  static displayName = 'objPlayer'
+  static name = 'objPlayer'
 
   constructor() {
     super({
@@ -216,7 +216,5 @@ class Player extends GameObject {
     }
   }
 }
-
-window.Player = Player
 
 export default Player
