@@ -35,10 +35,11 @@ class Block extends GameObject {
   draw(drawing) {
     super.draw(drawing)
 
-    drawing.setLineWidth(2)
-    drawing.setFillColor('transparent')
-    drawing.setStrokeColor('coral')
-    drawing.roundedRectangle(this.x, this.y, Block.width, Block.height, 4)
+    drawing
+      .setLineWidth(2)
+      .setFillColor('transparent')
+      .setStrokeColor('coral')
+      .roundedRectangle(this.x, this.y, Block.width, Block.height, 4)
   }
 }
 room.instanceCreate(Block, 200, 200)
@@ -62,9 +63,10 @@ class Bullet extends GameObject {
   draw(drawing) {
     super.draw(drawing)
 
-    drawing.setStrokeColor('coral')
-    drawing.setFillColor('coral')
-    drawing.circle(this.x, this.y, 4)
+    drawing
+      .setStrokeColor('coral')
+      .setFillColor('coral')
+      .circle(this.x, this.y, 4)
   }
 }
 
@@ -105,16 +107,17 @@ class Globby extends GameObject {
   draw(drawing) {
     super.draw(drawing)
 
-    drawing.setLineWidth(this.strokeWidth)
-    drawing.setFillColor('#ddd')
-    drawing.setStrokeColor('#fff')
-    drawing.ellipse(
-      this.x,
-      this.y,
-      this.getElongatedSize(),
-      this.size,
-      toRadians(this.direction),
-    )
+    drawing
+      .setLineWidth(this.strokeWidth)
+      .setFillColor('#ddd')
+      .setStrokeColor('#fff')
+      .ellipse(
+        this.x,
+        this.y,
+        this.getElongatedSize(),
+        this.size,
+        toRadians(this.direction),
+      )
 
     // eyes
     const eyeDist = this.size + Math.pow(this.speed * 5, 0.6)
@@ -122,40 +125,40 @@ class Globby extends GameObject {
     const eyeSize = 6
 
     // whites
-    drawing.setLineWidth(2)
-    drawing.setFillColor('white')
-    drawing.setStrokeColor('#888')
-
-    drawing.circle(
-      offsetX(this.x, eyeDist, this.direction - eyeGap),
-      offsetY(this.y, eyeDist, this.direction - eyeGap),
-      eyeSize,
-    )
-    drawing.circle(
-      offsetX(this.x, eyeDist, this.direction + eyeGap),
-      offsetY(this.y, eyeDist, this.direction + eyeGap),
-      eyeSize,
-    )
+    drawing
+      .setLineWidth(2)
+      .setFillColor('white')
+      .setStrokeColor('#888')
+      .circle(
+        offsetX(this.x, eyeDist, this.direction - eyeGap),
+        offsetY(this.y, eyeDist, this.direction - eyeGap),
+        eyeSize,
+      )
+      .circle(
+        offsetX(this.x, eyeDist, this.direction + eyeGap),
+        offsetY(this.y, eyeDist, this.direction + eyeGap),
+        eyeSize,
+      )
 
     // pupils
     const eyePupilSize = eyeSize * 0.5
     const eyePupilDist = Math.pow(eyeDist, 1.05)
     const eyePupilGap = Math.pow(eyeGap, 0.9)
 
-    drawing.setLineWidth(0)
-    drawing.setFillColor('#284')
-
-    drawing.setStrokeColor('transparent')
-    drawing.circle(
-      offsetX(this.x, eyePupilDist, this.direction - eyePupilGap),
-      offsetY(this.y, eyePupilDist, this.direction - eyePupilGap),
-      eyePupilSize,
-    )
-    drawing.circle(
-      offsetX(this.x, eyePupilDist, this.direction + eyePupilGap),
-      offsetY(this.y, eyePupilDist, this.direction + eyePupilGap),
-      eyePupilSize,
-    )
+    drawing
+      .setLineWidth(0)
+      .setFillColor('#284')
+      .setStrokeColor('transparent')
+      .circle(
+        offsetX(this.x, eyePupilDist, this.direction - eyePupilGap),
+        offsetY(this.y, eyePupilDist, this.direction - eyePupilGap),
+        eyePupilSize,
+      )
+      .circle(
+        offsetX(this.x, eyePupilDist, this.direction + eyePupilGap),
+        offsetY(this.y, eyePupilDist, this.direction + eyePupilGap),
+        eyePupilSize,
+      )
   }
 
   getElongatedSize() {

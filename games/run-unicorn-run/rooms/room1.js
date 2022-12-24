@@ -44,9 +44,10 @@ export default class Room1 extends GameRoom {
     }
 
     this.stars.forEach((star) => {
-      drawing.setStrokeColor('transparent')
-      drawing.setFillColor(`rgba(${star.r}, ${star.g}, ${star.b}, ${star.a})`)
-      drawing.rectangle(star.x, star.y, star.size, star.size)
+      drawing
+        .setStrokeColor('transparent')
+        .setFillColor(`rgba(${star.r}, ${star.g}, ${star.b}, ${star.a})`)
+        .rectangle(star.x, star.y, star.size, star.size)
 
       // grow in brightness then die
       if (star.dying) {

@@ -21,14 +21,15 @@ class Room extends GameRoom {
   draw(drawing) {
     super.draw(drawing)
 
-    drawing.setFillColor('white')
-    drawing.setFontSize(21)
-    drawing.textAlign('center')
-    drawing.text(
-      'TODO: this will load a game from JSON',
-      this.width / 2,
-      this.height / 2,
-    )
+    drawing
+      .setFillColor('white')
+      .setFontSize(21)
+      .textAlign('center')
+      .text(
+        'TODO: this will load a game from JSON',
+        this.width / 2,
+        this.height / 2,
+      )
   }
 }
 

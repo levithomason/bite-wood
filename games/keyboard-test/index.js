@@ -20,15 +20,15 @@ class Room extends GameRoom {
       const columnX = 100 + columnWidth * columnIndex
       const columnY = 100
 
-      drawing.setFontSize(headerFontSize)
-      drawing.text(category, columnX, columnY)
+      drawing.setFontSize(headerFontSize).text(category, columnX, columnY)
 
       Object.entries(values).forEach(([keyName, keyState], rowIndex) => {
         const rowOffset =
           (rowIndex + 1) * (headerFontSize * 1.15) + headerBottomMargin
 
-        drawing.setFontSize(itemFontSize)
-        drawing.text(JSON.stringify(keyName), columnX, columnY + rowOffset)
+        drawing
+          .setFontSize(itemFontSize)
+          .text(JSON.stringify(keyName), columnX, columnY + rowOffset)
       })
     })
   }

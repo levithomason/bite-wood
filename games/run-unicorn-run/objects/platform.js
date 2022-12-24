@@ -40,15 +40,16 @@ class Platform extends GameObject {
     super.draw(drawing)
 
     if (gameState.debug) {
-      drawing.setLineWidth(4)
-      drawing.setFillColor('transparent')
-      drawing.setStrokeColor('magenta')
-      drawing.rectangle(
-        this.x,
-        this.y,
-        this.sprite.boundingBoxWidth,
-        this.sprite.boundingBoxHeight,
-      )
+      drawing
+        .setLineWidth(4)
+        .setFillColor('transparent')
+        .setStrokeColor('magenta')
+        .rectangle(
+          this.x,
+          this.y,
+          this.sprite.boundingBoxWidth,
+          this.sprite.boundingBoxHeight,
+        )
     }
   }
 }
