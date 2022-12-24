@@ -14,20 +14,10 @@ function actionTool(
       @click="${onClick}"
     >
       ${icon !== undefined
-        ? html`
-            <i class="fa-sharp fas fa-fw fa-${icon}"></i>
-          `
+        ? html` <i class="fa-sharp fas fa-fw fa-${icon}"></i> `
         : ''}
-      ${label !== undefined
-        ? html`
-            <span class="label">${label}</span>
-          `
-        : ''}
-      ${badge !== undefined
-        ? html`
-            <span class="badge">${badge}</span>
-          `
-        : ''}
+      ${label !== undefined ? html` <span class="label">${label}</span> ` : ''}
+      ${badge !== undefined ? html` <span class="badge">${badge}</span> ` : ''}
     </button>
   `
 }

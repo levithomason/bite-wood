@@ -77,7 +77,7 @@ export const objects = (self, other, cb) => {
   const withSolid = other === 'solid'
   const name = !withAny && !withSolid ? other : ''
 
-  return gameRooms.currentRoom.objects.some(object => {
+  return gameRooms.currentRoom.objects.some((object) => {
     // TODO: introduce object ids so as not to rely on instance equality, could be over network
     if (self === object) return false
 

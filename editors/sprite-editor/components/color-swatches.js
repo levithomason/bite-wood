@@ -9,7 +9,7 @@ import { setState } from '../state-manager.js'
 function colorSwatch(state, { r = 0, g = 0, b = 0, a = 1 } = {}) {
   const a255 = a * 255
 
-  const handleClick = e => {
+  const handleClick = (e) => {
     setState({
       color: [r, g, b, a255],
       tool:
@@ -79,7 +79,7 @@ function colorSwatches(state) {
   }
 
   const rgbaInUseMap = new Map()
-  state.frames.forEach(frame => {
+  state.frames.forEach((frame) => {
     imageDataUtils.forEachPixel(frame, ([r, g, b, a255]) => {
       const a = a255 / 255
       const obj = { r, g, b, a }
@@ -95,7 +95,7 @@ function colorSwatches(state) {
     .sort((a, b) => {
       return tinycolor(a).toHsv().v > tinycolor(b).toHsv().v ? -1 : 1
     })
-    .map(rgbaObj => {
+    .map((rgbaObj) => {
       return colorSwatch(state, rgbaObj)
     })
 

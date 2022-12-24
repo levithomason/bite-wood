@@ -1,7 +1,7 @@
 import DRAWING_TOOLS from './config/drawing-tools.js'
 import { actions, getState, setState } from './state-manager.js'
 
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', (e) => {
   const state = getState()
 
   // only allow keyboard shortcuts when not typing in an input

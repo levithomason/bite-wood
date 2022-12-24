@@ -4,11 +4,11 @@ import SETTINGS from './settings.js'
 import { actions, setState } from '../state-manager.js'
 
 const ACTION_TOOLS = {
-  clear: /** State */ state => ({
+  clear: /** State */ (state) => ({
     key: 'clear',
     icon: 'times-circle',
     label: 'Clear',
-    onClick: e => {
+    onClick: (e) => {
       if (confirm('Are you sure you want to CLEAR the image?')) {
         setState({
           frameDataDrawing: imageDataUtils.clear(state.frameDataDrawing),
@@ -17,21 +17,21 @@ const ACTION_TOOLS = {
     },
   }),
 
-  grid: /** State */ state => ({
+  grid: /** State */ (state) => ({
     key: 'grid',
     icon: 'th',
     label: 'Grid',
     active: state.showGrid,
-    onClick: e => {
+    onClick: (e) => {
       setState({ showGrid: !state.showGrid })
     },
   }),
 
-  resize: /** State */ state => ({
+  resize: /** State */ (state) => ({
     key: 'resize',
     icon: 'expand-alt',
     label: 'resize',
-    onClick: e => {
+    onClick: (e) => {
       // TODO: validate numbers only
       const w = prompt('Width of the NEW IMAGE:').trim()
       const h = prompt('Height of the NEW IMAGE:').trim()
@@ -51,31 +51,31 @@ const ACTION_TOOLS = {
     },
   }),
 
-  undo: /** State */ state => ({
+  undo: /** State */ (state) => ({
     key: 'undo',
     icon: 'undo',
     badge: state.undos.length,
     disabled: state.undos.length < 1,
-    onClick: e => {
+    onClick: (e) => {
       actions.undo(state)
     },
   }),
 
-  redo: /** State */ state => ({
+  redo: /** State */ (state) => ({
     key: 'redo',
     icon: 'redo',
     badge: state.redos.length,
     disabled: state.redos.length < 1,
-    onClick: e => {
+    onClick: (e) => {
       actions.redo(state)
     },
   }),
 
-  export: /** State */ state => ({
+  export: /** State */ (state) => ({
     key: 'export',
     icon: 'file-export',
     label: 'Export',
-    onClick: e => {
+    onClick: (e) => {
       const filename = `${state.name}.json`
       const contentType = 'application/json;charset=utf-8;'
       const uriComponent = encodeURIComponent(
@@ -95,20 +95,20 @@ const ACTION_TOOLS = {
     },
   }),
 
-  zoomIn: /** State */ state => ({
+  zoomIn: /** State */ (state) => ({
     key: 'zoomIn',
     icon: 'search-plus',
     disabled: state.scale >= SETTINGS.MAX_ZOOM,
-    onClick: e => {
+    onClick: (e) => {
       actions.zoomIn(state)
     },
   }),
 
-  zoomOut: /** State */ state => ({
+  zoomOut: /** State */ (state) => ({
     key: 'zoomOut',
     icon: 'search-minus',
     disabled: state.scale <= SETTINGS.MIN_ZOOM,
-    onClick: e => {
+    onClick: (e) => {
       actions.zoomOut(state)
     },
   }),

@@ -119,7 +119,7 @@ export function line(array, width, x1, y1, x2, y2, [r, g, b, a]) {
   return cloned
 }
 
-export function mapPixels(array, cb = x => x) {
+export function mapPixels(array, cb = (x) => x) {
   const length = array.length
   const cloned = arrayFrom(length)
 

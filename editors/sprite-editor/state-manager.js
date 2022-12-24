@@ -19,14 +19,15 @@ export class State {
       name: state.name,
       width: state.width,
       height: state.height,
-      frames: state.frames.map(frame => new Array(...frame)),
+      frames: state.frames.map((frame) => new Array(...frame)),
     }
   }
 
-  static fromJSON = json => {
+  static fromJSON = (json) => {
     return {
       ...json,
-      frames: json.frames?.map(frame => imageDataUtils.arrayFrom(frame)) ?? [],
+      frames:
+        json.frames?.map((frame) => imageDataUtils.arrayFrom(frame)) ?? [],
     }
   }
 
@@ -67,7 +68,7 @@ export class State {
 // ----------------------------------------
 // Private
 // ----------------------------------------
-const renderApp = state => {
+const renderApp = (state) => {
   if (!renderApp.mountNode) {
     renderApp.mountNode = document.createElement('div')
     renderApp.mountNode.id = 'root'
@@ -77,7 +78,7 @@ const renderApp = state => {
   render(editor(state), renderApp.mountNode)
 }
 
-const drawDrawingCanvas = state => {
+const drawDrawingCanvas = (state) => {
   const canvas = document.querySelector('.drawing-canvas')
   const ctx = canvas.getContext('2d')
   const imageData = new ImageData(
@@ -88,7 +89,7 @@ const drawDrawingCanvas = state => {
   ctx.putImageData(imageData, 0, 0)
 }
 
-const getUndoRedoRecord = state => {
+const getUndoRedoRecord = (state) => {
   const { width, height, frames } = new State(state)
   return { width, height, frames }
 }
@@ -145,7 +146,7 @@ export const actions = {}
 // Actions: Sprite
 //
 
-actions.addFrame = state => {
+actions.addFrame = (state) => {
   setState({
     frames: [
       ...state.frames,
@@ -155,7 +156,7 @@ actions.addFrame = state => {
   })
 }
 
-actions.reverseFrames = state => {
+actions.reverseFrames = (state) => {
   setState({
     frames: state.frames.reverse(),
   })
@@ -186,7 +187,7 @@ actions.deleteAllFrames = (state, index) => {
 // Actions: Editor
 //
 
-actions.addUndo = state => {
+actions.addUndo = (state) => {
   setState({
     undos: [getUndoRedoRecord(state), ...state.undos].slice(
       0,
@@ -239,14 +240,14 @@ actions.addUndoIfNeeded = (prevState, state) => {
   console.log('  ...NO, no pertinent changes')
 }
 
-actions.addRedo = state => {
+actions.addRedo = (state) => {
   setState({
     redos: [getUndoRedoRecord(state), ...state.redos],
   })
   console.log('addRedo', getState().redos)
 }
 
-actions.undo = state => {
+actions.undo = (state) => {
   console.group('undo')
   console.log({ undos: state.undos, redos: state.redos })
   const undoState = state.undos.shift()
@@ -262,7 +263,7 @@ actions.undo = state => {
   console.groupEnd()
 }
 
-actions.redo = state => {
+actions.redo = (state) => {
   console.group('redo')
   console.log({ undos: state.undos, redos: state.redos })
   const redoState = state.redos.shift()
@@ -278,11 +279,11 @@ actions.redo = state => {
   console.groupEnd()
 }
 
-actions.zoomIn = state => {
+actions.zoomIn = (state) => {
   setState({ scale: Math.min(SETTINGS.MAX_ZOOM, state.scale * 1.5) })
 }
 
-actions.zoomOut = state => {
+actions.zoomOut = (state) => {
   setState({
     scale: Math.max(SETTINGS.MIN_ZOOM, Math.round(state.scale / 1.5)),
   })

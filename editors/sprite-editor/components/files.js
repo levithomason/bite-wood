@@ -4,13 +4,13 @@ import { setState, State } from '../state-manager.js'
 import storage, { loadState } from '../storage-manager.js'
 
 function files(state) {
-  const spriteStates = storage.values().map(json => State.fromJSON(json))
+  const spriteStates = storage.values().map((json) => State.fromJSON(json))
 
   if (!spriteStates.length) {
     return null
   }
 
-  const handleClick = uid => e => {
+  const handleClick = (uid) => (e) => {
     if (state.uid !== uid) {
       setState(new State(loadState(uid)))
     }
@@ -32,7 +32,7 @@ function files(state) {
       <!-- TODO: breakout file() component -->
       <!-- TODO: breakout file() component -->
       <!-- TODO: breakout file() component -->
-      ${spriteStates.map(spriteState => {
+      ${spriteStates.map((spriteState) => {
         const isActive = spriteState.uid === state.uid
 
         // TODO: make canvas component, we're drawing data inline a lot

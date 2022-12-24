@@ -32,7 +32,7 @@ export class GameAudio {
   play() {
     if (!this.element.paused) return
 
-    this.element.play().catch(error => {
+    this.element.play().catch((error) => {
       switch (error) {
         case 'NotAllowedError':
           console.error(`Can't play audio, try implementing a "play" button.`)

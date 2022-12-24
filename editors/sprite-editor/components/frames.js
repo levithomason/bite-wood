@@ -85,7 +85,7 @@ function frames(state) {
 
     document
       .querySelectorAll('.frames canvas:not(.dragging)')
-      .forEach(node => (node.style.boxShadow = ''))
+      .forEach((node) => (node.style.boxShadow = ''))
   }
 
   return html`
@@ -113,11 +113,11 @@ function frames(state) {
         const ctx = canvas.getContext('2d')
         ctx.putImageData(imageData, 0, 0)
 
-        const handleDeleteClick = e => {
+        const handleDeleteClick = (e) => {
           actions.deleteFrame(state, i)
         }
 
-        const handleCopyClick = e => {
+        const handleCopyClick = (e) => {
           const frames = [
             ...state.frames.slice(0, i + 1),
             ...state.frames.slice(i),
@@ -135,7 +135,7 @@ function frames(state) {
             on-dragstart="${handleDragStart}"
             on-dragover="${handleDragOver}"
             on-dragend="${handleDragEnd}"
-            @click="${e => {
+            @click="${(e) => {
               setState({ frameIndexDrawing: i })
             }}"
             class="frame ${classMap({
@@ -144,7 +144,7 @@ function frames(state) {
           >
             ${canvas}
             <div class="index">${i}</div>
-            <ul class="menu" @click="${e => e.stopPropagation()}">
+            <ul class="menu" @click="${(e) => e.stopPropagation()}">
               <li>
                 <a @click="${handleCopyClick}">
                   <i class="fas fa-fw fa-copy"></i>

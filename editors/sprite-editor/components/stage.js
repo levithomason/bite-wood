@@ -14,7 +14,7 @@ import spritePreview from './sprite-preview.js'
 
 let stateBeforeDraw
 
-document.addEventListener('mousedown', e => {
+document.addEventListener('mousedown', (e) => {
   const state = getState()
   stateBeforeDraw = state
 
@@ -29,7 +29,7 @@ document.addEventListener('mousedown', e => {
   }
 })
 
-document.addEventListener('mousemove', e => {
+document.addEventListener('mousemove', (e) => {
   const state = getState()
 
   if (state.isDrawing && e.target.classList.contains('drawing-canvas')) {
@@ -41,7 +41,7 @@ document.addEventListener('mousemove', e => {
   }
 })
 
-document.addEventListener('mouseup', e => {
+document.addEventListener('mouseup', (e) => {
   const state = getState()
 
   if (state.isDrawing) {
@@ -101,9 +101,7 @@ function gridCanvas(state) {
     ctx.fillRect(i + cellSize, 0, 1, height)
   }
 
-  return html`
-    ${canvas}
-  `
+  return html` ${canvas} `
 }
 
 function stage(state) {

@@ -13,7 +13,7 @@ export const MOUSE_BUTTONS = {
  */
 class GameMouse {
   /** @param {MouseEvent} e */
-  #setMousePosition = e => {
+  #setMousePosition = (e) => {
     // TODO: this doesn't let the mouse work outside of the canvas
     // In order to track the mouse position outside of the canvas, we'd need to add the
     // offset position of the canvas to the pageX/Y.  The canvas can be placed anywhere
@@ -32,12 +32,12 @@ class GameMouse {
   }
 
   /** @param {MouseEvent} e */
-  #handleMouseMove = e => {
+  #handleMouseMove = (e) => {
     this.#setMousePosition(e)
   }
 
   /** @param {MouseEvent} e */
-  #handleMouseDown = e => {
+  #handleMouseDown = (e) => {
     const button = MOUSE_BUTTONS[e.button]
 
     // the position hasn't been set if the user hasn't moved the mouse yet
@@ -59,7 +59,7 @@ class GameMouse {
   }
 
   /** @param {MouseEvent} e */
-  #handleMouseUp = e => {
+  #handleMouseUp = (e) => {
     const button = MOUSE_BUTTONS[e.button]
 
     // the position hasn't been set if the user hasn't moved the mouse yet

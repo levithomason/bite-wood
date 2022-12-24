@@ -4,7 +4,7 @@ import memoryStorage from './memory-storage.js'
 // Utils
 // --------------------------------------------------------
 
-const escapeRegExp = str => str.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+const escapeRegExp = (str) => str.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
 
 const storage = (function getStorageAdapter() {
   // Default
@@ -34,10 +34,10 @@ const storage = (function getStorageAdapter() {
 
   // create storage
   return {
-    get: key => adapter.getItem(key),
+    get: (key) => adapter.getItem(key),
     set: (key, value) => adapter.setItem(key, value),
-    remove: key => adapter.removeItem(key),
-    key: index => adapter.key(index),
+    remove: (key) => adapter.removeItem(key),
+    key: (index) => adapter.key(index),
     length: () => adapter.length,
   }
 })()
@@ -90,7 +90,7 @@ class LocalSync {
    * @returns {Array} Array of callback return values.
    * @private
    */
-  _mapBuckets(callback = bucket => bucket) {
+  _mapBuckets(callback = (bucket) => bucket) {
     const result = []
     // iterate in reverse for max speed and index preservation when removing items
     for (let i = storage.length() - 1; i >= 0; --i) {
@@ -222,9 +222,9 @@ class LocalSync {
    */
   _validateValue(value) {
     const validTypes = [null, undefined, true, 0, '', [], {}]
-    const signature = arg => Object.prototype.toString.call(arg)
+    const signature = (arg) => Object.prototype.toString.call(arg)
 
-    if (!validTypes.some(valid => signature(value) === signature(valid))) {
+    if (!validTypes.some((valid) => signature(value) === signature(valid))) {
       throw new Error(
         `LocalSync cannot store "value" of type ${signature(value)}`,
       )
@@ -347,7 +347,7 @@ class LocalSync {
    * Clears all values from the current bucket.
    */
   clear() {
-    this.getAll().forEach(item => {
+    this.getAll().forEach((item) => {
       this.remove(Object.keys(item)[0])
     })
   }
@@ -361,7 +361,7 @@ class LocalSync {
    * @returns {String[]} An array of `key` strings.
    */
   keys() {
-    return this._mapKeys(key => key)
+    return this._mapKeys((key) => key)
   }
 
   /**
@@ -369,7 +369,7 @@ class LocalSync {
    * @returns {Array.<*>} An array of values.
    */
   values() {
-    return this._mapKeys(key => this.get(key))
+    return this._mapKeys((key) => this.get(key))
   }
 
   /**
@@ -377,7 +377,7 @@ class LocalSync {
    * @returns {Object[]} An array of objects `{<key>: <value>}`.
    */
   getAll() {
-    return this._mapKeys(key => ({ [key]: this.get(key) }))
+    return this._mapKeys((key) => ({ [key]: this.get(key) }))
   }
 }
 

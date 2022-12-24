@@ -48,7 +48,7 @@ class GameRooms {
       const persistedObjects = []
 
       if (this.currentRoom) {
-        this.currentRoom.objects = this.currentRoom.objects.filter(object => {
+        this.currentRoom.objects = this.currentRoom.objects.filter((object) => {
           if (object.persist) persistedObjects.push(object)
 
           return !object.persist
@@ -65,9 +65,8 @@ class GameRooms {
         if (!this.currentRoom.initialized) {
           this.currentRoom.create()
         }
-        this.currentRoom.objects = this.currentRoom.objects.concat(
-          persistedObjects,
-        )
+        this.currentRoom.objects =
+          this.currentRoom.objects.concat(persistedObjects)
         if (this.currentRoom.backgroundMusic) {
           this.currentRoom.backgroundMusic.play()
         }

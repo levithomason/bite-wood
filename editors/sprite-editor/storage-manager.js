@@ -26,12 +26,12 @@ const storage = new LocalSync({
 // ADDITIONAL API
 //
 
-export const saveState = state => {
+export const saveState = (state) => {
   storage.setBucket(BUCKETS.SPRITES)
   storage.set(state.uid, state)
 }
 
-export const loadState = uid => {
+export const loadState = (uid) => {
   if (!uid) {
     const originalBucket = storage.getBucket()
 

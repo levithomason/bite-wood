@@ -5,9 +5,7 @@ mountNode.id = 'root'
 document.body.appendChild(mountNode)
 
 function levelEditor() {
-  return html`
-    <h1>Level Editor</h1>
-  `
+  return html` <h1>Level Editor</h1> `
 }
 
 export const init = () => {

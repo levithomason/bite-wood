@@ -43,7 +43,7 @@ export default class Room1 extends GameRoom {
       })
     }
 
-    this.stars.forEach(star => {
+    this.stars.forEach((star) => {
       drawing.setStrokeColor('transparent')
       drawing.setFillColor(`rgba(${star.r}, ${star.g}, ${star.b}, ${star.a})`)
       drawing.rectangle(star.x, star.y, star.size, star.size)
@@ -62,7 +62,7 @@ export default class Room1 extends GameRoom {
       star.b = 127 + ((star.b + star.twinkle) % 127)
     })
 
-    this.stars = this.stars.filter(star => {
+    this.stars = this.stars.filter((star) => {
       return !(star.dying && star.a < 0.01)
     })
   }

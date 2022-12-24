@@ -2,11 +2,11 @@ import { html } from '../../../node_modules/lit-html/lit-html.js'
 import { setState } from '../state-manager.js'
 
 function spriteHeader(state) {
-  const handleInput = e => {
+  const handleInput = (e) => {
     setState({ name: e.target.value })
   }
 
-  const handleKeyDown = e => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.target.blur()
     }

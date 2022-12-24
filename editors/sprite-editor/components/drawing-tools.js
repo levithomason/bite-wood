@@ -15,14 +15,8 @@ function drawingTool(state, { key, icon, label }) {
       class="tool ${classMap({ active: state.tool === key })}"
       @click="${handleClick}"
     >
-      ${icon &&
-        html`
-          <i class="fas fa-fw fa-${icon}"></i>
-        `}
-      ${label &&
-        html`
-          <span class="label">${label}</span>
-        `}
+      ${icon && html` <i class="fas fa-fw fa-${icon}"></i> `}
+      ${label && html` <span class="label">${label}</span> `}
     </button>
   `
 }

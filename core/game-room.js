@@ -28,7 +28,7 @@ export class GameRoom {
   }
 
   create() {
-    this.objects.forEach(object => object.create())
+    this.objects.forEach((object) => object.create())
     this.initialized = true
   }
 
@@ -36,7 +36,7 @@ export class GameRoom {
   instanceCount(object) {
     return !object
       ? this.objects.length
-      : this.objects.filter(o => o.name === object.name).length
+      : this.objects.filter((o) => o.name === object.name).length
   }
 
   /**
@@ -90,7 +90,7 @@ export class GameRoom {
 
   /** @param {GameObject} object */
   instanceExists(object) {
-    return this.objects.some(o => {
+    return this.objects.some((o) => {
       return o.name === object.name
     })
   }
@@ -117,7 +117,7 @@ export class GameRoom {
 
   /** @param {GameObject} object */
   instanceDestroy(object) {
-    const index = this.objects.findIndex(o => o === object)
+    const index = this.objects.findIndex((o) => o === object)
 
     this.objects[index]?.events?.destroy?.(this)
     this.objects.splice(index, 1)

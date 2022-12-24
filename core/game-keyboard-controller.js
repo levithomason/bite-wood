@@ -19,7 +19,7 @@ class GameKeyboard {
   up = {}
 
   /** @param {KeyboardEvent} e */
-  #handleKeyDown = e => {
+  #handleKeyDown = (e) => {
     this.active[e.key] = true
 
     // ensure keydown only fires once per game step
@@ -47,7 +47,7 @@ class GameKeyboard {
   }
 
   /** @param {KeyboardEvent} e */
-  #handleKeyUp = e => {
+  #handleKeyUp = (e) => {
     this.up[e.key] = true
 
     // since key events are handled on game step we can only safely remove

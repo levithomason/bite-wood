@@ -34,37 +34,38 @@ const sndEatApple = new GameAudio(
  * @param {boolean} opts.eval - Whether to eval action values.
  * @returns {function(*=): function(*=, *=): *}
  */
-const createAction = (cb, opts = {}) => (params = {}) => (
-  /** GameObject */ self,
-) => {
-  const evaluatedParams = Object.keys(params).reduce((acc, key) => {
-    let value = params[key]
+const createAction =
+  (cb, opts = {}) =>
+  (params = {}) =>
+  (/** GameObject */ self) => {
+    const evaluatedParams = Object.keys(params).reduce((acc, key) => {
+      let value = params[key]
 
-    // evaluate strings referencing 'self', math notation, and comparisons
-    // allows the user to supply values like 'self.x + 4' or 'gameRooms.currentRoom.width'
-    if (
-      opts.eval !== false &&
-      typeof value === 'string' &&
-      (value === 'self' || /(?:[+\-*/^]+|\w\.\w|[><=])/gi.test(value))
-    ) {
-      try {
-        value = eval(value)
-      } catch (e) {
-        console.warn('Cannot evaluate action param value:', value)
-        console.error(e)
+      // evaluate strings referencing 'self', math notation, and comparisons
+      // allows the user to supply values like 'self.x + 4' or 'gameRooms.currentRoom.width'
+      if (
+        opts.eval !== false &&
+        typeof value === 'string' &&
+        (value === 'self' || /(?:[+\-*/^]+|\w\.\w|[><=])/gi.test(value))
+      ) {
+        try {
+          value = eval(value)
+        } catch (e) {
+          console.warn('Cannot evaluate action param value:', value)
+          console.error(e)
+        }
       }
-    }
 
-    acc[key] = value
+      acc[key] = value
 
-    return acc
-  }, {})
+      return acc
+    }, {})
 
-  // console.log('evaluatedParams', evaluatedParams)
-  // console.groupEnd()
+    // console.log('evaluatedParams', evaluatedParams)
+    // console.groupEnd()
 
-  cb(evaluatedParams, self)
-}
+    cb(evaluatedParams, self)
+  }
 
 const actions = {
   //
@@ -79,18 +80,18 @@ const actions = {
   //
   if: createAction(({ condition, trueActions, falseActions }, self) => {
     if (condition) {
-      resolveActions(trueActions).forEach(action => action(self))
+      resolveActions(trueActions).forEach((action) => action(self))
     } else {
-      resolveActions(falseActions).forEach(action => action(self))
+      resolveActions(falseActions).forEach((action) => action(self))
     }
   }),
 
   ifCollisionObject: createAction(
     ({ other, trueActions, falseActions }, self) => {
       if (collision.objects(self, other)) {
-        resolveActions(trueActions).forEach(action => action(self))
+        resolveActions(trueActions).forEach((action) => action(self))
       } else {
-        resolveActions(falseActions).forEach(action => action(self))
+        resolveActions(falseActions).forEach((action) => action(self))
       }
     },
   ),
