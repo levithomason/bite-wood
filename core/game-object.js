@@ -17,6 +17,12 @@ import { gameRooms } from './game-rooms.js'
 
 export class GameObject {
   /**
+   * An array of all instantiated game objects.
+   * @type {GameObject[]}
+   */
+  static instances = []
+
+  /**
    * @param {GameSprite} sprite
    * @param {boolean} [persist=false] - Determines whether this object should still exist when the room changes.
    * @param {boolean} [solid=true]
@@ -30,7 +36,8 @@ export class GameObject {
    * @param {number} [direction=0]
    *
    * @param {object} events
-   * @param {object} events.create
+   * @param {GameObjectAction} events.create
+   * @param {GameObjectAction} events.destroy
    * @param {GameObjectAction} events.create
    * @param {GameDrawingAction} events.draw
    * @param {GameObjectAction} events.keyActive
@@ -80,6 +87,8 @@ export class GameObject {
     this.setSprite = this.setSprite.bind(this)
     this.step = this.step.bind(this)
     this.draw = this.draw.bind(this)
+
+    GameObject.instances.push(this)
   }
 
   get displayName() {
@@ -159,6 +168,13 @@ export class GameObject {
    */
   create() {
     this.events?.create?.(this)
+  }
+
+  destroy() {
+    this.events?.destroy?.(this)
+
+    const index = GameObject.instances.indexOf(this)
+    GameObject.instances.splice(index, 1)
   }
 
   moveTo(x, y) {

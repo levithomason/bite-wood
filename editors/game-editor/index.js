@@ -7,8 +7,7 @@ document.body.appendChild(mountNode)
 function gameEditor() {
   const playPopout = () => {
     window.open(
-      // TODO: need to know what url:port we're on programmatically
-      'http://127.0.0.1:4321/games/run-unicorn-run',
+      './../../games/run-unicorn-run',
       '_blank',
       // TODO: need to know game size programmatically
       'popup,noopener,noreferrer,width=800,height=600',
@@ -37,7 +36,7 @@ function gameEditor() {
         <!-- TODO: need to know what url:port we're on programmatically -->
         <iframe
           id="game-iframe"
-          src="http://127.0.0.1:4321/games/run-unicorn-run/index.html"
+          src="./../../games/run-unicorn-run/index.html"
           width="800"
           height="600"
         ></iframe>

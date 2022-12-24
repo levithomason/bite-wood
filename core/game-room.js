@@ -114,8 +114,8 @@ export class GameRoom {
   /** @param {GameObject} object */
   instanceDestroy(object) {
     const index = this.objects.findIndex(o => o === object)
-    // TODO: call object.destory() which invokes object.events?.destroy?.()
 
+    this.objects[index]?.events?.destroy?.(this)
     this.objects.splice(index, 1)
   }
 

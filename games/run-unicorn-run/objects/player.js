@@ -170,22 +170,24 @@ class Player extends GameObject {
 
     // walking
     if (gameKeyboard.active.ArrowRight || gameKeyboard.active.ArrowLeft) {
-      self.friction = 0
-      self.hspeed =
-        Math.sign(self.hspeed) * Math.min(Math.abs(self.hspeed), self.maxSpeed)
+      this.friction = 0
+      this.hspeed =
+        Math.sign(this.hspeed) * Math.min(Math.abs(this.hspeed), this.maxSpeed)
+    } else {
+      this.friction = gamePhysics.friction
     }
 
     // apply friction
     this.hspeed = this.hspeed * (1 - this.friction)
 
     // go to next/prev room on room edge
-    if (self.x >= gameRooms.currentRoom.width) {
+    if (this.x >= gameRooms.currentRoom.width) {
       if (gameRooms.nextRoom()) {
-        self.x = self.hspeed
+        this.x = this.hspeed
       }
-    } else if (self.x <= 0) {
+    } else if (this.x <= 0) {
       if (gameRooms.prevRoom()) {
-        self.x = gameRooms.currentRoom.width + self.hspeed
+        this.x = gameRooms.currentRoom.width + this.hspeed
       }
     }
 

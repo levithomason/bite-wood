@@ -1,6 +1,5 @@
-@import "../../public/css/global.css";
+@import './css/global.css';
 
-html,
 body {
   display: flex;
   width: 100vw;
@@ -8,4 +7,5 @@ body {
   align-items: center;
   justify-content: space-around;
   overflow: hidden;
+  padding: 0;
 }
