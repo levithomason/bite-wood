@@ -1,6 +1,11 @@
 export class GameRoom {
   static instances = []
 
+  /** @type GameImage */
+  backgroundImage
+  /** @type GameAudio */
+  backgroundMusic
+
   /**
    * @param {number} width
    * @param {number} height

@@ -39,6 +39,16 @@ export class GameDrawing {
   }
 
   /**
+   * Sets the blend mode for drawing new shapes.
+   * @param {GlobalCompositeOperation} mode
+   * @return {GameDrawing}
+   */
+  setBlendMode(mode) {
+    this.#ctx.globalCompositeOperation = mode
+    return this
+  }
+
+  /**
    * Sets the height of the canvas.
    * @param {number} height
    */
@@ -97,6 +107,26 @@ export class GameDrawing {
    */
   setStrokeColor(color) {
     this.#ctx.strokeStyle = color
+    return this
+  }
+
+  /**
+   * Sets the text alignment for drawing text.
+   * @param {CanvasTextAlign} alignment
+   * @return {GameDrawing}
+   */
+  setTextAlign(alignment) {
+    this.#ctx.textAlign = alignment
+    return this
+  }
+
+  /**
+   * Sets the text baseline for drawing text.
+   * @param {CanvasTextBaseline} baseline
+   * @return {GameDrawing}
+   */
+  setTextBaseline(baseline) {
+    this.#ctx.textBaseline = baseline
     return this
   }
 
@@ -166,6 +196,20 @@ export class GameDrawing {
    */
   clear(x1 = 0, y1 = 0, w = this.canvas.width, h = this.canvas.height) {
     this.#ctx.clearRect(x1, y1, w, h)
+
+    return this
+  }
+
+  /**
+   * Draws a cross at x, y with the specified width and height.
+   * @param {number} x
+   * @param {number} y
+   * @param {number} [width=10]
+   * @param {number} [height=10]
+   */
+  cross(x, y, width = 10, height = 10) {
+    this.line(x - width, y, x + width, y)
+    this.line(x, y - height, x, y + height)
 
     return this
   }
@@ -310,20 +354,16 @@ export class GameDrawing {
    * @return {GameDrawing}
    */
   sprite(sprite, x, y) {
-    const direction = sprite.rtl ? -1 : 1
-    const rtlWidth = sprite.frameWidth * direction
-    const rtlInsertionX = sprite.insertionX * direction
-
     this.#ctx.drawImage(
       sprite.image.element,
-      sprite.offsetX + sprite.frameIndex * rtlWidth,
-      sprite.offsetY,
-      rtlWidth,
+      sprite.currentFrameX,
+      sprite.currentFrameY,
+      sprite.frameWidth,
       sprite.frameHeight,
-      x - rtlInsertionX * sprite.scaleX,
-      y - sprite.insertionY * sprite.scaleY,
-      rtlWidth * sprite.scaleX,
-      sprite.frameHeight * sprite.scaleY,
+      x - sprite.insertionX,
+      y - sprite.insertionY,
+      sprite.width,
+      sprite.height,
     )
 
     return this
@@ -382,16 +422,6 @@ export class GameDrawing {
   }
 
   /**
-   * Sets the text alignment for drawing text.
-   * @param {CanvasTextAlign} alignment
-   * @return {GameDrawing}
-   */
-  textAlign(alignment) {
-    this.#ctx.textAlign = alignment
-    return this
-  }
-
-  /**
    * Draws a debug view of a GameObject.
    * @param {GameObject} object
    * @return {GameDrawing}
@@ -408,83 +438,72 @@ export class GameDrawing {
       direction,
       gravity,
       friction,
+      boundingBoxTop,
+      boundingBoxLeft,
+      boundingBoxWidth,
+      boundingBoxHeight,
     } = object
 
     this.saveSettings()
 
-    this.setLineWidth(2)
+    this.setLineWidth(1)
+    this.setFillColor('transparent')
+
+    // sprite frame
+    if (object.sprite) {
+      this.setStrokeColor('#555')
+      this.rectangle(
+        object.spriteLeft,
+        object.spriteTop,
+        sprite.width,
+        sprite.height,
+      )
+    }
 
     // bounding box
     if (collision.objects(object, 'any')) {
       this.setStrokeColor('#F00')
     } else {
-      this.setStrokeColor('#FF0')
+      this.setStrokeColor('#F0F')
     }
-    this.setFillColor('transparent')
     this.rectangle(
-      x -
-        sprite.insertionX * sprite.scaleX +
-        sprite.boundingBoxLeft * sprite.scaleX,
-      y -
-        sprite.insertionY * sprite.scaleY +
-        sprite.boundingBoxTop * sprite.scaleY,
-      sprite.boundingBoxWidth * sprite.scaleX,
-      sprite.boundingBoxHeight * sprite.scaleY,
+      boundingBoxLeft,
+      boundingBoxTop,
+      boundingBoxWidth,
+      boundingBoxHeight,
     )
-
-    // sprite frame
-    this.setStrokeColor('#555')
-    this.#ctx.setLineDash([2, 2])
-    this.rectangle(
-      x - sprite.insertionX * sprite.scaleX,
-      y - sprite.insertionY * sprite.scaleY,
-      sprite.frameWidth * sprite.scaleX,
-      sprite.frameHeight * sprite.scaleY,
-    )
-    this.#ctx.setLineDash([])
 
     // insertion point
-    this.setLineWidth(3)
     this.setStrokeColor('#F00')
-    this.line(x - 10, y, x + 10, y)
-    this.line(x, y - 10, x, y + 10)
+    this.cross(x, y, 8, 8)
 
     // vector
-    if (object.speed) {
+    if (speed) {
       this.setStrokeColor('#0F0')
-      this.arrow(x, y, x + object.hspeed * 10, y + object.vspeed * 10)
-
-      return this
+      this.arrow(x, y, x + hspeed * 10, y + vspeed * 10)
     }
 
     // text values
-    this.setFillColor('#000')
     this.setFontSize(12)
     this.setFontFamily('monospace')
+    this.setTextAlign('left')
+    const fixed = (n) => n.toFixed(2)
     const lines = [
       `${name}`,
-      // `x          = ${x.toFixed(2)}`,
-      // `y          = ${y.toFixed(2)}`,
-      `direction   = ${direction.toFixed(2)}`,
-      `speed       = ${speed.toFixed(2)} (${hspeed.toFixed(
-        2,
-      )}, ${vspeed.toFixed(2)})`,
-      `gravity     = ${gravity.magnitude.toFixed(2)}`,
-      `friction    = ${friction.toFixed(2)}`,
-      `boundingBox = ${object.boundingBoxTop.toFixed(
-        2,
-      )}, ${object.boundingBoxRight.toFixed(
-        2,
-      )}, ${object.boundingBoxBottom.toFixed(
-        2,
-      )}, ${object.boundingBoxLeft.toFixed(2)}`,
+      `x         ${fixed(x)}`,
+      `y         ${fixed(y)}`,
+      `direction ${fixed(direction)}`,
+      `speed     ${fixed(speed)} (${fixed(hspeed)}, ${fixed(vspeed)})`,
+      `gravity   ${fixed(gravity.magnitude)}`,
+      `friction  ${fixed(friction)}`,
     ]
     lines.reverse().forEach((line, i) => {
-      this.text(
-        line,
-        x - sprite.insertionX * sprite.scaleX,
-        y - sprite.insertionY * sprite.scaleY - 4 - i * 14,
-      )
+      const x = object.spriteLeft
+      const y = object.spriteTop - (i + 1) * 14
+      this.setFillColor('#fff')
+      this.text(line, x, y)
+      this.setFillColor('#000')
+      this.text(line, x - 1, y - 1)
     })
     this.loadSettings()
 
@@ -520,7 +539,7 @@ export class GameDrawing {
     )
 
     // labels: x, y, angle, magnitude
-    this.textAlign('center')
+    this.setTextAlign('center')
     this.setFillColor('red')
     this.text(
       Math.round(vector.magnitude),

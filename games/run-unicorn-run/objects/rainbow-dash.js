@@ -16,13 +16,12 @@ export const imgRainbowDashL = new GameImage(
   './../run-unicorn-run/images/my-littlepony-left.png',
 )
 
-export const sprRainbowDashFlyR = new GameSprite({
-  image: imgRainbowDashR,
-  frameCount: 6,
+export const sprRainbowDashFlyR = new GameSprite(imgRainbowDashR, {
+  frameFirstY: 1057,
+  frameFirstX: -2,
   frameWidth: 95,
   frameHeight: 40,
-  offsetX: -2,
-  offsetY: 1057,
+  frameCount: 6,
   scaleX: 2,
   scaleY: 2,
   insertionX: 48,
@@ -34,16 +33,15 @@ export const sprRainbowDashFlyR = new GameSprite({
   stepsPerFrame: 4,
 })
 
-export const sprRainbowDashFlyL = new GameSprite({
-  image: imgRainbowDashL,
-  frameCount: 6,
+export const sprRainbowDashFlyL = new GameSprite(imgRainbowDashL, {
   // TODO: do away with RTL once we have sprite edit ability
   // or we need to mirror frames
-  rtl: true,
+  frameFirstY: 1057,
+  frameFirstX: 1108,
   frameWidth: 95,
   frameHeight: 40,
-  offsetX: 1108,
-  offsetY: 1057,
+  frameCount: 6,
+  rtl: true,
   scaleX: 2,
   scaleY: 2,
   insertionX: 48,

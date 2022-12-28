@@ -68,6 +68,7 @@ class GameRooms {
         this.currentRoom.objects =
           this.currentRoom.objects.concat(persistedObjects)
         if (this.currentRoom.backgroundMusic) {
+          this.currentRoom.backgroundMusic.loop = true
           this.currentRoom.backgroundMusic.play()
         }
       }

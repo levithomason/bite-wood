@@ -24,7 +24,7 @@ class Room extends GameRoom {
     drawing
       .setFillColor('white')
       .setFontSize(21)
-      .textAlign('center')
+      .setTextAlign('center')
       .text(
         'TODO: this will load a game from JSON',
         this.width / 2,
@@ -33,7 +33,7 @@ class Room extends GameRoom {
   }
 }
 
-const room = new Room(800, 600)
+const room = new Room()
 gameRooms.addRoom(room)
 
 const game = new Game()

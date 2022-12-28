@@ -4,6 +4,7 @@ import { gamePhysics } from './game-physics-controller.js'
 import { gameState } from './game-state-controller.js'
 import { Vector } from './math.js'
 import { gameRooms } from './game-rooms.js'
+import { gameDrawing } from './game-drawing-controller.js'
 
 /**
  * @typedef {function} GameObjectAction
@@ -15,7 +16,31 @@ import { gameRooms } from './game-rooms.js'
  * @param {GameDrawing} self
  */
 
+/**
+ * @typedef {object} GameObjectEvents
+ * @property {GameObjectAction} [create]
+ * @property {GameObjectAction} [destroy]
+ * @property {GameObjectAction} [create]
+ * @property {GameDrawingAction} [draw]
+ * @property {GameObjectAction} [keyActive]
+ * @property {GameObjectAction} [keyDown]
+ * @property {GameObjectAction} [keyUp]
+ * @property {GameObjectAction} [mouseActive]
+ * @property {GameObjectAction} [mouseDown]
+ * @property {GameObjectAction} [mouseUp]
+ * @property {GameObjectAction} [step]
+ */
+
 export class GameObject {
+  /** @type number */
+  #boundingBoxWidth
+  /** @type number */
+  #boundingBoxHeight
+  /** @type number */
+  #boundingBoxLeft
+  /** @type number */
+  #boundingBoxTop
+
   /**
    * An array of all instantiated game objects.
    * @type {GameObject[]}
@@ -23,44 +48,49 @@ export class GameObject {
   static instances = []
 
   /**
-   * @param {GameSprite} sprite
-   * @param {boolean} [persist=false] - Determines whether this object should still exist when the room changes.
-   * @param {boolean} [solid=true]
-   * @param {number} [x=0]
-   * @param {number} [y=0]
-   * @param {number} [acceleration=0]
-   * @param {Vector} [gravity=gamePhysics.gravity]
-   * @param {number} [friction=gamePhysics.friction]
-   * @param {number} [speed=0]
-   * @param {number} [direction=0]
-   * @param {object} [events={}]
-   * @param {GameObjectAction} [events.create]
-   * @param {GameObjectAction} [events.destroy]
-   * @param {GameObjectAction} [events.create]
-   * @param {GameDrawingAction} [events.draw]
-   * @param {GameObjectAction} [events.keyActive]
-   * @param {GameObjectAction} [events.keyDown]
-   * @param {GameObjectAction} [events.keyUp]
-   * @param {GameObjectAction} [events.mouseActive]
-   * @param {GameObjectAction} [events.mouseDown]
-   * @param {GameObjectAction} [events.mouseUp]
-   * @param {GameObjectAction} [events.step]
-   * @param {object} ...properties
+   * @param {object} [config]
+   * @param {number} [config.boundingBoxTop=0] - The bounding box's distance away from the object's y position.
+   * @param {number} [config.boundingBoxLeft=0] - The bounding box's distance away from the object's x position.
+   * @param {number} [config.boundingBoxWidth=0] - How wide the bounding box starting from boundingBoxLeft.
+   * @param {number} [config.boundingBoxHeight=0] - How tall the bounding box starting from boundingBoxTop.
+   * @param {boolean} [config.persist=false] - Determines whether this object should still exist when the room changes.
+   * @param {GameSprite|undefined} [config.sprite]
+   * @param {boolean} [config.solid=false]
+   * @param {number} [config.x=0]
+   * @param {number} [config.y=0]
+   * @param {number} [config.acceleration=0]
+   * @param {Vector} [config.gravity=gamePhysics.gravity]
+   * @param {number} [config.friction=gamePhysics.friction]
+   * @param {number} [config.speed=0]
+   * @param {number} [config.direction=0]
+   * @param {GameObjectEvents} [config.events={}]
+   * @param {...object} ...properties
    */
-  constructor({
-    persist = false,
-    sprite,
-    solid = true,
-    x = 0,
-    y = 0,
-    acceleration = 0,
-    gravity = gamePhysics.gravity,
-    friction = gamePhysics.friction,
-    speed = 0,
-    direction = 0,
-    events = {},
-    ...properties
-  } = {}) {
+  constructor(config = {}) {
+    const {
+      boundingBoxTop = 0,
+      boundingBoxLeft = 0,
+      boundingBoxWidth = 0,
+      boundingBoxHeight = 0,
+      persist = false,
+      sprite,
+      solid = false,
+      x = 0,
+      y = 0,
+      acceleration = 0,
+      gravity = gamePhysics.gravity,
+      friction = gamePhysics.friction,
+      speed = 0,
+      direction = 0,
+      events = {},
+      ...properties
+    } = config
+
+    this.#boundingBoxTop = boundingBoxTop
+    this.#boundingBoxLeft = boundingBoxLeft
+    this.#boundingBoxWidth = boundingBoxWidth
+    this.#boundingBoxHeight = boundingBoxHeight
+
     this.persist = persist
     this.sprite = sprite
     this.solid = solid
@@ -125,31 +155,35 @@ export class GameObject {
   }
 
   get boundingBoxTop() {
-    return (
-      this.y -
-      this.sprite.insertionY * this.sprite.scaleY +
-      this.sprite.boundingBoxTop * this.sprite.scaleY
-    )
+    if (this.sprite) {
+      return this.y - this.sprite.insertionY + this.sprite.boundingBoxTop
+    }
+
+    return this.y + this.#boundingBoxTop
   }
 
   get boundingBoxLeft() {
-    return (
-      this.x -
-      this.sprite.insertionX * this.sprite.scaleX +
-      this.sprite.boundingBoxLeft * this.sprite.scaleX
-    )
+    if (this.sprite) {
+      return this.x - this.sprite.insertionX + this.sprite.boundingBoxLeft
+    }
+
+    return this.x + this.#boundingBoxLeft
   }
 
   get boundingBoxRight() {
-    return (
-      this.boundingBoxLeft + this.sprite.boundingBoxWidth * this.sprite.scaleX
-    )
+    if (this.sprite) {
+      return this.boundingBoxLeft + this.sprite.boundingBoxWidth
+    }
+
+    return this.boundingBoxLeft + this.#boundingBoxWidth
   }
 
   get boundingBoxBottom() {
-    return (
-      this.boundingBoxTop + this.sprite.boundingBoxHeight * this.sprite.scaleY
-    )
+    if (this.sprite) {
+      return this.boundingBoxTop + this.sprite.boundingBoxHeight
+    }
+
+    return this.boundingBoxTop + this.#boundingBoxHeight
   }
 
   get boundingBoxWidth() {
@@ -157,13 +191,51 @@ export class GameObject {
   }
 
   get boundingBoxHeight() {
-    return Math.abs(this.boundingBoxTop - this.boundingBoxBottom)
+    return Math.abs(this.boundingBoxBottom - this.boundingBoxTop)
+  }
+
+  /**
+   * This is the current sprite's top position in the room.
+   * Returns 0 if there is no sprite
+   * @return {number}
+   */
+  get spriteTop() {
+    if (!this.sprite) return 0
+    return this.y - this.sprite.insertionY
+  }
+  /**
+   * This is the current sprite's left position in the room.
+   * Returns 0 if there is no sprite
+   * @return {number}
+   */
+  get spriteLeft() {
+    if (!this.sprite) return 0
+    return this.x - this.sprite.insertionX
+  }
+  /**
+   * This is the current sprite's right position in the room.
+   * Returns 0 if there is no sprite
+   * @return {number}
+   */
+  get spriteRight() {
+    if (!this.sprite) return 0
+    return this.spriteLeft + this.sprite.width
+  }
+  /**
+   * This is the current sprite's bottom position in the room.
+   * Returns 0 if there is no sprite
+   * @return {number}
+   */
+  get spriteBottom() {
+    if (!this.sprite) return 0
+    return this.spriteTop + this.sprite.height
   }
 
   /**
    * Called when the object is created in the room.
    */
   create() {
+    // TODO: set xStart and yStart here
     this.events?.create?.(this)
   }
 
@@ -175,6 +247,10 @@ export class GameObject {
   }
 
   moveTo(x, y) {
+    // TODO: Make get/set for x,y (#x,#y) and track xPrev, yPrev
+    //       This is not the same as applying the vector in reverse, since,
+    //       it is possible to update the vector then check xPrev, yPrev and get
+    //       the wrong values. We want real world last x,y
     this.x = x
     this.y = y
   }
@@ -318,6 +394,10 @@ export class GameObject {
 
     if (gameState.isPlaying) {
       this.events?.draw?.(drawing)
+    }
+
+    if (gameState.debug) {
+      gameDrawing.objectDebug(this)
     }
   }
 

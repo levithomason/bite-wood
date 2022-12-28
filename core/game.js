@@ -2,6 +2,7 @@ import { gameDrawing } from './game-drawing-controller.js'
 import { gameRooms } from './game-rooms.js'
 import { gameMouse } from './game-mouse-controller.js'
 import { gameState } from './game-state-controller.js'
+import { scale } from './math.js'
 
 // Tracks whether the game loop is running
 let _isRunning = false
@@ -20,12 +21,24 @@ export class Game {
    * @param {HTMLElement} [parentElement=document.body] - A DOM element where the canvas should be placed.
    * @param {number} [width=800] - The width of the game in pixels.
    * @param {number} [height=600] - The height of the game in pixels.
+   * @param {boolean} [pauseOnBlur=false] Pause/Play on window blur/focus.
+   * Sometimes the game loses focus due to the player clicking outsite or switching windows.
+   * When this happens, control is lost as keystrokes and mouse movements aren't happening inside
+   * the game canvas, but outside in some other location. To help inform the user when they aren't playing
+   * due to focus being lost, you can enable this option to pause the game automatically when the game
+   * loses focus and resume the game when the player restores focus to the game.
    */
   constructor(
-    { parentElement = document.body, width = 800, height = 600 } = {
+    {
+      parentElement = document.body,
+      width = 800,
+      height = 600,
+      pauseOnBlur = false,
+    } = {
       parentElement: document.body,
       width: 800,
       height: 600,
+      pauseOnBlur: false,
     },
   ) {
     this.start = this.start.bind(this)
@@ -35,9 +48,25 @@ export class Game {
     this.step = this.step.bind(this)
     this.draw = this.draw.bind(this)
 
-    gameDrawing.setCanvasWidth(width)
-    gameDrawing.setCanvasHeight(height)
+    this.width = width
+    this.height = height
+
+    gameDrawing.setCanvasWidth(this.width)
+    gameDrawing.setCanvasHeight(this.height)
     parentElement.append(gameDrawing.canvas)
+
+    if (pauseOnBlur) {
+      let pausedOnBlur = false
+      window.addEventListener('blur', () => {
+        pausedOnBlur = true
+        gameState.pause()
+      })
+      window.addEventListener('focus', () => {
+        if (pausedOnBlur) {
+          gameState.play()
+        }
+      })
+    }
   }
 
   start() {
@@ -95,8 +124,9 @@ export class Game {
         console.error('Failed to draw room:', err)
       }
 
-      // objects - continue drawing if the room fails
+      // objects
       gameRooms.currentRoom.objects.forEach((object) => {
+        // continue drawing if the room fails
         try {
           object.draw?.(gameDrawing)
         } catch (err) {
@@ -109,16 +139,32 @@ export class Game {
       })
     }
 
-    // debug
+    // debug: mouse position
     if (gameState.debug) {
-      gameDrawing.text(
-        `${gameMouse.x}, ${gameMouse.y}`,
-        gameMouse.x + 10,
-        gameMouse.y - 10,
-      )
+      const x =
+        gameMouse.x +
+        (gameMouse.x < 30 ? 30 : gameMouse.x > this.width - 36 ? -36 : 0)
+      const y = gameMouse.y + (gameMouse.y < this.height - 28 ? 18 : -14)
+      const text = `(${gameMouse.x}, ${gameMouse.y})`
+
+      gameDrawing.saveSettings()
+
+      gameDrawing.setFontSize(10)
+      gameDrawing.setFontFamily('monospace')
+      gameDrawing.setTextAlign('center')
+      gameDrawing.setTextBaseline('top')
+
+      gameDrawing.setLineWidth(2)
+      gameDrawing.setStrokeColor('white')
+      gameDrawing.strokeText(text, x, y)
+
+      gameDrawing.setFillColor('black')
+      gameDrawing.text(text, x, y)
+
+      gameDrawing.loadSettings()
     }
 
-    // paused
+    // paused - overlay
     if (!gameState.isPlaying) {
       const x = gameRooms.currentRoom.width / 2 - 40
       const y = gameRooms.currentRoom.height / 2

@@ -26,12 +26,20 @@ describe('GameDrawing', () => {
       drawing = new GameDrawing(10, 10)
     })
 
+    //
+    // Settings
+    //
+
     it('saveSettings() returns this', () => {
       expect(drawing.saveSettings() === drawing).toBe(true)
     })
 
     it('loadSettings() returns this', () => {
       expect(drawing.loadSettings() === drawing).toBe(true)
+    })
+
+    it('setBlendMode() returns this', () => {
+      expect(drawing.setBlendMode('difference') === drawing).toBe(true)
     })
 
     it('setCanvasWidth() returns this', () => {
@@ -54,8 +62,28 @@ describe('GameDrawing', () => {
       expect(drawing.setStrokeColor('red') === drawing).toBe(true)
     })
 
+    it('setTextAlign() returns this', () => {
+      expect(drawing.setTextAlign('center') === drawing).toBe(true)
+    })
+
+    it('setTextBaseline() returns this', () => {
+      expect(drawing.setTextBaseline('top') === drawing).toBe(true)
+    })
+
+    //
+    // Drawing
+    //
+
     it('arrow() returns this', () => {
       expect(drawing.arrow(0, 0, 1, 1) === drawing).toBe(true)
+    })
+
+    it('circle() returns this', () => {
+      expect(drawing.circle(0, 0, 0) === drawing).toBe(true)
+    })
+
+    it('cross() returns this', () => {
+      expect(drawing.cross(0, 0) === drawing).toBe(true)
     })
 
     it('clear() returns this', () => {
@@ -95,12 +123,9 @@ describe('GameDrawing', () => {
     })
 
     it('sprite() returns this', () => {
-      const gameSprite = new GameSprite({
-        image: new GameImage(),
+      const gameSprite = new GameSprite(new GameImage(), {
         frameWidth: 0,
         frameHeight: 0,
-        boundingBoxWidth: 0,
-        boundingBoxHeight: 0,
       })
 
       expect(drawing.sprite(gameSprite, 0, 0) === drawing).toBe(true)
@@ -108,10 +133,6 @@ describe('GameDrawing', () => {
 
     it('text() returns this', () => {
       expect(drawing.text() === drawing).toBe(true)
-    })
-
-    it('textAlign() returns this', () => {
-      expect(drawing.textAlign('center') === drawing).toBe(true)
     })
 
     // TODO: This test is revealing some bad arch.
@@ -122,15 +143,7 @@ describe('GameDrawing', () => {
     it('objectDebug() returns this', () => {
       gameRooms.addRoom(new GameRoom(10, 10))
 
-      const object = new GameObject({
-        sprite: new GameSprite({
-          image: new GameImage(),
-          frameWidth: 0,
-          frameHeight: 0,
-          boundingBoxWidth: 0,
-          boundingBoxHeight: 0,
-        }),
-      })
+      const object = new GameObject()
       expect(drawing.objectDebug(object) === drawing).toBe(true)
     })
 

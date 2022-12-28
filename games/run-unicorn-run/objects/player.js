@@ -32,13 +32,12 @@ export const imgPlayerR = new GameImage(
 export const imgPlayerL = new GameImage(
   '../run-unicorn-run/images/my-littlepony-left.png',
 )
-export const sprPlayerIdleR = new GameSprite({
-  image: imgPlayerR,
-  frameCount: 16,
+export const sprPlayerIdleR = new GameSprite(imgPlayerR, {
+  frameFirstY: 543,
+  frameFirstX: 0,
   frameWidth: 45,
   frameHeight: 46,
-  offsetX: 0,
-  offsetY: 543,
+  frameCount: 16,
   scaleX: 2,
   scaleY: 2,
   insertionX: 24,
@@ -46,14 +45,13 @@ export const sprPlayerIdleR = new GameSprite({
   stepsPerFrame: 8,
   ...boundingBoxR,
 })
-export const sprPlayerIdleL = new GameSprite({
-  image: imgPlayerL,
-  rtl: true,
-  frameCount: 16,
+export const sprPlayerIdleL = new GameSprite(imgPlayerL, {
+  frameFirstY: 543,
+  frameFirstX: 1106,
   frameWidth: 45,
   frameHeight: 46,
-  offsetX: 1106,
-  offsetY: 543,
+  frameCount: 16,
+  rtl: true,
   scaleX: 2,
   scaleY: 2,
   insertionX: 24,
@@ -61,13 +59,12 @@ export const sprPlayerIdleL = new GameSprite({
   stepsPerFrame: 8,
   ...boundingBoxL,
 })
-export const sprPlayerWalkR = new GameSprite({
-  image: imgPlayerR,
+export const sprPlayerWalkR = new GameSprite(imgPlayerR, {
   frameCount: 6,
   frameWidth: 48,
   frameHeight: 46,
-  offsetX: 55,
-  offsetY: 12,
+  frameFirstX: 55,
+  frameFirstY: 12,
   scaleX: 2,
   scaleY: 2,
   insertionX: 24,
@@ -75,14 +72,13 @@ export const sprPlayerWalkR = new GameSprite({
   stepsPerFrame: 2,
   ...boundingBoxR,
 })
-export const sprPlayerWalkL = new GameSprite({
-  image: imgPlayerL,
-  rtl: true,
+export const sprPlayerWalkL = new GameSprite(imgPlayerL, {
   frameCount: 6,
   frameWidth: 48,
   frameHeight: 46,
-  offsetX: 1051,
-  offsetY: 12,
+  frameFirstX: 1051,
+  frameFirstY: 12,
+  rtl: true,
   scaleX: 2,
   scaleY: 2,
   insertionX: 24,
@@ -144,9 +140,6 @@ class Player extends GameObject {
         },
       },
     })
-
-    this.x = 100
-    this.y = 573
   }
 
   step() {

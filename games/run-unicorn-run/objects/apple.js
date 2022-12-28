@@ -11,8 +11,8 @@ import * as math from '../../../core/math.js'
 // ----------------------------------------
 // Player
 // ----------------------------------------
-const sprApple = new GameSprite({
-  image: new GameImage(`../run-unicorn-run/images/apple.png`),
+const imgApple = new GameImage(`../run-unicorn-run/images/apple.png`)
+const sprApple = new GameSprite(imgApple, {
   scaleX: 2,
   scaleY: 2,
   frameCount: 1,

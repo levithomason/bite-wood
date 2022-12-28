@@ -10,18 +10,18 @@ import {
 // ----------------------------------------
 const width = 100
 const height = 78
-const groundThickness = 50
+const groundThickness = 28
 
-const sprPlatform = new GameSprite({
-  image: new GameImage(`../run-unicorn-run/images/background.png`),
-  frameCount: 1,
+const imgPlatform = new GameImage(`../run-unicorn-run/images/background.png`)
+const sprPlatform = new GameSprite(imgPlatform, {
+  frameFirstY: 522,
+  frameFirstX: 90,
   frameWidth: width,
   frameHeight: height,
-  offsetX: 90,
-  offsetY: 600 - height,
-  boundingBoxTop: groundThickness,
-  boundingBoxHeight: height - groundThickness,
-  insertionY: groundThickness,
+  frameCount: 1,
+  boundingBoxTop: height - groundThickness,
+  boundingBoxHeight: groundThickness,
+  insertionY: height - groundThickness,
 })
 
 class Platform extends GameObject {
@@ -30,27 +30,8 @@ class Platform extends GameObject {
   constructor() {
     super({
       sprite: sprPlatform,
-      maxSpeed: 0,
-      acceleration: 0,
       solid: true,
     })
-  }
-
-  draw(drawing) {
-    super.draw(drawing)
-
-    if (gameState.debug) {
-      drawing
-        .setLineWidth(4)
-        .setFillColor('transparent')
-        .setStrokeColor('magenta')
-        .rectangle(
-          this.x,
-          this.y,
-          this.sprite.boundingBoxWidth,
-          this.sprite.boundingBoxHeight,
-        )
-    }
   }
 }
 

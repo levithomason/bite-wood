@@ -94,18 +94,18 @@ class GameMouse {
   active = {}
 
   /**
-   * @type {object} active - Object where keys are left|right|middle and values are boolean.
-   * @property {boolean} active.left - True when the left mouse button is down, fires once.
-   * @property {boolean} active.right - True when the right mouse button is down, fires once.
-   * @property {boolean} active.middle - True when the middle mouse button is down, fires once.
+   * @type {object} down - Object where keys are left|right|middle and values are boolean.
+   * @property {boolean} down.left - True when the left mouse button is down, fires once.
+   * @property {boolean} down.right - True when the right mouse button is down, fires once.
+   * @property {boolean} down.middle - True when the middle mouse button is down, fires once.
    */
   down = {}
 
   /**
-   * @type {object} active - Object where keys are left|right|middle and values are boolean.
-   * @property {boolean} active.left - True when the left mouse button is up, fires once.
-   * @property {boolean} active.right - True when the right mouse button is up, fires once.
-   * @property {boolean} active.middle - True when the middle mouse button is up, fires once.
+   * @type {object} up - Object where keys are left|right|middle and values are boolean.
+   * @property {boolean} up.left - True when the left mouse button is up, fires once.
+   * @property {boolean} up.right - True when the right mouse button is up, fires once.
+   * @property {boolean} up.middle - True when the middle mouse button is up, fires once.
    */
   up = {}
 }

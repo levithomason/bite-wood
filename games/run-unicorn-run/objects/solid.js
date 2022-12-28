@@ -12,8 +12,8 @@ import {
 // ----------------------------------------
 const width = 60
 const height = 60
+const imgSolid = new GameImage()
 const spriteConfig = {
-  image: new GameImage(),
   frameCount: 1,
   frameWidth: width,
   frameHeight: height,
@@ -21,9 +21,23 @@ const spriteConfig = {
   insertionY: height / 2,
 }
 
-const sprSolid = new GameSprite(spriteConfig)
+const sprSolid = new GameSprite(imgSolid, spriteConfig)
+const sprSolidColliding = new GameSprite(imgSolid, spriteConfig)
 
-const sprSolidColliding = new GameSprite(spriteConfig)
+/**
+ * TODO
+ *   1) [X] Move sprite collision (and insertion?) config to GameObjec
+ *      Why? Allows game objects to exist without sprites
+ *      They should be allowed to have collisions without sprites.
+ *   2) [ ] Test collision.js methods with new GameObject shape.
+ *   3) [ ] Create GameObjectState for FSM management of object states
+ *        - Add IDLE_LEFT, IDLE_RIGHT, etc to Player
+ *        - Listen to correct keys on each state
+ *        - Update sprite config on each state
+ *          *this is also why sprite config can move to GameObject,
+ *          states can manage changing sprite info.
+ *        - It's possible that GameSprite merges entirely into GameObject.
+ */
 
 class Solid extends GameObject {
   static name = 'objSolid'
@@ -31,8 +45,6 @@ class Solid extends GameObject {
   constructor() {
     super({
       sprite: sprSolid,
-      maxSpeed: 0,
-      acceleration: 0,
     })
 
     this.x = 300

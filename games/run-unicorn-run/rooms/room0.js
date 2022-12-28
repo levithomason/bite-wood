@@ -39,6 +39,6 @@ export default class Room0 extends GameRoom {
     this.instanceCreate(Solid)
     this.instanceCreate(RainbowDash)
 
-    this.instanceCreate(Player, 100, 573)
+    this.instanceCreate(Player, 200, 600)
   }
 }

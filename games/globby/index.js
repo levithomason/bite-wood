@@ -8,6 +8,7 @@ import {
   GameSprite,
   GameDrawing,
   GameImage,
+  gameState,
 } from '../../core/index.js'
 import {
   clamp,
@@ -73,6 +74,10 @@ class Bullet extends GameObject {
 class Globby extends GameObject {
   constructor() {
     super({
+      boundingBoxTop: -14,
+      boundingBoxLeft: -14,
+      boundingBoxWidth: -14 * 2,
+      boundingBoxHeight: -14 * 2,
       events: {
         keyDown: {
           ' ': () => {
@@ -258,5 +263,6 @@ class Fuego extends GameObject {
 }
 room.instanceCreate(Fuego, room.width - 100, 100)
 
+gameState.debug = true
 const game = new Game()
 game.start()

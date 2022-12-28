@@ -1,0 +1,3 @@
+describe('game-object', () => {
+  it('', () => {})
+})
