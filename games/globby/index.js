@@ -23,7 +23,7 @@ import {
 import { loadState } from '../../editors/sprite-editor/storage-manager.js'
 
 class Room extends GameRoom {
-  backgroundColor = '#223'
+  backgroundColor = '#a5de93'
 }
 
 const room = new Room(800, 600)

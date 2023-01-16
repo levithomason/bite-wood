@@ -3,6 +3,7 @@ import { gameRooms } from './game-rooms.js'
 import { gameMouse } from './game-mouse-controller.js'
 import { gameState } from './game-state-controller.js'
 import { scale } from './math.js'
+import { gameKeyboard } from './game-keyboard-controller.js'
 
 // Tracks whether the game loop is running
 let _isRunning = false
@@ -95,6 +96,23 @@ export class Game {
       _lastTickTimestamp = timestamp
       this.step()
       this.draw()
+
+      // handle play/pause/debug global keybindings
+      if (gameKeyboard.down.p) {
+        if (gameState.isPlaying) {
+          gameState.pause()
+        } else {
+          gameState.play()
+        }
+      } else if (gameKeyboard.down['`']) {
+        gameState.debug = !gameState.debug
+      }
+
+      // Key up/down and mouse up/down should only fire once per tick, clear their values
+      gameKeyboard.down = {}
+      gameKeyboard.up = {}
+      gameMouse.down = {}
+      gameMouse.up = {}
     }
 
     _raf = requestAnimationFrame(this.tick)

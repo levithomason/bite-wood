@@ -12,6 +12,42 @@ export const MOUSE_BUTTONS = {
  * Gives the current state of the mouse.
  */
 class GameMouse {
+  constructor() {
+    document.addEventListener('mousemove', this.#handleMouseMove)
+    document.addEventListener('mousedown', this.#handleMouseDown)
+    document.addEventListener('mouseup', this.#handleMouseUp)
+  }
+
+  /** @type {number} x - x position of the mouse on the canvas */
+  x = 0
+
+  /** @type {number} y - y position of the mouse on the canvas */
+  y = 0
+
+  /**
+   * @type {object} active - Object where keys are left|right|middle and values are boolean.
+   * @property {boolean} active.left - True when the left mouse button is pressed.
+   * @property {boolean} active.right - True when the right mouse button is pressed.
+   * @property {boolean} active.middle - True when the middle mouse button is pressed.
+   */
+  active = {}
+
+  /**
+   * @type {object} down - Object where keys are left|right|middle and values are boolean.
+   * @property {boolean} down.left - True when the left mouse button is down, fires once.
+   * @property {boolean} down.right - True when the right mouse button is down, fires once.
+   * @property {boolean} down.middle - True when the middle mouse button is down, fires once.
+   */
+  down = {}
+
+  /**
+   * @type {object} up - Object where keys are left|right|middle and values are boolean.
+   * @property {boolean} up.left - True when the left mouse button is up, fires once.
+   * @property {boolean} up.right - True when the right mouse button is up, fires once.
+   * @property {boolean} up.middle - True when the middle mouse button is up, fires once.
+   */
+  up = {}
+
   /** @param {MouseEvent} e */
   #setMousePosition = (e) => {
     // TODO: this doesn't let the mouse work outside of the canvas
@@ -72,42 +108,6 @@ class GameMouse {
     delete this.active[button]
     delete this.down[button]
   }
-
-  constructor() {
-    document.addEventListener('mousemove', this.#handleMouseMove)
-    document.addEventListener('mousedown', this.#handleMouseDown)
-    document.addEventListener('mouseup', this.#handleMouseUp)
-  }
-
-  /** @type {number} x - x position of the mouse on the canvas */
-  x = 0
-
-  /** @type {number} y - y position of the mouse on the canvas */
-  y = 0
-
-  /**
-   * @type {object} active - Object where keys are left|right|middle and values are boolean.
-   * @property {boolean} active.left - True when the left mouse button is pressed.
-   * @property {boolean} active.right - True when the right mouse button is pressed.
-   * @property {boolean} active.middle - True when the middle mouse button is pressed.
-   */
-  active = {}
-
-  /**
-   * @type {object} down - Object where keys are left|right|middle and values are boolean.
-   * @property {boolean} down.left - True when the left mouse button is down, fires once.
-   * @property {boolean} down.right - True when the right mouse button is down, fires once.
-   * @property {boolean} down.middle - True when the middle mouse button is down, fires once.
-   */
-  down = {}
-
-  /**
-   * @type {object} up - Object where keys are left|right|middle and values are boolean.
-   * @property {boolean} up.left - True when the left mouse button is up, fires once.
-   * @property {boolean} up.right - True when the right mouse button is up, fires once.
-   * @property {boolean} up.middle - True when the middle mouse button is up, fires once.
-   */
-  up = {}
 }
 
 export const gameMouse = new GameMouse()

@@ -101,8 +101,8 @@ export class GameRoom {
   }
 
   /**
-   * @param {number} [x=room.width/2]
-   * @param {number} [y=room.width/2]
+   * @param {number} [x=room.randomXPosition()]
+   * @param {number} [y=room.randomYPosition()]
    * @param {typeof GameObject} GameObject
    */
   instanceCreate(

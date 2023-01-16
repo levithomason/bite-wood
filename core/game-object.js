@@ -287,56 +287,42 @@ export class GameObject {
     // keyDown
     if (this.events.keyDown) {
       Object.keys(gameKeyboard.down).forEach((key) => {
-        this.events.keyDown?.[key]?.(this)
-        // keydown should only register for one step
-        // TODO: buggy response to keydown, need queues, see TODO.md
-        delete gameKeyboard.down[key]
+        this.events.keyDown[key]?.(this)
       })
     }
 
     // keyActive
     if (this.events.keyActive) {
       Object.keys(gameKeyboard.active).forEach((key) => {
-        this.events.keyActive?.[key]?.(this)
+        this.events.keyActive[key]?.(this)
       })
     }
 
     // keyUp
     if (this.events.keyUp) {
       Object.keys(gameKeyboard.up).forEach((key) => {
-        this.events.keyUp?.[key]?.(this)
-
-        // keyup events should only fire for one step
-        delete gameKeyboard.up[key]
+        this.events.keyUp[key]?.(this)
       })
     }
 
     // mouseDown
     if (this.events.mouseDown) {
-      Object.keys(gameMouse.down)
-        .filter((button) => gameMouse.down[button] !== null)
-        .forEach((key) => {
-          this.events.mouseDown?.[key]?.(this)
-          // keydown should only register for one step
-          // remember which we've handled so we don't handle them again
-          gameMouse.down[key] = null
-        })
+      Object.keys(gameMouse.down).forEach((key) => {
+        this.events.mouseDown[key]?.(this)
+      })
     }
 
     // mouseActive
     if (this.events.mouseActive) {
       Object.keys(gameMouse.active).forEach((button) => {
-        this.events.mouseActive?.[button]?.(this)
+        this.events.mouseActive[button]?.(this)
       })
     }
 
     // mouseUp
     if (this.events.mouseUp) {
       Object.keys(gameMouse.up).forEach((button) => {
-        this.events.mouseUp?.[button]?.(this)
-
-        // keyup events should only fire for one step
-        delete gameMouse.up[button]
+        this.events.mouseUp[button]?.(this)
       })
     }
 
