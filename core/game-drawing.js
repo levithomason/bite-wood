@@ -1,4 +1,6 @@
 import * as collision from './collision.js'
+import { gameMouse } from './game-mouse-controller.js'
+import { gameDrawing } from './game-drawing-controller.js'
 
 /** Provides a canvas and helpful methods for drawing on it. */
 export class GameDrawing {
@@ -480,7 +482,7 @@ export class GameDrawing {
     // vector
     if (speed) {
       this.setStrokeColor('#0D0')
-      this.line(x, y, x + hspeed * 10, y + vspeed * 10, 4)
+      this.arrow(x, y, x + hspeed * 10, y + vspeed * 10, 4)
     }
 
     // text values
@@ -567,5 +569,53 @@ export class GameDrawing {
     this.loadSettings()
 
     return this
+  }
+
+  /**
+   * Draws a debug view of a mouse position.
+   * @param {number} gameWidth
+   * @param {number} gameHeight
+   */
+  mouseDebug(gameWidth, gameHeight) {
+    const height = 16
+    const offsetTop = 24
+    const offsetBottom = 20
+
+    const padX = 40
+    const padY = height + offsetBottom
+
+    const x =
+      gameMouse.x +
+      (gameMouse.x < 30 ? 30 : gameMouse.x > gameWidth - padX ? -padX : 0)
+    const y =
+      gameMouse.y +
+      (gameMouse.y < gameHeight - padY ? offsetTop : -offsetBottom)
+    const text = `(${gameMouse.x}, ${gameMouse.y})`
+
+    this.saveSettings()
+
+    this.setFontSize(10)
+    this.setFontFamily('monospace')
+    this.setTextAlign('center')
+    this.setTextBaseline('top')
+
+    // text background
+    const textWidth = this.#ctx.measureText(text).width
+    const textPadX = 4
+    this.setStrokeColor('transparent')
+    this.setFillColor('rgba(0, 0, 0, 0.5)')
+    this.rectangle(
+      x - textWidth / 2 - textPadX,
+      y - 3,
+      textWidth + textPadX * 2,
+      height,
+    )
+
+    // text
+    this.setLineWidth(1)
+    this.setFillColor('#FFFFFF')
+    this.text(text, x, y)
+
+    this.loadSettings()
   }
 }

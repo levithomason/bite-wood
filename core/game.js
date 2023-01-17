@@ -159,27 +159,7 @@ export class Game {
 
     // debug: mouse position
     if (gameState.debug) {
-      const x =
-        gameMouse.x +
-        (gameMouse.x < 30 ? 30 : gameMouse.x > this.width - 36 ? -36 : 0)
-      const y = gameMouse.y + (gameMouse.y < this.height - 28 ? 18 : -14)
-      const text = `(${gameMouse.x}, ${gameMouse.y})`
-
-      gameDrawing.saveSettings()
-
-      gameDrawing.setFontSize(10)
-      gameDrawing.setFontFamily('monospace')
-      gameDrawing.setTextAlign('center')
-      gameDrawing.setTextBaseline('top')
-
-      gameDrawing.setLineWidth(2)
-      gameDrawing.setStrokeColor('white')
-      gameDrawing.strokeText(text, x, y)
-
-      gameDrawing.setFillColor('black')
-      gameDrawing.text(text, x, y)
-
-      gameDrawing.loadSettings()
+      gameDrawing.mouseDebug(this.width, this.height)
     }
 
     // paused - overlay
