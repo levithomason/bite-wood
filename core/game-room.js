@@ -1,3 +1,5 @@
+import { random } from './math.js'
+
 export class GameRoom {
   static instances = []
 
@@ -45,33 +47,33 @@ export class GameRoom {
   }
 
   /**
-   * @param {number} paddingLeft - Percentage (0 - 1) or number of pixels.
-   * @param {number} paddingRight - Percentage (0 - 1) or number of pixels.
+   * @param {number} [paddingLeft=0] - Percentage (0 - 1) or number of pixels.
+   * @param {number} [paddingRight=0] - Percentage (0 - 1) or number of pixels.
    * @returns {number}
    */
   randomXPosition(paddingLeft = 0, paddingRight = 0) {
-    const pxLeft = paddingLeft < 1 ? this.width * paddingLeft : paddingLeft
-    const pxRight = paddingRight < 1 ? this.width * paddingRight : paddingRight
+    const pxLeft = paddingLeft * (paddingLeft < 1 ? this.width : 1)
+    const pxRight = paddingRight * (paddingRight < 1 ? this.width : 1)
 
     const horizontalRange = this.width - pxLeft - pxRight
 
     // TODO: avoid solid objects
-    return pxLeft + horizontalRange * Math.random()
+    return pxLeft + random(horizontalRange)
   }
 
   /**
-   * @param {number} paddingTop - Percentage (0 - 1) or number of pixels.
-   * @param {number} paddingBottom - Percentage (0 - 1) or number of pixels.
+   * @param {number} [paddingTop=0] - Percentage (0 - 1) or number of pixels.
+   * @param {number} [paddingBottom=0] - Percentage (0 - 1) or number of pixels.
    * @returns {number}
    */
   randomYPosition(paddingTop = 0, paddingBottom = 0) {
-    const pxTop = paddingTop * paddingTop < 1 ? this.height : 1
-    const pxBottom = paddingBottom * paddingBottom < 1 ? this.height : 1
+    const pxTop = paddingTop * (paddingTop < 1 ? this.height : 1)
+    const pxBottom = paddingBottom * (paddingBottom < 1 ? this.height : 1)
 
     const verticalRange = this.height - pxTop - pxBottom
 
     // TODO: avoid solid objects
-    return pxTop + verticalRange * Math.random()
+    return pxTop + random(verticalRange)
   }
 
   /**

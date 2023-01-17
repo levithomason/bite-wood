@@ -462,9 +462,9 @@ export class GameDrawing {
 
     // bounding box
     if (collision.objects(object, 'any')) {
-      this.setStrokeColor('#F00')
+      this.setStrokeColor('#F80')
     } else {
-      this.setStrokeColor('#F0F')
+      this.setStrokeColor('#08F')
     }
     this.rectangle(
       boundingBoxLeft,
@@ -475,12 +475,12 @@ export class GameDrawing {
 
     // insertion point
     this.setStrokeColor('#F00')
-    this.cross(x, y, 8, 8)
+    this.cross(x, y, 6, 6)
 
     // vector
     if (speed) {
-      this.setStrokeColor('#0F0')
-      this.arrow(x, y, x + hspeed * 10, y + vspeed * 10)
+      this.setStrokeColor('#0D0')
+      this.line(x, y, x + hspeed * 10, y + vspeed * 10, 4)
     }
 
     // text values
