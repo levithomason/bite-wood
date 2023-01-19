@@ -433,6 +433,7 @@ export class GameDrawing {
     const {
       name,
       sprite,
+      state,
       x,
       y,
       hspeed,
@@ -493,6 +494,7 @@ export class GameDrawing {
     const fixed = (n) => n.toFixed(2)
     const lines = [
       `${name}`,
+      `state     ${state.name}`,
       `x         ${fixed(x)}`,
       `y         ${fixed(y)}`,
       `direction ${fixed(direction)}`,

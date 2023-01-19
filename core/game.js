@@ -2,7 +2,6 @@ import { gameDrawing } from './game-drawing-controller.js'
 import { gameRooms } from './game-rooms.js'
 import { gameMouse } from './game-mouse-controller.js'
 import { gameState } from './game-state-controller.js'
-import { scale } from './math.js'
 import { gameKeyboard } from './game-keyboard-controller.js'
 
 // Tracks whether the game loop is running
