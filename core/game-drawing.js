@@ -356,6 +356,7 @@ export class GameDrawing {
    * @return {GameDrawing}
    */
   sprite(sprite, x, y) {
+    this.#ctx.imageSmoothingEnabled = false
     this.#ctx.drawImage(
       sprite.image.element,
       sprite.currentFrameX,
