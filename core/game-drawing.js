@@ -1,6 +1,5 @@
 import * as collision from './collision.js'
 import { gameMouse } from './game-mouse-controller.js'
-import { gameDrawing } from './game-drawing-controller.js'
 
 /** Provides a canvas and helpful methods for drawing on it. */
 export class GameDrawing {
@@ -348,26 +347,18 @@ export class GameDrawing {
   }
 
   /**
-   * Draws a sprite on top of the canvas at x, y. The current frame of the
-   * sprite is drawn at the current scale of the sprite.
-   * @param {GameSprite} sprite
-   * @param {number} x
-   * @param {number} y
+   * Draws a polygon using an array of x, y coordinates as vertices.
+   * @param {[number, number][]} vertices - A 2d array of vertices: [[x1, y1], [x2, y2], ...]
    * @return {GameDrawing}
    */
-  sprite(sprite, x, y) {
-    this.#ctx.imageSmoothingEnabled = false
-    this.#ctx.drawImage(
-      sprite.image.element,
-      sprite.currentFrameX,
-      sprite.currentFrameY,
-      sprite.frameWidth,
-      sprite.frameHeight,
-      x - sprite.insertionX,
-      y - sprite.insertionY,
-      sprite.width,
-      sprite.height,
-    )
+  polygon(vertices) {
+    const [start, ...rest] = vertices
+
+    this.#ctx.beginPath()
+    this.#ctx.moveTo(start[0], start[1])
+    rest.forEach(([x, y]) => this.#ctx.lineTo(x, y))
+    this.#ctx.fill()
+    this.#ctx.stroke()
 
     return this
   }
@@ -396,18 +387,32 @@ export class GameDrawing {
   }
 
   /**
-   * Draws a polygon using an array of x, y coordinates as vertices.
-   * @param {[number, number][]} vertices - A 2d array of vertices: [[x1, y1], [x2, y2], ...]
+   * Draws a sprite on top of the canvas at x, y. The current frame of the
+   * sprite is drawn at the current scale of the sprite.
+   * @param {GameSprite} sprite
+   * @param {number} x
+   * @param {number} y
    * @return {GameDrawing}
    */
-  polygon(vertices) {
-    const [start, ...rest] = vertices
+  sprite(sprite, x, y) {
+    this.#ctx.imageSmoothingEnabled = false
+    this.#ctx.drawImage(
+      sprite.image.element,
+      sprite.currentFrameX,
+      sprite.currentFrameY,
+      sprite.frameWidth,
+      sprite.frameHeight,
+      x - sprite.insertionX,
+      y - sprite.insertionY,
+      sprite.width,
+      sprite.height,
+    )
 
-    this.#ctx.beginPath()
-    this.#ctx.moveTo(start[0], start[1])
-    rest.forEach(([x, y]) => this.#ctx.lineTo(x, y))
-    this.#ctx.fill()
-    this.#ctx.stroke()
+    return this
+  }
+
+  strokeText(text, x, y) {
+    this.#ctx.strokeText(text, x, y)
 
     return this
   }
@@ -418,8 +423,92 @@ export class GameDrawing {
     return this
   }
 
-  strokeText(text, x, y) {
-    this.#ctx.strokeText(text, x, y)
+  //
+  // Debug
+  //
+
+  fpsDebug(gameWidth, fps) {
+    this.saveSettings()
+    this.setStrokeColor('transparent')
+
+    const top = 0
+    const text = Math.round(fps) + ' FPS'
+    const textPaddingX = 8
+    const textPaddingY = 4
+    const textMargin = 8
+    const textHeight = 12
+    this.setFontFamily('monospace')
+    this.setFontSize(textHeight)
+    this.setTextAlign('center')
+    this.setTextBaseline('middle')
+    const textWidth = this.measureText(text)
+
+    this.setFillColor('rgba(0, 0, 0, 0.25)')
+    this.rectangle(
+      gameWidth - textMargin - textPaddingX * 2 - textWidth,
+      top + textMargin,
+      textWidth + textPaddingX * 2,
+      textHeight + textPaddingY * 2,
+    )
+
+    this.setFillColor('rgba(255, 255, 255, 0.75)')
+    this.text(
+      text,
+      gameWidth - textMargin - textPaddingX - textWidth / 2,
+      textMargin + textPaddingY + textHeight / 2,
+    )
+
+    this.loadSettings()
+
+    return this
+  }
+
+  /**
+   * Draws a debug view of a mouse position.
+   * @param {number} gameWidth
+   * @param {number} gameHeight
+   */
+  mouseDebug(gameWidth, gameHeight) {
+    const height = 16
+    const offsetTop = 24
+    const offsetBottom = 20
+
+    const padX = 40
+    const padY = height + offsetBottom
+
+    const x =
+      gameMouse.x +
+      (gameMouse.x < 30 ? 30 : gameMouse.x > gameWidth - padX ? -padX : 0)
+    const y =
+      gameMouse.y +
+      (gameMouse.y < gameHeight - padY ? offsetTop : -offsetBottom)
+    const text = `(${gameMouse.x}, ${gameMouse.y})`
+
+    this.saveSettings()
+
+    this.setFontSize(10)
+    this.setFontFamily('monospace')
+    this.setTextAlign('center')
+    this.setTextBaseline('top')
+
+    // text background
+    const textWidth = this.#ctx.measureText(text).width
+    const textPadX = 4
+    this.setStrokeColor('transparent')
+    this.setFillColor('rgba(0, 0, 0, 0.25)')
+    this.rectangle(
+      x - textWidth / 2 - textPadX,
+      y - 3,
+      textWidth + textPadX * 2,
+      height,
+    )
+
+    // text
+    this.setLineWidth(1)
+    this.setFillColor('rgba(255, 255, 255, 0.75)')
+    this.text(text, x, y)
+
+    this.loadSettings()
 
     return this
   }
@@ -494,7 +583,8 @@ export class GameDrawing {
     const fixed = (n) => n.toFixed(2)
     const lines = [
       `${name}`,
-      `state     ${state.name}`,
+      // TODO: make state a required abstraction of game objects
+      `state     ${state?.name}`,
       `x         ${fixed(x)}`,
       `y         ${fixed(y)}`,
       `direction ${fixed(direction)}`,
@@ -574,51 +664,16 @@ export class GameDrawing {
     return this
   }
 
+  //
+  // Utilities
+  //
+
   /**
-   * Draws a debug view of a mouse position.
-   * @param {number} gameWidth
-   * @param {number} gameHeight
+   * Returns the width of a string on the canvas.
+   * @param {string} text
+   * @return {number}
    */
-  mouseDebug(gameWidth, gameHeight) {
-    const height = 16
-    const offsetTop = 24
-    const offsetBottom = 20
-
-    const padX = 40
-    const padY = height + offsetBottom
-
-    const x =
-      gameMouse.x +
-      (gameMouse.x < 30 ? 30 : gameMouse.x > gameWidth - padX ? -padX : 0)
-    const y =
-      gameMouse.y +
-      (gameMouse.y < gameHeight - padY ? offsetTop : -offsetBottom)
-    const text = `(${gameMouse.x}, ${gameMouse.y})`
-
-    this.saveSettings()
-
-    this.setFontSize(10)
-    this.setFontFamily('monospace')
-    this.setTextAlign('center')
-    this.setTextBaseline('top')
-
-    // text background
-    const textWidth = this.#ctx.measureText(text).width
-    const textPadX = 4
-    this.setStrokeColor('transparent')
-    this.setFillColor('rgba(0, 0, 0, 0.5)')
-    this.rectangle(
-      x - textWidth / 2 - textPadX,
-      y - 3,
-      textWidth + textPadX * 2,
-      height,
-    )
-
-    // text
-    this.setLineWidth(1)
-    this.setFillColor('#FFFFFF')
-    this.text(text, x, y)
-
-    this.loadSettings()
+  measureText(text) {
+    return this.#ctx.measureText(text).width
   }
 }

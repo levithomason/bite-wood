@@ -3,6 +3,7 @@ import { gameRooms } from './game-rooms.js'
 import { gameMouse } from './game-mouse-controller.js'
 import { gameState } from './game-state-controller.js'
 import { gameKeyboard } from './game-keyboard-controller.js'
+import { avg } from './math.js'
 
 // Tracks whether the game loop is running
 let _isRunning = false
@@ -17,6 +18,13 @@ let _raf = null
  * Runs the game loop. Calls the step() and draw() methods on all objects.
  */
 export class Game {
+  /**
+   * A list of the last 100 FPS values.
+   * @private
+   * @type {number[]}
+   */
+  #fps = []
+
   /**
    * @param {HTMLElement} [parentElement=document.body] - A DOM element where the canvas should be placed.
    * @param {number} [width=800] - The width of the game in pixels.
@@ -96,6 +104,13 @@ export class Game {
       this.step()
       this.draw()
 
+      // track FPS
+      if (gameState.debug) {
+        const fps = 1000 / timeSinceTick
+        this.#fps.unshift(fps)
+        this.#fps.splice(120) // 2 seconds worth of frames
+      }
+
       // handle play/pause/debug global keybindings
       if (gameKeyboard.down.p) {
         if (gameState.isPlaying) {
@@ -107,6 +122,8 @@ export class Game {
         gameState.debug = !gameState.debug
       }
 
+      // TODO: seems the keyboard should have a tick as well
+      //       the game loop shouldn't know what gameKeyboard needs to do
       // Key up/down and mouse up/down should only fire once per tick, clear their values
       gameKeyboard.down = {}
       gameKeyboard.up = {}
@@ -156,9 +173,10 @@ export class Game {
       })
     }
 
-    // debug: mouse position
+    // debug drawings
     if (gameState.debug) {
       gameDrawing.mouseDebug(this.width, this.height)
+      gameDrawing.fpsDebug(this.width, avg(this.#fps))
     }
 
     // paused - overlay

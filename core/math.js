@@ -11,6 +11,20 @@ export const direction = (x1, y1, x2 = 0, y2 = 0) => {
 }
 
 /**
+ * Returns the sum of an array of values.
+ * @param {number[]} values - An array of numbers
+ * @return {number}
+ */
+export const sum = (values) => values.reduce((a, b) => a + b, 0)
+
+/**
+ * Returns the average of an array of values.
+ * @param {number[]} values - An array of numbers
+ * @return {number}
+ */
+export const avg = (values) => sum(values) / values.length
+
+/**
  * Returns `min` when `val` is less than `min` and `max` when `val` is greater than `max.
  * @param val
  * @param min
