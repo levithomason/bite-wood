@@ -82,18 +82,22 @@ export const objects = (self, other = 'any', cb) => {
     if (self === object) return false
 
     const isColliding =
-      (onTop(self, object) || onBottom(self, object)) &&
-      (onLeft(self, object) || onRight(self, object))
+      self.boundingBoxRight >= object.boundingBoxLeft &&
+      self.boundingBoxLeft <= object.boundingBoxRight &&
+      self.boundingBoxBottom >= object.boundingBoxTop &&
+      self.boundingBoxTop <= object.boundingBoxBottom
 
-    // Defer to custom logic
-    if (isColliding && typeof cb === 'function') {
+    if (!isColliding) return false
+
+    // Defer to custom collision detection logic
+    if (typeof cb === 'function') {
       return cb(self, object)
     }
 
-    // Default logic
-    if (withSolid && !object.solid) return false
-    if (!withAny && name !== object.name) return false
+    // Fallback to default collision detection logic
+    if (withAny) return true
+    if (withSolid) return !!object.solid
 
-    return isColliding
+    return name === object.name
   })
 }

@@ -1,23 +1,36 @@
 import { Game } from '../../core/game.js'
 import { GameObject, GameRoom, gameRooms, gameState } from '../../core/index.js'
 import { random } from '../../core/math.js'
+import * as collision from '../../core/collision.js'
 
-const OBJECT_SIZE = 32
+let OBJECT_SIZE_MIN = 10
+let OBJECT_SIZE_MAX = 80
+let OBJECT_COUNT = 20
 
 class Object extends GameObject {
   constructor() {
-    super({
-      // TODO: It is confusing that the config for bounding box is relative to the x,y position
-      //       but the this.boundingBox* properties are abs positions in the room.
-      //       Consider using the word "offset" in the config or something to differentiate the two.
-      boundingBoxTop: -OBJECT_SIZE / 2,
-      boundingBoxLeft: -OBJECT_SIZE / 2,
-      boundingBoxWidth: OBJECT_SIZE,
-      boundingBoxHeight: OBJECT_SIZE,
-    })
+    super(
+      (() => {
+        let w = random(OBJECT_SIZE_MAX, OBJECT_SIZE_MIN)
+        let h = random(OBJECT_SIZE_MAX, OBJECT_SIZE_MIN)
 
-    this.speed = 1
-    this.direction = random(360)
+        return {
+          speed: random(0.25, 1),
+          direction: random(360),
+
+          // TODO: It is confusing that the config for bounding box is relative to the x,y position
+          //       but the this.boundingBox* properties are abs positions in the room.
+          //       Consider using the word "offset" in the config or something to differentiate the two.
+          //       -
+          //       We should also consider creating a Box class with these properties and collision helpers
+          //
+          boundingBoxTop: -h / 2,
+          boundingBoxLeft: -w / 2,
+          boundingBoxWidth: w,
+          boundingBoxHeight: h,
+        }
+      })(),
+    )
   }
 
   step() {
@@ -33,6 +46,19 @@ class Object extends GameObject {
     } else if (this.boundingBoxBottom >= room.height) {
       this.vspeed = -Math.abs(this.vspeed)
     }
+
+    // TODO bounce objects off each other
+    // collision.objects(this, 'any', (other /** @type GameObject */) => {
+    //   // bounce
+    //   if (collision.onTop(this, other) || collision.onBottom(this, other)) {
+    //     this.vspeed = -this.vspeed
+    //   } else if (
+    //     collision.onLeft(this, other) ||
+    //     collision.onRight(this, other)
+    //   ) {
+    //     this.hspeed = -this.hspeed
+    //   }
+    // })
   }
 
   draw(drawing) {
@@ -48,11 +74,11 @@ class Room extends GameRoom {
 }
 
 const room = new Room()
-for (let i = 0; i < 20; i += 1) {
+for (let i = 0; i < OBJECT_COUNT; i += 1) {
   room.instanceCreate(
     Object,
-    room.randomXPosition(OBJECT_SIZE, OBJECT_SIZE),
-    room.randomYPosition(OBJECT_SIZE, OBJECT_SIZE),
+    room.randomXPosition(OBJECT_SIZE_MAX, OBJECT_SIZE_MAX),
+    room.randomYPosition(OBJECT_SIZE_MAX, OBJECT_SIZE_MAX),
   )
 }
 
