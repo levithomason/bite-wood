@@ -544,7 +544,7 @@ export class GameDrawing {
 
     // sprite frame
     if (object.sprite) {
-      this.setStrokeColor('#555')
+      this.setStrokeColor('rgba(0, 0, 0, 0.2)')
       this.rectangle(
         object.spriteLeft,
         object.spriteTop,
@@ -595,10 +595,8 @@ export class GameDrawing {
     lines.reverse().forEach((line, i) => {
       const x = object.spriteLeft
       const y = object.spriteTop - (i + 1) * 14
-      this.setFillColor('#fff')
-      this.text(line, x, y)
       this.setFillColor('#000')
-      this.text(line, x - 1, y - 1)
+      this.text(line, x, y)
     })
     this.loadSettings()
 

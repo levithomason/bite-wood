@@ -197,7 +197,13 @@ export class GameSprite {
     return this.#boundingBoxTop * this.scaleY
   }
   get boundingBoxLeft() {
-    return this.#boundingBoxLeft * this.scaleX
+    const left = this.#boundingBoxLeft * this.scaleX
+
+    if (this.rtl) {
+      return this.width - left - this.#boundingBoxWidth * this.scaleX
+    }
+
+    return left
   }
   get boundingBoxRight() {
     return this.boundingBoxLeft + this.#boundingBoxWidth * this.scaleX

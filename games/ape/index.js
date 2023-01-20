@@ -7,6 +7,7 @@ import {
   GameRoom,
   gameRooms,
   GameSprite,
+  gameState,
 } from '../../core/index.js'
 
 const imgApe = new GameImage('./sprites/ape.png')
@@ -16,7 +17,7 @@ const spriteConfigBase /** @type GameSpriteConfig */ = {
   frameWidth: 16,
   frameHeight: 16,
   insertionX: 8,
-  insertionY: 16,
+  insertionY: 15,
   scaleX: 4,
   scaleY: 4,
 }
@@ -25,8 +26,8 @@ const spriteConfigStand = {
   frameCount: 2,
   boundingBoxTop: 3,
   boundingBoxLeft: 2,
-  boundingBoxHeight: 11,
-  boundingBoxWidth: 12,
+  boundingBoxHeight: 12,
+  boundingBoxWidth: 13,
   stepsPerFrame: 30,
 }
 const spriteConfigRun = {
@@ -36,9 +37,9 @@ const spriteConfigRun = {
   frameHeight: 16,
   frameFirstY: 16,
   boundingBoxTop: 3,
-  boundingBoxLeft: 0,
+  boundingBoxLeft: 2,
   boundingBoxHeight: 13,
-  boundingBoxWidth: 16,
+  boundingBoxWidth: 14,
   stepsPerFrame: 8,
 }
 const spriteConfigJump = {
@@ -47,10 +48,10 @@ const spriteConfigJump = {
   frameWidth: 16,
   frameHeight: 16,
   frameFirstY: 32,
-  boundingBoxTop: 3,
-  boundingBoxLeft: 0,
+  boundingBoxTop: 2,
+  boundingBoxLeft: 1,
   boundingBoxHeight: 13,
-  boundingBoxWidth: 16,
+  boundingBoxWidth: 15,
   stepsPerFrame: 8,
 }
 const sprAprStandR = new GameSprite(imgApe, { ...spriteConfigStand })
@@ -199,6 +200,7 @@ const room = new Room()
 room.instanceCreate(Ape, 100, 600)
 
 gameRooms.addRoom(room)
+gameState.debug = true
 
 const game = new Game()
 game.start()
