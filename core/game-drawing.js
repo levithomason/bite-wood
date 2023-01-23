@@ -1,5 +1,6 @@
 import * as collision from './collision.js'
 import { gameMouse } from './game-mouse-controller.js'
+import { isColliding } from './collision.js'
 
 /** Provides a canvas and helpful methods for drawing on it. */
 export class GameDrawing {
@@ -554,7 +555,7 @@ export class GameDrawing {
     }
 
     // bounding box
-    if (collision.objects(object, 'any')) {
+    if (isColliding(object)) {
       this.setStrokeColor('#F80')
     } else {
       this.setStrokeColor('#08F')

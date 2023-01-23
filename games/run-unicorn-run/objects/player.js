@@ -9,7 +9,7 @@ import {
 } from '../../../core/index.js'
 
 import * as utils from '../../../core/math.js'
-import * as collision from '../../../core/collision.js'
+import { onBottom } from '../../../core/collision.js'
 
 // ----------------------------------------
 // Player
@@ -112,7 +112,7 @@ class Player extends GameObject {
 
         keyDown: {
           ArrowUp(self) {
-            if (collision.onBottom(self, 'solid')) {
+            if (onBottom(self, 'solid')) {
               self.motionAdd(gamePhysics.DIRECTION_UP, self.jump)
             }
           },

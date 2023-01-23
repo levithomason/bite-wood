@@ -47,6 +47,9 @@ export class GameObject {
    */
   static instances = []
 
+  // TODO: introduce object ids, replace instance equality checks
+  // id = uuidv4()
+
   /**
    * @param {object} [config]
    * @param {number} [config.boundingBoxTop=0] - The bounding box's distance away from the object's y position.
@@ -162,12 +165,20 @@ export class GameObject {
     return this.y + this.#boundingBoxTop
   }
 
+  set boundingBoxTop(val) {
+    this.#boundingBoxTop = val
+  }
+
   get boundingBoxLeft() {
     if (this.sprite) {
       return this.x - this.sprite.insertionX + this.sprite.boundingBoxLeft
     }
 
     return this.x + this.#boundingBoxLeft
+  }
+
+  set boundingBoxLeft(val) {
+    this.#boundingBoxLeft = val
   }
 
   get boundingBoxRight() {
@@ -190,8 +201,16 @@ export class GameObject {
     return Math.abs(this.boundingBoxRight - this.boundingBoxLeft)
   }
 
+  set boundingBoxWidth(val) {
+    this.#boundingBoxWidth = val
+  }
+
   get boundingBoxHeight() {
     return Math.abs(this.boundingBoxBottom - this.boundingBoxTop)
+  }
+
+  set boundingBoxHeight(val) {
+    this.#boundingBoxHeight = val
   }
 
   /**
@@ -230,6 +249,14 @@ export class GameObject {
     if (!this.sprite) return 0
     return this.spriteTop + this.sprite.height
   }
+
+  // events
+
+  /**
+   * Called when this object has registered a collision.
+   * @param {GameObject} other
+   */
+  onCollision(other) {}
 
   /**
    * Called when the object is created in the room.
@@ -341,32 +368,12 @@ export class GameObject {
     // Physics
     //
 
-    // TODO: this requires having a bounding box at all times to compute collision.
-    //       currently, only sprites have bounding boxes.
-    //       GameObject should have a bounding box, and it should defer to the sprite's bounding box if present.
-    //       This way, objects can have collisions without sprites, such as when custom drawing an object with GameDrawing.
-    // stop on solid objects
-    // TODO: this is naive and shouldn't assume platformer (collision on bottom, stop vspeed)
-    //       should instead check collisions on all sides and stop each direction if appropriate
-    // if (
-    //   collision.objects(this, 'solid', o => {
-    //     return collision.onBottom(this, o)
-    //   })
-    // ) {
-    //   this.vspeed = 0
-    // }
-
     //
     // Movement
     //
 
     // apply final calculated movement values
     this.move(this.direction, this.speed)
-
-    // TODO: if ! solid collision below:
-    //   moveToCollisionPoint()
-    //   keep outside solid objects!
-    //   this is the same as moving outside the room and stopping / moving back to room edge
   }
 
   /**

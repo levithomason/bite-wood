@@ -6,6 +6,7 @@ import {
   gameMouse,
   gameState,
 } from '../../../core/index.js'
+import { isColliding } from '../../../core/collision.js'
 
 // ----------------------------------------
 // Solid
@@ -62,7 +63,7 @@ class Solid extends GameObject {
 
     this.moveTo(gameMouse.x, gameMouse.y)
 
-    if (collision.objects(this, 'any')) {
+    if (isColliding(this)) {
       this.setSprite(sprSolidColliding)
     } else {
       this.setSprite(sprSolid)

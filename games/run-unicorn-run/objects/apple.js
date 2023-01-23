@@ -1,4 +1,3 @@
-import * as collision from '../../../core/collision.js'
 import {
   GameAudio,
   GameImage,
@@ -7,6 +6,7 @@ import {
   gameRooms,
 } from '../../../core/index.js'
 import * as math from '../../../core/math.js'
+import { isColliding } from '../../../core/collision.js'
 
 // ----------------------------------------
 // Player
@@ -88,7 +88,7 @@ const actions = {
 
   ifCollisionObject: createAction(
     ({ other, trueActions, falseActions }, self) => {
-      if (collision.objects(self, other)) {
+      if (isColliding(self, other)) {
         resolveActions(trueActions).forEach((action) => action(self))
       } else {
         resolveActions(falseActions).forEach((action) => action(self))
@@ -250,7 +250,7 @@ class Apple extends GameObject {
           },
 
           //   // die on collision with player
-          //   if (collision.objects(self, Player)) {
+          //   if (collision.isColliding(self, Player)) {
           //     sndEatApple.play()
           //     gameRooms.currentRoom.instanceDestroy(self)
           //

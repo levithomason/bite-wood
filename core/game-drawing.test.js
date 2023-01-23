@@ -184,7 +184,6 @@ describe('GameDrawing', () => {
     })
 
     it('fpsDebug() returns this', () => {
-      const vector = new Vector(0, 0)
       expect(drawing.fpsDebug(100, 60) === drawing).toBe(true)
     })
 

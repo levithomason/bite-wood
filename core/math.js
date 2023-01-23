@@ -46,6 +46,15 @@ export const random = (max = 1, min = 0) => {
 }
 
 /**
+ * Returns a random item from an array.
+ * @param {*[]} array
+ * @return {number}
+ */
+export const randomChoice = (array) => {
+  return array[Math.floor(random(array.length))]
+}
+
+/**
  * Returns 0 when `val <= min` and 1 when `val >= max`.
  * @param {number} val
  * @param {number} min
@@ -106,54 +115,57 @@ export const inRange = (val, lower, upper) => {
 
 export class Vector {
   constructor(direction = 0, magnitude = 0) {
-    this._angle = toRadians(direction)
-    this._hypotenuse = magnitude
-    this._adjacent = this._hypotenuse * Math.cos(this._angle)
-    this._opposite = this._hypotenuse * Math.sin(this._angle)
+    const angle = toRadians(direction)
+    this.magnitude = magnitude
+    this.x = magnitude * Math.cos(angle)
+    this.y = magnitude * Math.sin(angle)
 
     this.add = this.add.bind(this)
   }
 
+  /**
+   * The angle of the vector in radians.
+   * @type {number}
+   */
+  get angle() {
+    return Math.atan2(this.y, this.x)
+  }
+
+  set angle(val) {
+    this.x = this.magnitude * Math.cos(val)
+    this.y = this.magnitude * Math.sin(val)
+  }
+
+  /**
+   * The direction of the vector in degrees.
+   * @type {number}
+   */
   get direction() {
-    return toDegrees(this._angle)
+    return toDegrees(Math.atan2(this.y, this.x))
   }
 
-  set direction(direction) {
-    this._angle = toRadians(direction)
-    this._adjacent = this._hypotenuse * Math.cos(this._angle)
-    this._opposite = this._hypotenuse * Math.sin(this._angle)
+  set direction(val) {
+    this.angle = toRadians(val)
   }
 
+  /**
+   * The magnitude (i.e. length) of the vector.
+   * @type {number}
+   */
   get magnitude() {
-    return this._hypotenuse
+    return Math.sqrt(this.x * this.x + this.y * this.y)
   }
 
-  set magnitude(hypotenuse) {
-    this._hypotenuse = hypotenuse
-    this._adjacent = this._hypotenuse * Math.cos(this._angle)
-    this._opposite = this._hypotenuse * Math.sin(this._angle)
+  set magnitude(val) {
+    this.x = val * Math.cos(this.angle)
+    this.y = val * Math.sin(this.angle)
   }
 
-  get x() {
-    return this._adjacent
-  }
-
-  set x(adjacent) {
-    this._adjacent = adjacent
-    this._angle = Math.atan2(this._opposite, this._adjacent)
-    this._hypotenuse = distance(this.x, this.y)
-  }
-
-  get y() {
-    return this._opposite
-  }
-
-  set y(opposite) {
-    this._opposite = opposite
-    this._angle = Math.atan2(this._opposite, this._adjacent)
-    this._hypotenuse = distance(this.x, this.y)
-  }
-
+  /**
+   * Add direction and magnitude to the vector.
+   * @param {number} direction
+   * @param {number} magnitude
+   */
   add(direction, magnitude) {
     const vector = new Vector(direction, magnitude)
 
