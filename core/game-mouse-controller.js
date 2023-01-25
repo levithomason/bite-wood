@@ -83,15 +83,7 @@ class GameMouse {
     this.active.middle = e.button === MOUSE_BUTTONS.middle
     this.active.right = e.button === MOUSE_BUTTONS.right
 
-    // ensure mousedown only fires once per game step
-    // on the first step, the mouse is handled
-    // future steps will skip the handled mouses
-    // the step that handles MouseUp will remove it from mouse down
-    // see the GameObject.invokeInputEvents() method
-    // once removed, we know if is safe to mark it true again
-    if (!this.down.hasOwnProperty(button)) {
-      this.down[button] = true
-    }
+    this.down[button] = true
   }
 
   /** @param {MouseEvent} e */
@@ -103,8 +95,6 @@ class GameMouse {
 
     this.up[button] = true
 
-    // since mouse events are handled on game step we can only safely remove
-    // mouseactive and mousedown events after a game step handles the mouseup event
     delete this.active[button]
     delete this.down[button]
   }

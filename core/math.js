@@ -114,11 +114,9 @@ export const inRange = (val, lower, upper) => {
 }
 
 export class Vector {
-  constructor(direction = 0, magnitude = 0) {
-    const angle = toRadians(direction)
-    this.magnitude = magnitude
-    this.x = magnitude * Math.cos(angle)
-    this.y = magnitude * Math.sin(angle)
+  constructor(x = 0, y = 0) {
+    this.x = x
+    this.y = y
 
     this.add = this.add.bind(this)
   }

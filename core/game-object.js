@@ -2,7 +2,7 @@ import { gameKeyboard } from './game-keyboard-controller.js'
 import { gameMouse } from './game-mouse-controller.js'
 import { gamePhysics } from './game-physics-controller.js'
 import { gameState } from './game-state-controller.js'
-import { Vector } from './math.js'
+import { offsetX, offsetY, Vector } from './math.js'
 import { gameRooms } from './game-rooms.js'
 import { gameDrawing } from './game-drawing-controller.js'
 
@@ -40,6 +40,9 @@ export class GameObject {
   #boundingBoxLeft
   /** @type number */
   #boundingBoxTop
+
+  /** @type {Vector} */
+  #vector
 
   /**
    * An array of all instantiated game objects.
@@ -102,7 +105,10 @@ export class GameObject {
     this.acceleration = acceleration
     this.friction = friction
     this.gravity = gravity
-    this._vector = new Vector(direction, speed)
+    this.#vector = new Vector(
+      offsetX(this.x, speed, direction),
+      offsetY(this.y, speed, direction),
+    )
     this.events = events
 
     // assign any custom properties the developer passed in
@@ -126,35 +132,35 @@ export class GameObject {
   }
 
   get speed() {
-    return this._vector.magnitude
+    return this.#vector.magnitude
   }
 
   set speed(speed) {
-    this._vector.magnitude = speed
+    this.#vector.magnitude = speed
   }
 
   get hspeed() {
-    return this._vector.x
+    return this.#vector.x
   }
 
   set hspeed(hspeed) {
-    this._vector.x = hspeed
+    this.#vector.x = hspeed
   }
 
   get vspeed() {
-    return this._vector.y
+    return this.#vector.y
   }
 
   set vspeed(vspeed) {
-    this._vector.y = vspeed
+    this.#vector.y = vspeed
   }
 
   get direction() {
-    return this._vector.direction
+    return this.#vector.direction
   }
 
   set direction(direction) {
-    this._vector.direction = direction
+    this.#vector.direction = direction
   }
 
   get boundingBoxTop() {
@@ -291,7 +297,7 @@ export class GameObject {
   }
 
   motionAdd(direction, speed) {
-    this._vector.add(direction, speed)
+    this.#vector.add(direction, speed)
   }
 
   setSprite(sprite) {

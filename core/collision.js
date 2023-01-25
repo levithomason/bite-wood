@@ -1,19 +1,41 @@
 import { gameRooms } from './game-rooms.js'
 
 /**
+ * Checks if a point is colliding with a rectangle.
+ * @param {number} x - The x position of the point.
+ * @param {number} y - The y position of the point.
+ * @param {number} x1 - The x1 of the rectangle.
+ * @param {number} y1 - The y1 of the rectangle.
+ * @param {number} x2 - The x2 of the rectangle.
+ * @param {number} y2 - The y2 of the rectangle.
+ * @returns {boolean}
+ */
+export const collisionPointRectangle = (x, y, x1, y1, x2, y2) => {
+  return (
+    x >= Math.min(x1, x2) &&
+    x <= Math.max(x1, x2) &&
+    y >= Math.min(y1, y2) &&
+    y <= Math.max(y1, y2)
+  )
+}
+
+/**
  * Checks if a point is colliding with an object.
- * @param {number} x
- * @param {number} y
+ * @param {number} x - The x position of the point.
+ * @param {number} y - The y position of the point.
  * @param {GameObject} object
  * @returns {boolean}
  */
-export const point = (x, y, object) => {
-  return (
-    x >= object.boundingBoxLeft &&
-    x <= object.boundingBoxRight &&
-    y >= object.boundingBoxTop &&
-    y <= object.boundingBoxBottom
-  )
+export const collisionPointObject = (x, y, object) => {
+  return gameRooms.currentRoom.objects.some((obj) => {
+    return (
+      obj instanceof object &&
+      x >= obj.boundingBoxLeft &&
+      x <= obj.boundingBoxRight &&
+      y >= obj.boundingBoxTop &&
+      y <= obj.boundingBoxBottom
+    )
+  })
 }
 
 /**
