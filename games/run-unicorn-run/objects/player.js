@@ -8,7 +8,7 @@ import {
   gameKeyboard,
 } from '../../../core/index.js'
 
-import * as utils from '../../../core/math.js'
+import * as math from '../../../core/math.js'
 import { onBottom } from '../../../core/collision.js'
 
 // ----------------------------------------
@@ -101,10 +101,10 @@ class Player extends GameObject {
         mouseActive: {
           left(self) {
             const speed =
-              utils.distance(self.x, self.y, gameMouse.x, gameMouse.y) / 500
+              math.distance(self.x, self.y, gameMouse.x, gameMouse.y) / 500
 
             self.motionAdd(
-              utils.direction(self.x, self.y, gameMouse.x, gameMouse.y),
+              math.direction(self.x, self.y, gameMouse.x, gameMouse.y),
               Math.min(1, speed),
             )
           },

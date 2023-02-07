@@ -1,9 +1,19 @@
-export const toDegrees = (radians) => (radians * 180) / Math.PI
+const radToDegMul = 180 / Math.PI
+const degToRadMul = Math.PI / 180
 
-export const toRadians = (degrees) => (degrees * Math.PI) / 180
+/**
+ * Converts radians to degrees and returns a value between 0 and 360.
+ * @param {number} radians
+ * @return {number}
+ */
+export const toDegrees = (radians) => (radians * radToDegMul + 360) % 360
+
+export const toRadians = (degrees) => degrees * degToRadMul
 
 export const distance = (x1, y1, x2 = 0, y2 = 0) => {
-  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+  const x = x2 - x1
+  const y = y2 - y1
+  return Math.sqrt(x * x + y * y)
 }
 
 export const direction = (x1, y1, x2 = 0, y2 = 0) => {
@@ -121,6 +131,11 @@ export class Vector {
     this.add = this.add.bind(this)
   }
 
+  #setXY(angle, magnitude) {
+    this.x = magnitude * Math.cos(angle)
+    this.y = magnitude * Math.sin(angle)
+  }
+
   /**
    * The angle of the vector in radians.
    * @type {number}
@@ -129,9 +144,8 @@ export class Vector {
     return Math.atan2(this.y, this.x)
   }
 
-  set angle(val) {
-    this.x = this.magnitude * Math.cos(val)
-    this.y = this.magnitude * Math.sin(val)
+  set angle(angle) {
+    this.#setXY(angle, this.magnitude)
   }
 
   /**
@@ -139,7 +153,7 @@ export class Vector {
    * @type {number}
    */
   get direction() {
-    return toDegrees(Math.atan2(this.y, this.x))
+    return toDegrees(this.angle)
   }
 
   set direction(val) {
@@ -151,12 +165,11 @@ export class Vector {
    * @type {number}
    */
   get magnitude() {
-    return Math.sqrt(this.x * this.x + this.y * this.y)
+    return distance(this.x, this.y)
   }
 
-  set magnitude(val) {
-    this.x = val * Math.cos(this.angle)
-    this.y = val * Math.sin(this.angle)
+  set magnitude(magnitude) {
+    this.#setXY(this.angle, magnitude)
   }
 
   /**
@@ -165,9 +178,7 @@ export class Vector {
    * @param {number} magnitude
    */
   add(direction, magnitude) {
-    const vector = new Vector(direction, magnitude)
-
-    this.x += vector.x
-    this.y += vector.y
+    this.x += offsetX(0, magnitude, direction)
+    this.y += offsetY(0, magnitude, direction)
   }
 }

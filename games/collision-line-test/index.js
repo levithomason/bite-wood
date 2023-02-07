@@ -1,10 +1,12 @@
-import { Game } from '../../core/game.js'
-import { gameMouse, GameObject, GameRoom, gameRooms } from '../../core/index.js'
-import { direction, distance, Vector } from '../../core/math.js'
 import {
-  collisionPointObject,
-  collisionPointRectangle,
-} from '../../core/collision.js'
+  Game,
+  gameMouse,
+  GameObject,
+  GameRoom,
+  gameRooms,
+} from '../../core/index.js'
+import { distance, Vector } from '../../core/math.js'
+import { collisionPointRectangle } from '../../core/collision.js'
 
 const OBSTACLE_SIZE = 80
 class Obstacle extends GameObject {
@@ -20,9 +22,9 @@ class Obstacle extends GameObject {
   draw(drawing) {
     super.draw(drawing)
 
-    drawing.setStrokeColor('rgba(0, 128, 255, 0.5)')
     drawing.setLineWidth(2)
-    const overhang = 50
+    drawing.setStrokeColor('rgba(0, 128, 255, 0.2)')
+    const overhang = 0
     drawing.line(
       this.boundingBoxLeft,
       this.boundingBoxTop - overhang,
@@ -74,8 +76,6 @@ class MouseLine extends GameObject {
     })
   }
   create() {
-    this.x = 200
-    this.y = 150
     this.vector = new Vector(gameMouse.x - this.x, gameMouse.y - this.y)
 
     gameMouse.x = 546
@@ -112,38 +112,6 @@ class MouseLine extends GameObject {
     drawing.setTextAlign('center')
     drawing.setTextBaseline('middle')
 
-    const drawIntersects = (object, top, bottom, left, right) => {
-      const drawPoint = (point, label, onColor, offColor) => {
-        const tolerance = 50
-        const isNearObject =
-          point.x >= object.boundingBoxLeft - tolerance &&
-          point.x <= object.boundingBoxRight + tolerance &&
-          point.y >= object.boundingBoxTop - tolerance &&
-          point.y <= object.boundingBoxBottom + tolerance
-
-        if (!isNearObject) return
-
-        const isOnLeft = point.x >= object.boundingBoxLeft
-        const isOnRight = point.x <= object.boundingBoxRight
-        const isOnTop = point.y >= object.boundingBoxTop
-        const isOnBottom = point.y <= object.boundingBoxBottom
-        const isOnObject = isOnLeft && isOnRight && isOnTop && isOnBottom
-
-        drawing.setStrokeColor('transparent')
-        drawing.setFillColor(isOnObject ? onColor : offColor)
-        drawing.circle(point.x, point.y, 10)
-
-        drawing.setFontSize(12)
-        drawing.setFillColor(isOnObject ? '#000' : '#fff')
-        drawing.text(label, point.x, point.y)
-      }
-
-      drawPoint(top, 'T', '#0f0', '#060')
-      drawPoint(bottom, 'B', '#0f0', '#060')
-      drawPoint(left, 'L', '#f0f', '#707')
-      drawPoint(right, 'R', '#f0f', '#707')
-    }
-
     // draw default line under all
     drawing.setLineWidth(2)
     drawing.setStrokeColor('#fff')
@@ -158,6 +126,10 @@ class MouseLine extends GameObject {
       const leftRatio = (object.boundingBoxLeft - this.x) / this.width
       const rightRatio = (object.boundingBoxRight - this.x) / this.width
       const bottomRatio = (object.boundingBoxBottom - this.y) / this.height
+
+      if (topRatio < 0 && leftRatio < 0 && rightRatio < 0 && bottomRatio < 0) {
+        return acc
+      }
 
       const top = {
         x: this.width * topRatio + this.x,
@@ -183,15 +155,25 @@ class MouseLine extends GameObject {
         ratio: bottomRatio,
       }
 
-      drawIntersects(object, top, bottom, left, right)
+      const points = [top, left, right, bottom]
+      const pointsInFront = []
+      const pointsOnBox = []
 
-      const pointsOnBox = [top, left, right, bottom].filter(
-        (point) =>
+      points.forEach((point) => {
+        const isInFront = point.ratio >= 0
+        if (!isInFront) return
+        pointsInFront.push(point)
+
+        const isOnBox =
           point.x >= object.boundingBoxLeft &&
           point.x <= object.boundingBoxRight &&
           point.y >= object.boundingBoxTop &&
-          point.y <= object.boundingBoxBottom,
-      )
+          point.y <= object.boundingBoxBottom
+
+        if (isOnBox) pointsOnBox.push(point)
+      })
+
+      this.drawIntersects(drawing, object, pointsInFront)
 
       const isPointInRectangle = pointsOnBox.some((point) => {
         return collisionPointRectangle(
@@ -214,7 +196,7 @@ class MouseLine extends GameObject {
       )
 
       const nearestPoint = isOriginInRectangle
-        ? { x: this.x, y: this.y }
+        ? { x: this.x, y: this.y, ratio: 0 }
         : pointsOnBox.length
         ? pointsOnBox.reduce((a, b) => {
             if (!b) return a
@@ -226,12 +208,13 @@ class MouseLine extends GameObject {
           })
         : null
 
-      const isColliding = pointsOnBox.length >= 2 && isPointInRectangle
+      const isColliding =
+        isOriginInRectangle || (pointsOnBox.length >= 1 && isPointInRectangle)
 
       if (nearestPoint && nearestPoint.ratio > 0) {
-        // show potential nearest point
+        // show where nearest point would collide if the line were extended
         drawing.setLineWidth(2)
-        drawing.setStrokeColor('#ff0')
+        drawing.setStrokeColor('#fff')
         drawing.setFillColor('transparent')
         drawing.circle(nearestPoint.x, nearestPoint.y, 10)
       }
@@ -247,13 +230,9 @@ class MouseLine extends GameObject {
         if (!acc || distanceToNearestPoint < acc.distance) {
           return {
             object,
-            points: pointsOnBox,
+            points: pointsInFront,
             pointOfCollision: nearestPoint,
             distance: distanceToNearestPoint,
-            top,
-            left,
-            right,
-            bottom,
           }
         }
 
@@ -263,24 +242,18 @@ class MouseLine extends GameObject {
       return acc
     }, null)
 
-    // Draw rectangle formed by vector
-    drawing.setLineWidth(1)
-    drawing.setFillColor('transparent')
-    drawing.setStrokeColor('rgba(255, 255, 255, 0.25)')
-    drawing.rectangle(this.x, this.y, this.width, this.height)
-
-    // Draw line
     if (collision) {
+      // Draw red line when colliding
       drawing.setLineWidth(2)
       drawing.setStrokeColor('#f00')
       drawing.setFillColor('#f00')
       drawing.arrow(this.x, this.y, this.x2, this.y2)
 
       // Draw collision objects
-      const { object, points, pointOfCollision, top, left, right, bottom } =
-        collision
+      const { object, pointOfCollision, points } = collision
       drawing.setFillColor('transparent')
 
+      // Highlight
       drawing.setLineWidth(2)
       drawing.setStrokeColor('#f00')
       drawing.rectangle(
@@ -290,23 +263,15 @@ class MouseLine extends GameObject {
         object.boundingBoxHeight,
       )
 
-      // // highlight intersects on box
-      // drawing.setLineWidth(3)
-      // drawing.setFillColor('transparent')
-      // drawing.setStrokeColor('#f00')
-      // points.forEach((point) => {
-      //   if (point === pointOfCollision) return
-      //   drawing.circle(point.x, point.y, 10)
-      // })
+      this.drawIntersects(drawing, object, points)
 
-      drawIntersects(object, top, bottom, left, right)
-
+      // highlight point of collision
       if (pointOfCollision) {
-        // highlight point of collision
         drawing.setLineWidth(3)
         drawing.setFillColor('transparent')
-        drawing.setStrokeColor('#ff0')
+        drawing.setStrokeColor('#f00')
         drawing.circle(pointOfCollision.x, pointOfCollision.y, 10)
+        this.drawIntersects(drawing, object, [pointOfCollision])
       }
     }
 
@@ -317,7 +282,56 @@ class MouseLine extends GameObject {
     drawing.text(this.vector.direction.toFixed(0) + '*', this.x, this.y - 10)
   }
 
-  drawCollision(collision) {}
+  drawIntersects(drawing, object, points) {
+    const overhang = 50
+    const verticalColors = { on: '#0f0', off: '#090', bg: '#020' }
+    const horizontalColors = { on: '#ff0', off: '#990', bg: '#220' }
+
+    const isNearObject = (point) =>
+      point.x >= object.boundingBoxLeft - overhang &&
+      point.x <= object.boundingBoxRight + overhang &&
+      point.y >= object.boundingBoxTop - overhang &&
+      point.y <= object.boundingBoxBottom + overhang
+
+    const drawPoint = (point) => {
+      if (!isNearObject(point)) return
+
+      const isPastLeft = point.x >= object.boundingBoxLeft
+      const isBeforeRight = point.x <= object.boundingBoxRight
+      const isPastTop = point.y >= object.boundingBoxTop
+      const isBeforeBottom = point.y <= object.boundingBoxBottom
+      const isInsideObject =
+        isPastLeft && isBeforeRight && isPastTop && isBeforeBottom
+
+      const isOnLeft = point.x === object.boundingBoxLeft
+      const isOnRight = point.x === object.boundingBoxRight
+      const isOnTop = point.y === object.boundingBoxTop
+      const isOnBottom = point.y === object.boundingBoxBottom
+      const isHorizontal = isOnLeft || isOnRight
+
+      const label =
+        (isOnLeft && 'L') ||
+        (isOnRight && 'R') ||
+        (isOnTop && 'T') ||
+        (isOnBottom && 'B') ||
+        (isInsideObject && 'IN') ||
+        '?'
+
+      const color = isHorizontal ? horizontalColors : verticalColors
+      drawing.setStrokeColor('transparent')
+      drawing.setFillColor(color.bg)
+      drawing.circle(point.x, point.y, 8)
+
+      drawing.setFontSize(12)
+      drawing.setFillColor(isInsideObject ? color.on : color.off)
+      drawing.text(label, point.x, point.y)
+
+      drawing.setFontSize(10)
+      drawing.text(point.ratio.toFixed(2), point.x, point.y - 16)
+    }
+
+    points.forEach((point) => drawPoint(point))
+  }
 }
 
 class Room extends GameRoom {
@@ -336,9 +350,7 @@ room.instanceCreate(Obstacle, offset * 1, offset * 2)
 room.instanceCreate(Obstacle, offset * 2, offset * 2.5)
 room.instanceCreate(Obstacle, offset * 3, offset * 2)
 
-// room.instanceCreate(Obstacle, room.width / 2, room.height / 2)
-
-room.instanceCreate(MouseLine, 200, 200)
+room.instanceCreate(MouseLine, room.width / 2, room.height / 2)
 
 gameRooms.addRoom(room)
 

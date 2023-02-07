@@ -609,22 +609,26 @@ export class GameDrawing {
    * @param {number} x
    * @param {number} y
    * @param {Vector} vector
+   * @param {string} [color='black'] - A CSS color for the debug lines.
    * @return {GameDrawing}
    */
-  vectorDebug(x, y, vector) {
+  vectorDebug(x, y, vector, color = 'black') {
     this.saveSettings()
+    const mainColor = 'magenta'
+
+    this.setStrokeColor(color)
+    this.setFillColor('transparent')
 
     // adjacent
     this.line(x, y, x + vector.x, y)
     // opposite
     this.line(x + vector.x, y, x + vector.x, y + vector.y)
     // hypotenuse
-    this.setStrokeColor('red')
+    this.setStrokeColor(mainColor)
     this.arrow(x, y, x + vector.x, y + vector.y)
 
     // 90° box
-    this.setStrokeColor('black')
-    this.setFillColor('transparent')
+    this.setStrokeColor(color)
     this.rectangle(
       x + vector.x + 10 * -Math.sign(vector.x),
       y,
@@ -633,15 +637,17 @@ export class GameDrawing {
     )
 
     // labels: x, y, angle, magnitude
+    const fontSize = 12
+    this.setFontSize(fontSize)
     this.setTextAlign('center')
-    this.setFillColor('red')
+    this.setFillColor(mainColor)
     this.text(
       Math.round(vector.magnitude),
       x + vector.x / 2 - 20 * Math.sign(vector.x),
-      y + vector.y / 2,
+      y + vector.y / 2 + fontSize * 1.2 * Math.sign(vector.y),
     )
 
-    this.setFillColor('black')
+    this.setFillColor(color)
     this.text(
       'x ' + Math.round(vector.x),
       x + vector.x / 2,
