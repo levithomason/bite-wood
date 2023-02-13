@@ -585,14 +585,14 @@ export class GameDrawing {
     const lines = [
       `${name}`,
       // TODO: make state a required abstraction of game objects
-      `state     ${state?.name}`,
+      state && `state     ${state.name}`,
       `x         ${fixed(x)}`,
       `y         ${fixed(y)}`,
       `direction ${fixed(direction)}`,
       `speed     ${fixed(speed)} (${fixed(hspeed)}, ${fixed(vspeed)})`,
-      `gravity   ${fixed(gravity.magnitude)}`,
-      `friction  ${fixed(friction)}`,
-    ]
+      gravity && `gravity   ${fixed(gravity.magnitude)}`,
+      friction && `friction  ${fixed(friction)}`,
+    ].filter(Boolean)
     lines.reverse().forEach((line, i) => {
       const x = object.spriteLeft
       const y = object.spriteTop - (i + 1) * 14
@@ -667,6 +667,18 @@ export class GameDrawing {
     this.loadSettings()
 
     return this
+  }
+
+  // TODO: move to game loop, put particles on a separate layer
+  //       don't extend GameObject for GameParticles
+  //       otherwise, GameParticles get GameObject treatment (like debug drawing)
+  particlesDebug(particles) {
+    this.saveSettings()
+    // this.#ctx.setLineDash([1, 2])
+    this.setFillColor('transparent')
+    this.setStrokeColor('red')
+    this.rectangle(particles.x, particles.y, particles.width, particles.height)
+    this.loadSettings()
   }
 
   //

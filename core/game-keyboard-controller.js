@@ -20,23 +20,28 @@ class GameKeyboard {
 
   /** @param {KeyboardEvent} e */
   #handleKeyDown = (e) => {
-    this.active[e.key] = true
+    this.active[e.key.toUpperCase()] = true
 
     // Key up/down should only fire for one step in the game loop.
     // The game loop will clear key up/down state after each tick.
     // Only set keydown on the first press, not on repeats.
     if (!e.repeat) {
-      this.down[e.key] = true
-      delete this.up[e.key]
+      this.down[e.key.toUpperCase()] = true
+      delete this.up[e.key.toUpperCase()]
     }
   }
 
   /** @param {KeyboardEvent} e */
   #handleKeyUp = (e) => {
-    this.up[e.key] = true
+    this.up[e.key.toUpperCase()] = true
 
-    delete this.active[e.key]
-    delete this.down[e.key]
+    delete this.active[e.key.toUpperCase()]
+    delete this.down[e.key.toUpperCase()]
+
+    // if (e.shiftKey) {
+    // remove the lowercase version of the key
+    // delete this.active[e.key.toLowerCase()]
+    // }
   }
 }
 

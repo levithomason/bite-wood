@@ -32,19 +32,22 @@ export class GameAudio {
   play() {
     if (!this.element.paused) return
 
-    this.element.play().catch((error) => {
-      switch (error) {
-        case 'NotAllowedError':
-          console.error(`Can't play audio, try implementing a "play" button.`)
-          break
-        case 'NotSupportedError':
-          console.error(`Can't play audio, unsupported media format.`)
-          break
-        default:
-          console.error(`Unknown error playing audio: ${error}`)
-          break
-      }
-    })
+    this.element
+      .cloneNode(true)
+      .play()
+      .catch((error) => {
+        switch (error) {
+          case 'NotAllowedError':
+            console.error(`Can't play audio, try implementing a "play" button.`)
+            break
+          case 'NotSupportedError':
+            console.error(`Can't play audio, unsupported media format.`)
+            break
+          default:
+            console.error(`Unknown error playing audio: ${error}`)
+            break
+        }
+      })
   }
 
   pause() {

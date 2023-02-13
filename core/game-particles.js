@@ -1,6 +1,7 @@
 import { offsetX, offsetY, random, Vector } from './math.js'
 import { gameRooms } from './game-rooms.js'
 import { GameObject } from './game-object.js'
+import { gameState } from './game-state-controller.js'
 
 class GameParticle {
   /**
@@ -154,8 +155,8 @@ export class GameParticles extends GameObject {
 
     this.particles.push(
       new GameParticle({
-        x: this.x - this.width / 2 + random(0, this.width),
-        y: this.y - this.height / 2 + random(0, this.height),
+        x: this.x + random(0, this.width),
+        y: this.y + random(0, this.height),
         color: this.color,
         direction: random(this.directionStart, this.directionEnd),
         friction: this.friction,
@@ -210,5 +211,9 @@ export class GameParticles extends GameObject {
     this.particles.forEach((particle) => {
       particle.draw(drawing)
     })
+
+    if (gameState.debug) {
+      drawing.particlesDebug(this)
+    }
   }
 }

@@ -10,8 +10,15 @@ import {
   GameRoom,
   gameRooms,
   GameSprite,
+  gameState,
 } from '../../core/index.js'
 import { direction, random, Vector } from '../../core/math.js'
+
+// =============================================================================
+// Global State
+// =============================================================================
+
+let snowDepth = 0
 
 // =============================================================================
 // Particles
@@ -58,9 +65,26 @@ class SmokeParticles extends GameParticles {
       speed: 0.25,
       rate: 1,
       size: 12,
-      width: 24,
-      height: 24,
+      width: 32,
+      height: 32,
       color: 'rgba(57,64,65,0.04)',
+      shape: 'circle',
+    })
+  }
+}
+
+class SnowParticles extends GameParticles {
+  constructor() {
+    super({
+      count: Infinity,
+      life: 11000,
+      speed: 1,
+      rate: 100,
+      directionStart: 90 - 5,
+      directionEnd: 90 + 5,
+      size: 3,
+      width: 800,
+      color: '#fff',
       shape: 'circle',
     })
   }
@@ -123,7 +147,7 @@ const sndShootBanana = new GameAudio('./sounds/jump.m4a')
 class Banana extends GameObject {
   constructor() {
     super({
-      speed: 16,
+      speed: 14,
       sprite: sprBanana,
       gravity: gamePhysics.gravity,
     })
@@ -140,7 +164,11 @@ class Banana extends GameObject {
       barrelParticles.y = other.y
       room.objects.push(barrelParticles)
 
-      room.instanceCreate(SmokeParticles, other.x, other.y)
+      room.instanceCreate(
+        SmokeParticles,
+        other.x - other.boundingBoxWidth / 2,
+        other.y - other.boundingBoxHeight / 2,
+      )
       room.instanceCreate(BlastParticles, other.x, other.y)
       room.instanceDestroy(this)
       room.instanceDestroy(other)
@@ -236,6 +264,8 @@ const STATES = {
       this.hspeed = 0
     },
     step() {
+      this.y = gameRooms.currentRoom.height - snowDepth
+
       if (gameKeyboard.active.a || gameKeyboard.active.A) {
         this.setState(STATES.runL)
       } else if (gameKeyboard.active.d || gameKeyboard.active.D) {
@@ -252,6 +282,8 @@ const STATES = {
       this.hspeed = 0
     },
     step() {
+      this.y = gameRooms.currentRoom.height - snowDepth
+
       if (gameKeyboard.active.a || gameKeyboard.active.A) {
         this.setState(STATES.runL)
       } else if (gameKeyboard.active.d || gameKeyboard.active.D) {
@@ -268,6 +300,8 @@ const STATES = {
       this.hspeed = this.runSpeed
     },
     step() {
+      this.y = gameRooms.currentRoom.height - snowDepth
+
       if (gameKeyboard.up.d || gameKeyboard.up.D) {
         this.setState(STATES.standR)
       } else if (gameKeyboard.down.w || gameKeyboard.down.W) {
@@ -282,6 +316,8 @@ const STATES = {
       this.hspeed = -this.runSpeed
     },
     step() {
+      this.y = gameRooms.currentRoom.height - snowDepth
+
       if (gameKeyboard.up.a || gameKeyboard.up.A) {
         this.setState(STATES.standL)
       } else if (gameKeyboard.down.w || gameKeyboard.down.W) {
@@ -297,14 +333,14 @@ const STATES = {
       this.vspeed = this.jumpSpeed
     },
     step() {
-      if (this.y < gameRooms.currentRoom.height) {
+      if (this.y < gameRooms.currentRoom.height - snowDepth) {
         this.motionAdd(
           gamePhysics.gravity.direction,
           gamePhysics.gravity.magnitude,
         )
       } else {
         this.vspeed = 0
-        this.y = gameRooms.currentRoom.height
+        this.y = gameRooms.currentRoom.height - snowDepth
         this.setState(STATES.standR)
       }
     },
@@ -317,14 +353,14 @@ const STATES = {
       this.vspeed = this.jumpSpeed
     },
     step() {
-      if (this.y < gameRooms.currentRoom.height) {
+      if (this.y < gameRooms.currentRoom.height - snowDepth) {
         this.motionAdd(
           gamePhysics.gravity.direction,
           gamePhysics.gravity.magnitude,
         )
       } else {
         this.vspeed = 0
-        this.y = gameRooms.currentRoom.height
+        this.y = gameRooms.currentRoom.height - snowDepth
         this.setState(STATES.standL)
       }
     },
@@ -361,7 +397,7 @@ class Ape extends GameObject {
     })
 
     this.runSpeed = 4
-    this.jumpSpeed = -10
+    this.jumpSpeed = -8
     this.setState(STATES.standR)
   }
 
@@ -385,12 +421,56 @@ class Room extends GameRoom {
     super(800, 600)
     this.backgroundColor = '#94c0aa'
 
+    const makeBox = (x = random(100, 700), y = random(150, 450)) => {
+      this.instanceCreate(Box, x, y)
+    }
     for (let i = 0; i < 14; i += 1) {
-      const y = random(450, 150)
-      this.instanceCreate(Box, i * 50 + 50, y)
+      makeBox(i * 50 + 50)
     }
 
     this.instanceCreate(Ape, 100, 600)
+    this.instanceCreate(SnowParticles, 0, 0)
+
+    setTimeout(() => {
+      setInterval(() => {
+        if (this.instanceCount(Box) > 0) {
+          makeBox()
+        }
+      }, 2000)
+
+      this.increaseSnow = true
+    }, 11000 /* after snow hits ground */)
+  }
+
+  draw(drawing) {
+    super.draw(drawing)
+
+    if (this.increaseSnow) {
+      snowDepth += 0.2
+    }
+
+    drawing.setFillColor('#fff')
+    drawing.rectangle(0, 600 - snowDepth, 800, snowDepth)
+
+    if (snowDepth > 600) {
+      drawing.setFillColor('#000')
+      drawing.rectangle(0, 0, 800, 600)
+
+      drawing.setFillColor('#f00')
+      drawing.setFontSize(60)
+      drawing.setTextAlign('center')
+      drawing.text('DUN DUN DUN!', 400, 300)
+    }
+
+    if (this.instanceCount(Box) === 0) {
+      drawing.setFillColor('#fff')
+      drawing.rectangle(0, 0, 800, 600)
+
+      drawing.setFillColor('#0a0')
+      drawing.setFontSize(60)
+      drawing.setTextAlign('center')
+      drawing.text('YOU WIN!', 400, 300)
+    }
   }
 }
 
