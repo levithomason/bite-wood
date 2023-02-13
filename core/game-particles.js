@@ -10,7 +10,7 @@ class GameParticle {
    * @param {string} config.color
    * @param {number} config.direction
    * @param {number} config.life - Number of seconds to live
-   * @param {'circle'|'line'} config.shape
+   * @param {'circle'|'square'|'line'} config.shape
    * @param {number} config.size
    * @param {number} config.speed
    */
@@ -31,17 +31,30 @@ class GameParticle {
   }
 
   draw(drawing) {
-    drawing.setFillColor(this.color)
-    drawing.setStrokeColor('transparent')
-
     switch (this.shape) {
       case 'circle':
+        drawing.setFillColor(this.color)
+        drawing.setStrokeColor('transparent')
         drawing.circle(this.x, this.y, this.size)
         break
 
+      case 'square':
+        drawing.setFillColor(this.color)
+        drawing.setStrokeColor('transparent')
+        drawing.rectangle(
+          this.x - this.size / 2,
+          this.y - this.size / 2,
+          this.size,
+          this.size,
+        )
+        break
+
       case 'line':
-        const x2 = offsetX(this.x, this.speed, this.direction)
-        const y2 = offsetY(this.y, this.speed, this.direction)
+        const x2 = offsetX(this.x, this.speed * this.size, this.direction)
+        const y2 = offsetY(this.y, this.speed * this.size, this.direction)
+        drawing.setFillColor('transparent')
+        drawing.setStrokeColor(this.color)
+        drawing.setLineWidth(1)
         drawing.line(this.x, this.y, x2, y2)
         break
 

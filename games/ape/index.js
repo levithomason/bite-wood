@@ -17,16 +17,46 @@ import { direction, random } from '../../core/math.js'
 // Particles
 // =============================================================================
 
-class BananaParticles extends GameParticles {
+class BlastParticles extends GameParticles {
   constructor() {
     super({
       count: 10,
-      life: 250,
-      speed: 4,
+      life: 100,
+      speed: 6,
       rate: 1,
       size: 5,
+      color: '#fff',
+      shape: 'line',
+    })
+  }
+}
+
+class BarrelParticles extends GameParticles {
+  constructor() {
+    super({
+      count: 3,
+      life: 500,
+      speed: 1,
+      rate: 1,
+      size: 8,
+      directionStart: 135,
+      directionEnd: 45,
       color: '#9b7135',
-      // shape: 'circle',
+      shape: 'square',
+    })
+  }
+}
+
+class SmokeParticles extends GameParticles {
+  constructor() {
+    super({
+      count: 10,
+      life: 1000,
+      speed: 0.5,
+      rate: 1,
+      size: 15,
+      color: 'rgba(112,108,102,0.22)',
+      shape: 'circle',
     })
   }
 }
@@ -96,7 +126,9 @@ class Banana extends GameObject {
 
   onCollision(other) {
     if (other.name === 'Box') {
-      room.instanceCreate(BananaParticles, other.x, other.y)
+      room.instanceCreate(BarrelParticles, other.x, other.y)
+      room.instanceCreate(SmokeParticles, other.x, other.y)
+      room.instanceCreate(BlastParticles, other.x, other.y)
       room.instanceDestroy(this)
       room.instanceDestroy(other)
 
@@ -342,9 +374,9 @@ class Room extends GameRoom {
     super(800, 600)
     this.backgroundColor = '#94c0aa'
 
-    for (let i = 0; i < 7; i += 1) {
+    for (let i = 0; i < 28; i += 1) {
       const y = random(400, 100)
-      this.instanceCreate(Box, i * 100 + 100, y)
+      this.instanceCreate(Box, i * 25 + 25, y)
     }
 
     this.instanceCreate(Ape, 100, 600)
