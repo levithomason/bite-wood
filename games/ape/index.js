@@ -11,7 +11,7 @@ import {
   gameRooms,
   GameSprite,
 } from '../../core/index.js'
-import { direction, random } from '../../core/math.js'
+import { direction, random, Vector } from '../../core/math.js'
 
 // =============================================================================
 // Particles
@@ -20,11 +20,12 @@ import { direction, random } from '../../core/math.js'
 class BlastParticles extends GameParticles {
   constructor() {
     super({
-      count: 10,
-      life: 100,
-      speed: 6,
+      count: 5,
+      life: 500,
+      speed: 4,
+      friction: 0.1,
       rate: 1,
-      size: 5,
+      size: 24,
       color: '#fff',
       shape: 'line',
     })
@@ -32,16 +33,18 @@ class BlastParticles extends GameParticles {
 }
 
 class BarrelParticles extends GameParticles {
-  constructor() {
+  constructor({ directionStart, directionEnd, speed }) {
     super({
       count: 3,
-      life: 500,
-      speed: 1,
+      life: 1500,
+      speed,
+      friction: 0.01,
+      gravity: new Vector(0, 0.1),
       rate: 1,
       size: 8,
-      directionStart: 135,
-      directionEnd: 45,
-      color: '#9b7135',
+      directionStart,
+      directionEnd,
+      color: 'rgb(144, 113, 80)',
       shape: 'square',
     })
   }
@@ -50,12 +53,14 @@ class BarrelParticles extends GameParticles {
 class SmokeParticles extends GameParticles {
   constructor() {
     super({
-      count: 10,
+      count: 20,
       life: 1000,
-      speed: 0.5,
+      speed: 0.25,
       rate: 1,
-      size: 15,
-      color: 'rgba(112,108,102,0.22)',
+      size: 12,
+      width: 24,
+      height: 24,
+      color: 'rgba(57,64,65,0.04)',
       shape: 'circle',
     })
   }
@@ -126,7 +131,15 @@ class Banana extends GameObject {
 
   onCollision(other) {
     if (other.name === 'Box') {
-      room.instanceCreate(BarrelParticles, other.x, other.y)
+      const barrelParticles = new BarrelParticles({
+        directionStart: this.direction - 60,
+        directionEnd: this.direction + 60,
+        speed: this.speed * 0.5,
+      })
+      barrelParticles.x = other.x
+      barrelParticles.y = other.y
+      room.objects.push(barrelParticles)
+
       room.instanceCreate(SmokeParticles, other.x, other.y)
       room.instanceCreate(BlastParticles, other.x, other.y)
       room.instanceDestroy(this)
@@ -135,7 +148,7 @@ class Banana extends GameObject {
       if (room.instanceCount(Box) === 0) {
         setTimeout(() => {
           window.location.reload()
-        }, 1000)
+        }, 1500)
       }
     }
   }
@@ -341,8 +354,6 @@ class Ape extends GameObject {
               gameMouse.y,
             )
 
-            banana.motionAdd(this.direction, this.speed * 0.5)
-
             sndShootBanana.play()
           },
         },
@@ -374,9 +385,9 @@ class Room extends GameRoom {
     super(800, 600)
     this.backgroundColor = '#94c0aa'
 
-    for (let i = 0; i < 28; i += 1) {
-      const y = random(400, 100)
-      this.instanceCreate(Box, i * 25 + 25, y)
+    for (let i = 0; i < 14; i += 1) {
+      const y = random(450, 150)
+      this.instanceCreate(Box, i * 50 + 50, y)
     }
 
     this.instanceCreate(Ape, 100, 600)

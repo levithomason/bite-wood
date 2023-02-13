@@ -1,4 +1,4 @@
-import { offsetX, offsetY, random } from './math.js'
+import { offsetX, offsetY, random, Vector } from './math.js'
 import { gameRooms } from './game-rooms.js'
 import { GameObject } from './game-object.js'
 
@@ -9,25 +9,51 @@ class GameParticle {
    * @param {number} config.y
    * @param {string} config.color
    * @param {number} config.direction
+   * @param {number} config.friction
+   * @param {Vector} config.gravity
    * @param {number} config.life - Number of seconds to live
    * @param {'circle'|'square'|'line'} config.shape
    * @param {number} config.size
    * @param {number} config.speed
    */
-  constructor({ x, y, color, direction, life, shape, size, speed }) {
+  constructor({
+    x,
+    y,
+    color,
+    direction,
+    friction,
+    gravity,
+    life,
+    shape,
+    size,
+    speed,
+  }) {
     this.x = x
     this.y = y
     this.color = color
-    this.size = size
-    this.speed = speed
-    this.direction = direction
+    this.friction = friction
+    this.gravity = gravity
+    this.vector = new Vector(
+      offsetX(0, speed, direction),
+      offsetY(0, speed, direction),
+    )
     this.shape = shape
+    this.size = size
     this.timeToDie = Date.now() + life
   }
 
   step() {
-    this.x = offsetX(this.x, this.speed, this.direction)
-    this.y = offsetY(this.y, this.speed, this.direction)
+    if (typeof this.friction !== 'undefined') {
+      this.vector.magnitude *= 1 - this.friction
+    }
+
+    if (this.gravity) {
+      this.vector.add(this.gravity.direction, this.gravity.magnitude)
+    }
+
+    // movement
+    this.x = offsetX(this.x, this.vector.magnitude, this.vector.direction)
+    this.y = offsetY(this.y, this.vector.magnitude, this.vector.direction)
   }
 
   draw(drawing) {
@@ -50,8 +76,8 @@ class GameParticle {
         break
 
       case 'line':
-        const x2 = offsetX(this.x, this.speed * this.size, this.direction)
-        const y2 = offsetY(this.y, this.speed * this.size, this.direction)
+        const x2 = offsetX(this.x, this.size, this.vector.direction)
+        const y2 = offsetY(this.y, this.size, this.vector.direction)
         drawing.setFillColor('transparent')
         drawing.setStrokeColor(this.color)
         drawing.setLineWidth(1)
@@ -73,11 +99,16 @@ export class GameParticles extends GameObject {
    * @param {number} [config.count=10] - Number of particles to create
    * @param {number} [config.directionEnd=360] - Start of the direction range
    * @param {number} [config.directionStart=0] - End of the direction range
+   * @param {Vector} [config.gravity=new Vector(0, 0)] - Gravity vector applied to each particle
+   * @param {number} [config.friction=0] - Friction applied to each particle
    * @param {number} [config.life=1000] - Number of seconds for each particle to live
    * @param {number} [config.rate=100] - Number of particles to create per millisecond
    * @param {string} [config.shape='circle'] - Shape of the particle
    * @param {number} [config.size=5] - Size of the particle
    * @param {number} [config.speed=5] - Speed of the particle
+   * @param {number} [config.width=0] - Width of the emitter area
+   * @param {number} [config.height=0] - Height of the emitter area
+   *
    */
   constructor(config = {}) {
     super({ x: config.x, y: config.y })
@@ -87,21 +118,29 @@ export class GameParticles extends GameObject {
       count = 10,
       directionEnd = 360,
       directionStart = 0,
+      friction,
+      gravity,
       life = 1000,
       rate = 100,
       shape = 'circle',
       size = 5,
       speed = 5,
+      width = 0,
+      height = 0,
     } = config
 
     this.color = color
     this.count = count
     this.directionEnd = directionEnd
     this.directionStart = directionStart
+    this.friction = friction
+    this.gravity = gravity
     this.life = life
     this.rate = rate
     this.shape = shape
     this.size = size
+    this.width = width
+    this.height = height
     this.speed = speed
 
     this.particles = []
@@ -115,10 +154,12 @@ export class GameParticles extends GameObject {
 
     this.particles.push(
       new GameParticle({
-        x: this.x,
-        y: this.y,
+        x: this.x - this.width / 2 + random(0, this.width),
+        y: this.y - this.height / 2 + random(0, this.height),
         color: this.color,
         direction: random(this.directionStart, this.directionEnd),
+        friction: this.friction,
+        gravity: this.gravity,
         life: this.life,
         shape: this.shape,
         size: this.size,
@@ -145,10 +186,12 @@ export class GameParticles extends GameObject {
           ? 1
           : Math.floor((time - this.lastParticleCreatedAt) / this.rate)
 
-      for (let i = 0; i < particlesToCreate; i++) {
-        if (this.particlesCreated <= this.count) {
-          this.addParticle()
-        }
+      for (
+        let i = 0;
+        i < particlesToCreate && this.particlesCreated < this.count;
+        i++
+      ) {
+        this.addParticle()
       }
     }
 
