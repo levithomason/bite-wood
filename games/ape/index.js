@@ -5,6 +5,7 @@ import {
   gameKeyboard,
   gameMouse,
   GameObject,
+  GameParticles,
   gamePhysics,
   GameRoom,
   gameRooms,
@@ -13,11 +14,31 @@ import {
 import { direction, random } from '../../core/math.js'
 
 // =============================================================================
+// Particles
+// =============================================================================
+
+class BananaParticles extends GameParticles {
+  constructor() {
+    super({
+      count: 10,
+      life: 250,
+      speed: 4,
+      rate: 1,
+      size: 5,
+      color: '#9b7135',
+      // shape: 'circle',
+    })
+  }
+}
+
+// =============================================================================
 // Box
 // =============================================================================
 
 const imgBox = new GameImage('./sprites/box.png')
 await imgBox.loaded
+
+const sndBoxExplode = new GameAudio('./sounds/box-explode.m4a')
 
 class Box extends GameObject {
   constructor() {
@@ -29,8 +50,20 @@ class Box extends GameObject {
         insertionY: 4,
         scaleX: 4,
         scaleY: 4,
+        // TODO: this sound doesn't play when in the destroy event
+        // events: {
+        //   destroy: () => {
+        //     sndBoxExplode.play()
+        //   },
+        // },
       }),
     })
+  }
+
+  onCollision(other) {
+    if (other.constructor.name === 'Banana') {
+      sndBoxExplode.play()
+    }
   }
 }
 
@@ -62,11 +95,16 @@ class Banana extends GameObject {
   }
 
   onCollision(other) {
-    super.onCollision(other)
-
-    if (other instanceof Box) {
+    if (other.name === 'Box') {
+      room.instanceCreate(BananaParticles, other.x, other.y)
       room.instanceDestroy(this)
       room.instanceDestroy(other)
+
+      if (room.instanceCount(Box) === 0) {
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
+      }
     }
   }
 
@@ -280,7 +318,7 @@ class Ape extends GameObject {
     })
 
     this.runSpeed = 4
-    this.jumpSpeed = -8
+    this.jumpSpeed = -10
     this.setState(STATES.standR)
   }
 

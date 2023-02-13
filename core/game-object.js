@@ -289,11 +289,8 @@ export class GameObject {
   }
 
   move(direction, distance) {
-    const newX = this.x + distance * Math.cos((direction * Math.PI) / 180)
-    const newY = this.y + distance * Math.sin((direction * Math.PI) / 180)
-
-    this.x = newX
-    this.y = newY
+    this.x = offsetX(this.x, distance, direction)
+    this.y = offsetY(this.y, distance, direction)
   }
 
   motionAdd(direction, speed) {

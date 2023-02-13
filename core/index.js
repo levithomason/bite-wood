@@ -3,6 +3,7 @@ export * from './game-audio.js'
 export * from './game-drawing.js'
 export * from './game-image.js'
 export * from './game-object.js'
+export * from './game-particles.js'
 export * from './game-room.js'
 export * from './game-sprite.js'
 
