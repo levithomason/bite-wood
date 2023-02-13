@@ -1,17 +1,96 @@
-import { Game } from '../../core/game.js'
 import {
+  Game,
+  GameAudio,
   GameImage,
   gameKeyboard,
+  gameMouse,
   GameObject,
   gamePhysics,
   GameRoom,
   gameRooms,
   GameSprite,
-  gameState,
 } from '../../core/index.js'
+import { direction, random } from '../../core/math.js'
+
+// =============================================================================
+// Box
+// =============================================================================
+
+const imgBox = new GameImage('./sprites/box.png')
+await imgBox.loaded
+
+class Box extends GameObject {
+  constructor() {
+    super({
+      sprite: new GameSprite(imgBox, {
+        frameWidth: 8,
+        frameHeight: 8,
+        insertionX: 4,
+        insertionY: 4,
+        scaleX: 4,
+        scaleY: 4,
+      }),
+    })
+  }
+}
+
+// =============================================================================
+// Banana
+// =============================================================================
+
+const imgBanana = new GameImage('./sprites/banana.png')
+await imgBanana.loaded
+
+const sprBanana = new GameSprite(imgBanana, {
+  frameWidth: 8,
+  frameHeight: 8,
+  insertionX: 4,
+  insertionY: 4,
+  scaleX: 4,
+  scaleY: 4,
+})
+
+const sndShootBanana = new GameAudio('./sounds/jump.m4a')
+
+class Banana extends GameObject {
+  constructor() {
+    super({
+      speed: 16,
+      sprite: sprBanana,
+      gravity: gamePhysics.gravity,
+    })
+  }
+
+  onCollision(other) {
+    super.onCollision(other)
+
+    if (other instanceof Box) {
+      room.instanceDestroy(this)
+      room.instanceDestroy(other)
+    }
+  }
+
+  step() {
+    super.step()
+
+    if (this.isOutsideRoom()) {
+      room.instanceDestroy(this)
+      return
+    }
+
+    // apply gravity
+    this.motionAdd(gamePhysics.gravity.direction, gamePhysics.gravity.magnitude)
+  }
+}
+
+// =============================================================================
+// Ape
+// =============================================================================
 
 const imgApe = new GameImage('./sprites/ape.png')
 await imgApe.loaded
+
+const sndJump = new GameAudio('./sounds/jump-grunt.m4a')
 
 const spriteConfigBase /** @type GameSpriteConfig */ = {
   frameWidth: 16,
@@ -74,11 +153,11 @@ const STATES = {
       this.hspeed = 0
     },
     step() {
-      if (gameKeyboard.active.ArrowLeft) {
+      if (gameKeyboard.active.a || gameKeyboard.active.A) {
         this.setState(STATES.runL)
-      } else if (gameKeyboard.active.ArrowRight) {
+      } else if (gameKeyboard.active.d || gameKeyboard.active.D) {
         this.setState(STATES.runR)
-      } else if (gameKeyboard.active.ArrowUp) {
+      } else if (gameKeyboard.down.w || gameKeyboard.down.W) {
         this.setState(STATES.jumpR)
       }
     },
@@ -90,11 +169,11 @@ const STATES = {
       this.hspeed = 0
     },
     step() {
-      if (gameKeyboard.active.ArrowLeft) {
+      if (gameKeyboard.active.a || gameKeyboard.active.A) {
         this.setState(STATES.runL)
-      } else if (gameKeyboard.active.ArrowRight) {
+      } else if (gameKeyboard.active.d || gameKeyboard.active.D) {
         this.setState(STATES.runR)
-      } else if (gameKeyboard.active.ArrowUp) {
+      } else if (gameKeyboard.down.w || gameKeyboard.down.W) {
         this.setState(STATES.jumpL)
       }
     },
@@ -106,9 +185,9 @@ const STATES = {
       this.hspeed = this.runSpeed
     },
     step() {
-      if (gameKeyboard.up.ArrowRight) {
+      if (gameKeyboard.up.d || gameKeyboard.up.D) {
         this.setState(STATES.standR)
-      } else if (gameKeyboard.active.ArrowUp) {
+      } else if (gameKeyboard.down.w || gameKeyboard.down.W) {
         this.setState(STATES.jumpR)
       }
     },
@@ -120,9 +199,9 @@ const STATES = {
       this.hspeed = -this.runSpeed
     },
     step() {
-      if (gameKeyboard.up.ArrowLeft) {
+      if (gameKeyboard.up.a || gameKeyboard.up.A) {
         this.setState(STATES.standL)
-      } else if (gameKeyboard.active.ArrowUp) {
+      } else if (gameKeyboard.down.w || gameKeyboard.down.W) {
         this.setState(STATES.jumpL)
       }
     },
@@ -130,13 +209,14 @@ const STATES = {
   jumpR: {
     name: 'JumpR',
     enter() {
+      sndJump.play()
       this.setSprite(sprAprJumpR)
       this.vspeed = this.jumpSpeed
     },
     step() {
       if (this.y < gameRooms.currentRoom.height) {
         this.motionAdd(
-          gamePhysics.DIRECTION_DOWN,
+          gamePhysics.gravity.direction,
           gamePhysics.gravity.magnitude,
         )
       } else {
@@ -149,13 +229,14 @@ const STATES = {
   jumpL: {
     name: 'JumpL',
     enter() {
+      sndJump.play()
       this.setSprite(sprAprJumpL)
       this.vspeed = this.jumpSpeed
     },
     step() {
       if (this.y < gameRooms.currentRoom.height) {
         this.motionAdd(
-          gamePhysics.DIRECTION_DOWN,
+          gamePhysics.gravity.direction,
           gamePhysics.gravity.magnitude,
         )
       } else {
@@ -171,6 +252,31 @@ class Ape extends GameObject {
   constructor() {
     super({
       sprite: sprAprStandR,
+      events: {
+        mouseDown: {
+          left: () => {
+            if (room.instanceCount(Banana) >= 3) {
+              return
+            }
+
+            const xOffset = this.state.name.endsWith('R') ? 16 : -16
+            const x = this.x + xOffset
+            const y = this.y - 32
+            const banana = room.instanceCreate(Banana, x, y)
+
+            banana.direction = direction(
+              this.x,
+              this.y,
+              gameMouse.x,
+              gameMouse.y,
+            )
+
+            banana.motionAdd(this.direction, this.speed * 0.5)
+
+            sndShootBanana.play()
+          },
+        },
+      },
     })
 
     this.runSpeed = 4
@@ -189,18 +295,32 @@ class Ape extends GameObject {
   }
 }
 
+// =============================================================================
+// Room
+// =============================================================================
+
 class Room extends GameRoom {
   constructor() {
     super(800, 600)
     this.backgroundColor = '#94c0aa'
+
+    for (let i = 0; i < 7; i += 1) {
+      const y = random(400, 100)
+      this.instanceCreate(Box, i * 100 + 100, y)
+    }
+
+    this.instanceCreate(Ape, 100, 600)
   }
 }
 
 const room = new Room()
-room.instanceCreate(Ape, 100, 600)
 
 gameRooms.addRoom(room)
-gameState.debug = true
+// gameState.debug = true
+
+// =============================================================================
+// Game
+// =============================================================================
 
 const game = new Game()
 game.start()

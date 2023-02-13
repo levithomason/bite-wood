@@ -1,5 +1,10 @@
-import { Game } from '../../core/game.js'
-import { GameObject, GameRoom, gameRooms, gameState } from '../../core/index.js'
+import {
+  Game,
+  GameObject,
+  GameRoom,
+  gameRooms,
+  gameState,
+} from '../../core/index.js'
 import { random } from '../../core/math.js'
 
 const OBJECT_SIZE_MIN = 10

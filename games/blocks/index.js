@@ -1,11 +1,10 @@
-import { Game } from '../../core/game.js'
-import { gameMouse, GameObject, GameRoom, gameRooms } from '../../core/index.js'
+import { Game, GameObject, GameRoom, gameRooms } from '../../core/index.js'
 import { direction, random, randomChoice, Vector } from '../../core/math.js'
 
 const WIDTH = 800
 const HEIGHT = 600
 
-const BLOCK_INITIAL_COUNT = 0
+const BLOCK_INITIAL_COUNT = 20
 const BLOCK_SPAWN_INTERVAL = (1000 / 60) * 16
 
 const BLOCK_SPEED_SPAWN_MIN = 0.5
@@ -41,15 +40,17 @@ const bounceObjects = (a, b) => {
   const massA = Math.abs(a.size * a.size)
   const massB = Math.abs(b.size * b.size)
 
-  a.hspeed =
-    (a.hspeed * (massA - massB) + 2 * massB * b.hspeed) / (massA + massB)
-  a.vspeed =
-    (a.vspeed * (massA - massB) + 2 * massB * b.vspeed) / (massA + massB)
+  const aHSpeed = a.hspeed
+  const aVSpeed = a.vspeed
 
-  b.hspeed =
-    (b.hspeed * (massB - massA) + 2 * massA * a.hspeed) / (massA + massB)
-  b.vspeed =
-    (b.vspeed * (massB - massA) + 2 * massA * a.vspeed) / (massA + massB)
+  const bHSpeed = b.hspeed
+  const bVSpeed = b.vspeed
+
+  a.hspeed = (aHSpeed * (massA - massB) + 2 * massB * bHSpeed) / (massA + massB)
+  a.vspeed = (aVSpeed * (massA - massB) + 2 * massB * bVSpeed) / (massA + massB)
+
+  b.hspeed = (bHSpeed * (massB - massA) + 2 * massA * aHSpeed) / (massA + massB)
+  b.vspeed = (bVSpeed * (massB - massA) + 2 * massA * aVSpeed) / (massA + massB)
 }
 
 class Block extends GameObject {
@@ -127,10 +128,10 @@ class Block extends GameObject {
     other.speed *= BLOCK_COLLISION_FRICTION
 
     // bigger block eats smaller block
-    // const winner = Math.abs(this.size) > Math.abs(other.size) ? this : other
-    // const loser = winner === this ? other : this
-    // winner.size += loser.size
-    // room.instanceDestroy(loser)
+    const winner = Math.abs(this.size) > Math.abs(other.size) ? this : other
+    const loser = winner === this ? other : this
+    winner.size += Math.sqrt(Math.abs(loser.size)) * Math.sign(loser.size)
+    room.instanceDestroy(loser)
   }
 
   step() {
@@ -182,8 +183,11 @@ class Block extends GameObject {
 
   split() {
     const splits = 9
-    const splitOffset = BLOCK_SIZE_MAX / Math.sqrt(splits)
-    const splitSize = splitOffset * Math.sign(this.size) * 0.8
+    const splitsPerRow = Math.sqrt(splits)
+    const splitOffset = Math.abs(this.size) / splitsPerRow
+
+    // slightly smaller than the offset to give some margin between blocks
+    const splitSize = splitOffset * 0.8
     const splitSpeed = BLOCK_SPEED_MAX
 
     const yTop = this.y - splitOffset

@@ -7,7 +7,7 @@ export class GamePhysics {
     this.DIRECTION_LEFT = 180
     this.DIRECTION_UP = 270
 
-    this.gravity = new Vector(this.DIRECTION_DOWN, 0.4)
+    this.gravity = new Vector(0, 0.4)
     this.terminalVelocity = 15
 
     this.friction = 0.2

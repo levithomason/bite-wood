@@ -1,5 +1,4 @@
-import { Game } from '../../core/game.js'
-import { GameRoom, gameRooms } from '../../core/index.js'
+import { Game, GameRoom, gameRooms } from '../../core/index.js'
 import { collisionPointRectangle } from '../../core/collision.js'
 
 class Room extends GameRoom {
