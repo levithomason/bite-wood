@@ -266,11 +266,11 @@ const STATES = {
     step() {
       this.y = gameRooms.currentRoom.height - snowDepth
 
-      if (gameKeyboard.active.a || gameKeyboard.active.A) {
+      if (gameKeyboard.active.A) {
         this.setState(STATES.runL)
-      } else if (gameKeyboard.active.d || gameKeyboard.active.D) {
+      } else if (gameKeyboard.active.D) {
         this.setState(STATES.runR)
-      } else if (gameKeyboard.down.w || gameKeyboard.down.W) {
+      } else if (gameKeyboard.down.W) {
         this.setState(STATES.jumpR)
       }
     },
@@ -284,11 +284,11 @@ const STATES = {
     step() {
       this.y = gameRooms.currentRoom.height - snowDepth
 
-      if (gameKeyboard.active.a || gameKeyboard.active.A) {
+      if (gameKeyboard.active.A) {
         this.setState(STATES.runL)
-      } else if (gameKeyboard.active.d || gameKeyboard.active.D) {
+      } else if (gameKeyboard.active.D) {
         this.setState(STATES.runR)
-      } else if (gameKeyboard.down.w || gameKeyboard.down.W) {
+      } else if (gameKeyboard.down.W) {
         this.setState(STATES.jumpL)
       }
     },
@@ -302,9 +302,9 @@ const STATES = {
     step() {
       this.y = gameRooms.currentRoom.height - snowDepth
 
-      if (gameKeyboard.up.d || gameKeyboard.up.D) {
+      if (gameKeyboard.up.D) {
         this.setState(STATES.standR)
-      } else if (gameKeyboard.down.w || gameKeyboard.down.W) {
+      } else if (gameKeyboard.down.W) {
         this.setState(STATES.jumpR)
       }
     },
@@ -318,9 +318,9 @@ const STATES = {
     step() {
       this.y = gameRooms.currentRoom.height - snowDepth
 
-      if (gameKeyboard.up.a || gameKeyboard.up.A) {
+      if (gameKeyboard.up.A) {
         this.setState(STATES.standL)
-      } else if (gameKeyboard.down.w || gameKeyboard.down.W) {
+      } else if (gameKeyboard.down.W) {
         this.setState(STATES.jumpL)
       }
     },

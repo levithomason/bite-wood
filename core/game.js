@@ -90,7 +90,7 @@ export class Game {
     }
 
     // handle play/pause/debug global keybindings
-    if (gameKeyboard.down.p) {
+    if (gameKeyboard.down.P) {
       if (gameState.isPlaying) {
         gameState.pause()
       } else {
@@ -123,7 +123,7 @@ export class Game {
     //
     // Collisions
     //
-    handleCollisions()
+    handleCollisions(gameRooms.currentRoom.objects)
 
     //
     // Step - user code should "win", call step after collisions

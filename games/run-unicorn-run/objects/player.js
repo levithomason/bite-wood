@@ -162,7 +162,7 @@ class Player extends GameObject {
     //
 
     // walking
-    if (gameKeyboard.active.ArrowRight || gameKeyboard.active.ArrowLeft) {
+    if (gameKeyboard.active.ARROWRIGHT || gameKeyboard.active.ARROWLEFT) {
       this.friction = 0
       this.hspeed =
         Math.sign(this.hspeed) * Math.min(Math.abs(this.hspeed), this.maxSpeed)

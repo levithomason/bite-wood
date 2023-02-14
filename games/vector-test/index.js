@@ -29,24 +29,24 @@ class Room extends GameRoom {
     let horizontalOperation = ''
     let verticalOperation = ''
 
-    if (gameKeyboard.active.ArrowUp) {
+    if (gameKeyboard.active.ARROWUP) {
       this.vector.magnitude += 5
       verticalOperation = '+ magnitude'
-    } else if (gameKeyboard.active.ArrowDown) {
+    } else if (gameKeyboard.active.ARROWDOWN) {
       this.vector.magnitude -= this.vector.magnitude <= 5 ? 0 : 5
       verticalOperation = '- magnitude'
     }
 
-    if (gameKeyboard.active.ArrowLeft) {
-      if (gameKeyboard.active.Shift) {
+    if (gameKeyboard.active.ARROWLEFT) {
+      if (gameKeyboard.active.SHIFT) {
         this.vector.angle -= 0.036
         horizontalOperation = '- angle'
       } else {
         this.vector.direction -= 2
         horizontalOperation = '- direction'
       }
-    } else if (gameKeyboard.active.ArrowRight) {
-      if (gameKeyboard.active.Shift) {
+    } else if (gameKeyboard.active.ARROWRIGHT) {
+      if (gameKeyboard.active.SHIFT) {
         this.vector.angle += 0.036
         horizontalOperation = '+ angle'
       } else {

@@ -83,8 +83,6 @@ export const handleCollisions = (objects) => {
   // clear active collisions
   _activeCollisions.length = 0
 
-  const { objects } = gameRooms.currentRoom
-
   const visited = new Set()
 
   objects.forEach((self) => {
