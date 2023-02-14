@@ -2,8 +2,6 @@ import { Vector } from './math.js'
 import { GameDrawing } from './game-drawing.js'
 import { GameObject } from './game-object.js'
 import { GameSprite } from './game-sprite.js'
-import { gameRooms } from './game-rooms.js'
-import { GameRoom } from './game-room.js'
 import { GameImage } from './game-image.js'
 
 // jest-canvas-mock doesn't implement a mock for roundRect
@@ -187,20 +185,12 @@ describe('GameDrawing', () => {
       expect(drawing.fpsDebug(100, 60) === drawing).toBe(true)
     })
 
-    // TODO: This test is revealing some bad arch.
-    //       Refactor so drawing debug doesn't require creating a room and inserting an object.
-    //       This is due to the fact that the draw method checks for collisions.
-    //       The collision logic requires currentRoom.objects to find collisions.
-    //       Collisions should only register a check, then game step can call all the checks.
     it('mouseDebug() returns this', () => {
       expect(drawing.mouseDebug(0, 0) === drawing).toBe(true)
     })
 
     it('objectDebug() returns this', () => {
-      gameRooms.addRoom(new GameRoom(10, 10))
-
-      const object = new GameObject()
-      expect(drawing.objectDebug(object) === drawing).toBe(true)
+      expect(drawing.objectDebug(new GameObject()) === drawing).toBe(true)
     })
 
     it('vectorDebug() returns this', () => {
