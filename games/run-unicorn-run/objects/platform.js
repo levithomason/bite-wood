@@ -13,6 +13,8 @@ const height = 78
 const groundThickness = 28
 
 const imgPlatform = new GameImage(`../run-unicorn-run/images/background.png`)
+await imgPlatform.loaded
+
 const sprPlatform = new GameSprite(imgPlatform, {
   frameFirstY: 522,
   frameFirstX: 90,

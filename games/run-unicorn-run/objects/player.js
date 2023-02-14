@@ -29,9 +29,13 @@ const boundingBoxR = {
 export const imgPlayerR = new GameImage(
   '../run-unicorn-run/images/my-littlepony-right.png',
 )
+await imgPlayerR.loaded
+
 export const imgPlayerL = new GameImage(
   '../run-unicorn-run/images/my-littlepony-left.png',
 )
+await imgPlayerL.loaded
+
 export const sprPlayerIdleR = new GameSprite(imgPlayerR, {
   frameFirstY: 543,
   frameFirstX: 0,

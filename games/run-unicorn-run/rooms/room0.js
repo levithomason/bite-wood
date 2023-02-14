@@ -6,13 +6,14 @@ import Player from '../objects/player.js'
 import RainbowDash from '../objects/rainbow-dash.js'
 import Solid from '../objects/solid.js'
 
+const imgBackground = new GameImage('../run-unicorn-run/images/background.png')
+await imgBackground.loaded
+
 export default class Room0 extends GameRoom {
   constructor() {
     super(800, 600)
 
-    this.backgroundImage = new GameImage(
-      '../run-unicorn-run/images/background.png',
-    )
+    this.backgroundImage = imgBackground
 
     this.backgroundMusic = new GameAudio(
       'https://soundimage.org/wp-content/uploads/2016/03/More-Monkey-Island-Band_Looping.mp3',

@@ -11,10 +11,12 @@ import {
 export const imgRainbowDashR = new GameImage(
   './../run-unicorn-run/images/my-littlepony-right.png',
 )
+await imgRainbowDashR.loaded
 
 export const imgRainbowDashL = new GameImage(
   './../run-unicorn-run/images/my-littlepony-left.png',
 )
+await imgRainbowDashL.loaded
 
 export const sprRainbowDashFlyR = new GameSprite(imgRainbowDashR, {
   frameFirstY: 1057,

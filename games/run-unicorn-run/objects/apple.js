@@ -12,6 +12,8 @@ import { isColliding } from '../../../core/collision.js'
 // Player
 // ----------------------------------------
 const imgApple = new GameImage(`../run-unicorn-run/images/apple.png`)
+await imgApple.loaded
+
 const sprApple = new GameSprite(imgApple, {
   scaleX: 2,
   scaleY: 2,
