@@ -33,7 +33,7 @@ export class GameAudio {
     if (!this.element.paused) return
 
     this.element
-      .cloneNode(true)
+      .cloneNode(true) // allow playing this sound multiple times at once
       .play()
       .catch((error) => {
         switch (error) {
