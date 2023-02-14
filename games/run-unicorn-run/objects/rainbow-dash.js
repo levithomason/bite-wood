@@ -13,12 +13,7 @@ export const imgRainbowDashR = new GameImage(
 )
 await imgRainbowDashR.loaded
 
-export const imgRainbowDashL = new GameImage(
-  './../run-unicorn-run/images/my-littlepony-left.png',
-)
-await imgRainbowDashL.loaded
-
-export const sprRainbowDashFlyR = new GameSprite(imgRainbowDashR, {
+const config = {
   frameFirstY: 1057,
   frameFirstX: -2,
   frameWidth: 95,
@@ -33,26 +28,12 @@ export const sprRainbowDashFlyR = new GameSprite(imgRainbowDashR, {
   boundingBoxHeight: 14,
   boundingBoxWidth: 67,
   stepsPerFrame: 4,
-})
+}
+export const sprRainbowDashFlyR = new GameSprite(imgRainbowDashR, config)
 
-export const sprRainbowDashFlyL = new GameSprite(imgRainbowDashL, {
-  // TODO: do away with RTL once we have sprite edit ability
-  // or we need to mirror frames
-  frameFirstY: 1057,
-  frameFirstX: 1108,
-  frameWidth: 95,
-  frameHeight: 40,
-  frameCount: 6,
+export const sprRainbowDashFlyL = new GameSprite(imgRainbowDashR, {
+  ...config,
   rtl: true,
-  scaleX: 2,
-  scaleY: 2,
-  insertionX: 48,
-  insertionY: 18,
-  boundingBoxTop: 12,
-  boundingBoxLeft: 2,
-  boundingBoxHeight: 14,
-  boundingBoxWidth: 67,
-  stepsPerFrame: 4,
 })
 
 class RainbowDash extends GameObject {

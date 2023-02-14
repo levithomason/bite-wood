@@ -8,8 +8,22 @@ export class GameAudio {
   constructor(src) {
     this.element = new Audio(src)
 
-    this.play = this.play.bind(this)
+    this.playOne = this.playOne.bind(this)
     this.pause = this.pause.bind(this)
+  }
+
+  #handlePlayError(error) {
+    switch (error) {
+      case 'NotAllowedError':
+        console.error(`Can't play audio, try implementing a "play" button.`)
+        break
+      case 'NotSupportedError':
+        console.error(`Can't play audio, unsupported media format.`)
+        break
+      default:
+        console.error(`Unknown error playing audio: ${error}`)
+        break
+    }
   }
 
   /** @type boolean */
@@ -29,25 +43,16 @@ export class GameAudio {
     this.element.volume = val
   }
 
-  play() {
+  playOne() {
     if (!this.element.paused) return
 
+    this.element.play().catch(this.#handlePlayError)
+  }
+
+  playMany() {
     this.element
       .cloneNode(true) // allow playing this sound multiple times at once
-      .play()
-      .catch((error) => {
-        switch (error) {
-          case 'NotAllowedError':
-            console.error(`Can't play audio, try implementing a "play" button.`)
-            break
-          case 'NotSupportedError':
-            console.error(`Can't play audio, unsupported media format.`)
-            break
-          default:
-            console.error(`Unknown error playing audio: ${error}`)
-            break
-        }
-      })
+      .play(this.#handlePlayError)
   }
 
   pause() {

@@ -121,7 +121,7 @@ class Box extends GameObject {
 
   onCollision(other) {
     if (other.constructor.name === 'Banana') {
-      sndBoxExplode.play()
+      sndBoxExplode.playOne()
     }
   }
 }
@@ -328,7 +328,7 @@ const STATES = {
   jumpR: {
     name: 'JumpR',
     enter() {
-      sndJump.play()
+      sndJump.playOne()
       this.setSprite(sprAprJumpR)
       this.vspeed = this.jumpSpeed
     },
@@ -348,7 +348,7 @@ const STATES = {
   jumpL: {
     name: 'JumpL',
     enter() {
-      sndJump.play()
+      sndJump.playOne()
       this.setSprite(sprAprJumpL)
       this.vspeed = this.jumpSpeed
     },
@@ -390,7 +390,7 @@ class Ape extends GameObject {
               gameMouse.y,
             )
 
-            sndShootBanana.play()
+            sndShootBanana.playMany()
           },
         },
       },

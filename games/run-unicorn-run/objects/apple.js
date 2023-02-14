@@ -149,7 +149,7 @@ const actions = {
   //
   soundPlay: createAction(({ name }) => {
     // TODO: need to play sounds by name somehow... organized resources into resource tree
-    sndEatApple.play()
+    sndEatApple.playOne()
   }),
 }
 

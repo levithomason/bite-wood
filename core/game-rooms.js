@@ -41,7 +41,7 @@ class GameRooms {
    * @returns {boolean}
    */
   setRoomIndex(index) {
-    const nextIndex = clamp(index, -1, this.#rooms.length - 1)
+    const nextIndex = clamp(index, 0, this.#rooms.length - 1)
     const didChange = nextIndex !== this.#roomIndex
 
     if (didChange) {
@@ -69,7 +69,7 @@ class GameRooms {
           this.currentRoom.objects.concat(persistedObjects)
         if (this.currentRoom.backgroundMusic) {
           this.currentRoom.backgroundMusic.loop = true
-          this.currentRoom.backgroundMusic.play()
+          this.currentRoom.backgroundMusic.playOne()
         }
       }
     }

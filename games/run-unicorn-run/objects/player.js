@@ -14,29 +14,19 @@ import { onBottom } from '../../../core/collision.js'
 // ----------------------------------------
 // Player
 // ----------------------------------------
-const boundingBoxL = {
-  boundingBoxTop: 5,
-  boundingBoxLeft: 8,
-  boundingBoxWidth: 28,
-  boundingBoxHeight: 41,
-}
+export const imgPlayerR = new GameImage(
+  '../run-unicorn-run/images/my-littlepony-right.png',
+)
+await imgPlayerR.loaded
+
 const boundingBoxR = {
   boundingBoxTop: 5,
   boundingBoxLeft: 11,
   boundingBoxWidth: 28,
   boundingBoxHeight: 41,
 }
-export const imgPlayerR = new GameImage(
-  '../run-unicorn-run/images/my-littlepony-right.png',
-)
-await imgPlayerR.loaded
 
-export const imgPlayerL = new GameImage(
-  '../run-unicorn-run/images/my-littlepony-left.png',
-)
-await imgPlayerL.loaded
-
-export const sprPlayerIdleR = new GameSprite(imgPlayerR, {
+const sprIdleRConfig = {
   frameFirstY: 543,
   frameFirstX: 0,
   frameWidth: 45,
@@ -48,22 +38,14 @@ export const sprPlayerIdleR = new GameSprite(imgPlayerR, {
   insertionY: 46,
   stepsPerFrame: 8,
   ...boundingBoxR,
-})
-export const sprPlayerIdleL = new GameSprite(imgPlayerL, {
-  frameFirstY: 543,
-  frameFirstX: 1106,
-  frameWidth: 45,
-  frameHeight: 46,
-  frameCount: 16,
+}
+export const sprPlayerIdleR = new GameSprite(imgPlayerR, sprIdleRConfig)
+export const sprPlayerIdleL = new GameSprite(imgPlayerR, {
+  ...sprIdleRConfig,
   rtl: true,
-  scaleX: 2,
-  scaleY: 2,
-  insertionX: 24,
-  insertionY: 46,
-  stepsPerFrame: 8,
-  ...boundingBoxL,
 })
-export const sprPlayerWalkR = new GameSprite(imgPlayerR, {
+
+const sprWalkRConfig = {
   frameCount: 6,
   frameWidth: 48,
   frameHeight: 46,
@@ -75,20 +57,11 @@ export const sprPlayerWalkR = new GameSprite(imgPlayerR, {
   insertionY: 46,
   stepsPerFrame: 2,
   ...boundingBoxR,
-})
-export const sprPlayerWalkL = new GameSprite(imgPlayerL, {
-  frameCount: 6,
-  frameWidth: 48,
-  frameHeight: 46,
-  frameFirstX: 1051,
-  frameFirstY: 12,
+}
+export const sprPlayerWalkR = new GameSprite(imgPlayerR, sprWalkRConfig)
+export const sprPlayerWalkL = new GameSprite(imgPlayerR, {
+  ...sprWalkRConfig,
   rtl: true,
-  scaleX: 2,
-  scaleY: 2,
-  insertionX: 24,
-  insertionY: 46,
-  stepsPerFrame: 2,
-  ...boundingBoxL,
 })
 
 class Player extends GameObject {
@@ -115,7 +88,7 @@ class Player extends GameObject {
         },
 
         keyDown: {
-          ArrowUp(self) {
+          ARROWUP(self) {
             if (onBottom(self, 'solid')) {
               self.motionAdd(gamePhysics.DIRECTION_UP, self.jump)
             }
@@ -123,21 +96,21 @@ class Player extends GameObject {
         },
 
         keyUp: {
-          ArrowRight(self) {
+          ARROWRIGHT(self) {
             self.setSprite(sprPlayerIdleR)
           },
-          ArrowLeft(self) {
+          ARROWLEFT(self) {
             self.setSprite(sprPlayerIdleL)
           },
         },
 
         keyActive: {
-          ArrowRight(self) {
+          ARROWRIGHT(self) {
             self.setSprite(sprPlayerWalkR)
             self.motionAdd(gamePhysics.DIRECTION_RIGHT, self.acceleration)
           },
 
-          ArrowLeft(self) {
+          ARROWLEFT(self) {
             self.setSprite(sprPlayerWalkL)
             self.motionAdd(gamePhysics.DIRECTION_LEFT, self.acceleration)
           },
@@ -166,7 +139,11 @@ class Player extends GameObject {
     //
 
     // walking
-    if (gameKeyboard.active.ARROWRIGHT || gameKeyboard.active.ARROWLEFT) {
+    if (
+      this.y < gameRooms.currentRoom.height ||
+      gameKeyboard.active.ARROWRIGHT ||
+      gameKeyboard.active.ARROWLEFT
+    ) {
       this.friction = 0
       this.hspeed =
         Math.sign(this.hspeed) * Math.min(Math.abs(this.hspeed), this.maxSpeed)
@@ -206,7 +183,7 @@ class Player extends GameObject {
   draw(drawing) {
     super.draw(drawing)
 
-    if (gameMouse.down.left) {
+    if (gameMouse.active.left) {
       drawing
         .setLineWidth(2)
         .setStrokeColor('#753')

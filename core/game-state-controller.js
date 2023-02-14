@@ -29,7 +29,7 @@ class GameState {
     this.#isPlaying = true
 
     // TODO: controlling room music should be user code, not framework
-    gameRooms.currentRoom?.backgroundMusic?.play()
+    gameRooms.currentRoom?.backgroundMusic?.playOne()
   }
 
   /** Pause gameplay. */
