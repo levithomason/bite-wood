@@ -41,7 +41,7 @@ class GameRooms {
    * @returns {boolean}
    */
   setRoomIndex(index) {
-    const nextIndex = clamp(index, 0, this.#rooms.length - 1)
+    const nextIndex = clamp(index, -1, this.#rooms.length - 1)
     const didChange = nextIndex !== this.#roomIndex
 
     if (didChange) {
@@ -82,6 +82,9 @@ class GameRooms {
    * @returns {boolean}
    */
   nextRoom() {
+    // prevent going out of range
+    if (this.isLastRoom()) return false
+
     return this.setRoomIndex(this.#roomIndex + 1)
   }
 
@@ -90,6 +93,9 @@ class GameRooms {
    * @returns {boolean}
    */
   prevRoom() {
+    // prevent going out of range
+    if (this.isFirstRoom()) return false
+
     return this.setRoomIndex(this.#roomIndex - 1)
   }
 

@@ -156,9 +156,13 @@ const actions = {
 /**
  * Transforms an object of JSON actions into a function call.
  *
- * in : { moveTo: { x: 10, y: 20 } }
+ * in : {
+ *        moveTo: { x: 10, y: 20 },
+ *        soundPlay: { name: 'start' }
+ *      }
  * out: () => {
- *        actions.moveTo({ 10, 20 })
+ *        actions.moveTo({ x: 10, y: 20 })
+ *        actions.soundPlay('start')
  *      }
  *
  * @param actionsObj

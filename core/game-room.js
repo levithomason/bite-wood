@@ -114,9 +114,14 @@ export class GameRoom {
     const object = new GameObject()
     object.x = x
     object.y = y
-    object.create()
 
     this.objects.push(object)
+
+    // Instances created during run-time need to have their create() event fired.
+    // We do this AFTER the constructor and AFTER pushing it to the room objects so that
+    // the object's event has access to the full state of the room (including itself).
+    // The constructor instantiation time cannot provide for this.
+    object.create()
 
     return object
   }
