@@ -72,11 +72,16 @@ export const onRight = (self, other) => {
  * List of tuples of objects that are currently colliding.
  * @type {[GameObject, GameObject][]}
  */
-export const activeCollisions = []
+const _activeCollisions = []
 
-export const handleCollisions = () => {
+/**
+ * Calculates collisions between all `objects`, calls their `onCollision` methods,
+ * and
+ * @param {GameObject[]} objects
+ */
+export const handleCollisions = (objects) => {
   // clear active collisions
-  activeCollisions.length = 0
+  _activeCollisions.length = 0
 
   const { objects } = gameRooms.currentRoom
 
@@ -85,20 +90,21 @@ export const handleCollisions = () => {
   objects.forEach((self) => {
     // track visited objects, so we don't check collisions twice
     // this also prevents:
-    // 1. adding duplicate collisions to the activeCollisions list
+    // 1. adding duplicate collisions to the _activeCollisions list
     // 2. colliding with self
     visited.add(self)
 
     objects.forEach((other) => {
       if (visited.has(other)) return
 
+      // Simple check for overlapping AABB
       if (
         self.boundingBoxRight >= other.boundingBoxLeft &&
         self.boundingBoxLeft <= other.boundingBoxRight &&
         self.boundingBoxBottom >= other.boundingBoxTop &&
         self.boundingBoxTop <= other.boundingBoxBottom
       ) {
-        activeCollisions.push([self, other])
+        _activeCollisions.push([self, other])
       }
     })
   })
@@ -107,7 +113,7 @@ export const handleCollisions = () => {
   // TODO: resolve dynamic to dynamic
 
   // call user code for collisions
-  activeCollisions.forEach(([objectA, objectB]) => {
+  _activeCollisions.forEach(([objectA, objectB]) => {
     objectA.onCollision(objectB)
     objectB.onCollision(objectA)
   })
@@ -130,7 +136,7 @@ export const handleCollisions = () => {
  * @returns {boolean}
  */
 export const isColliding = (self, other) => {
-  return activeCollisions.some(([a, b]) => {
+  return _activeCollisions.some(([a, b]) => {
     if (a === self) return !other || b instanceof other
     if (b === self) return !other || a instanceof other
   })
