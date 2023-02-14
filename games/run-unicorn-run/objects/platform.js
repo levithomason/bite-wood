@@ -16,8 +16,8 @@ const imgPlatform = new GameImage(`../run-unicorn-run/images/background.png`)
 await imgPlatform.loaded
 
 const sprPlatform = new GameSprite(imgPlatform, {
+  frameFirstX: 98,
   frameFirstY: 522,
-  frameFirstX: 90,
   frameWidth: width,
   frameHeight: height,
   frameCount: 1,

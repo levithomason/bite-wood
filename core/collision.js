@@ -1,5 +1,3 @@
-import { gameRooms } from './game-rooms.js'
-
 /**
  * Checks if a point is colliding with a rectangle.
  * @param {number} x - The x position of the point.
