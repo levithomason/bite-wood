@@ -1,9 +1,19 @@
-export const toDegrees = (radians) => (radians * 180) / Math.PI
+const radToDegMul = 180 / Math.PI
+const degToRadMul = Math.PI / 180
 
-export const toRadians = (degrees) => (degrees * Math.PI) / 180
+/**
+ * Converts radians to degrees and returns a value between 0 and 360.
+ * @param {number} radians
+ * @return {number}
+ */
+export const toDegrees = (radians) => (radians * radToDegMul + 360) % 360
+
+export const toRadians = (degrees) => degrees * degToRadMul
 
 export const distance = (x1, y1, x2 = 0, y2 = 0) => {
-  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+  const x = x2 - x1
+  const y = y2 - y1
+  return Math.sqrt(x * x + y * y)
 }
 
 export const direction = (x1, y1, x2 = 0, y2 = 0) => {
@@ -43,6 +53,15 @@ export const clamp = (val, min, max) => {
  */
 export const random = (max = 1, min = 0) => {
   return (max - min) * Math.random() + min
+}
+
+/**
+ * Returns a random item from an array.
+ * @param {*[]} array
+ * @return {number}
+ */
+export const randomChoice = (array) => {
+  return array[Math.floor(random(array.length))]
 }
 
 /**
@@ -105,59 +124,61 @@ export const inRange = (val, lower, upper) => {
 }
 
 export class Vector {
-  constructor(direction = 0, magnitude = 0) {
-    this._angle = toRadians(direction)
-    this._hypotenuse = magnitude
-    this._adjacent = this._hypotenuse * Math.cos(this._angle)
-    this._opposite = this._hypotenuse * Math.sin(this._angle)
+  constructor(x = 0, y = 0) {
+    this.x = x
+    this.y = y
 
     this.add = this.add.bind(this)
   }
 
+  #setXY(angle, magnitude) {
+    this.x = magnitude * Math.cos(angle)
+    this.y = magnitude * Math.sin(angle)
+  }
+
+  /**
+   * The angle of the vector in radians.
+   * @type {number}
+   */
+  get angle() {
+    return Math.atan2(this.y, this.x)
+  }
+
+  set angle(angle) {
+    this.#setXY(angle, this.magnitude)
+  }
+
+  /**
+   * The direction of the vector in degrees.
+   * @type {number}
+   */
   get direction() {
-    return toDegrees(this._angle)
+    return toDegrees(this.angle)
   }
 
-  set direction(direction) {
-    this._angle = toRadians(direction)
-    this._adjacent = this._hypotenuse * Math.cos(this._angle)
-    this._opposite = this._hypotenuse * Math.sin(this._angle)
+  set direction(val) {
+    this.angle = toRadians(val)
   }
 
+  /**
+   * The magnitude (i.e. length) of the vector.
+   * @type {number}
+   */
   get magnitude() {
-    return this._hypotenuse
+    return distance(this.x, this.y)
   }
 
-  set magnitude(hypotenuse) {
-    this._hypotenuse = hypotenuse
-    this._adjacent = this._hypotenuse * Math.cos(this._angle)
-    this._opposite = this._hypotenuse * Math.sin(this._angle)
+  set magnitude(magnitude) {
+    this.#setXY(this.angle, magnitude)
   }
 
-  get x() {
-    return this._adjacent
-  }
-
-  set x(adjacent) {
-    this._adjacent = adjacent
-    this._angle = Math.atan2(this._opposite, this._adjacent)
-    this._hypotenuse = distance(this.x, this.y)
-  }
-
-  get y() {
-    return this._opposite
-  }
-
-  set y(opposite) {
-    this._opposite = opposite
-    this._angle = Math.atan2(this._opposite, this._adjacent)
-    this._hypotenuse = distance(this.x, this.y)
-  }
-
+  /**
+   * Add direction and magnitude to the vector.
+   * @param {number} direction
+   * @param {number} magnitude
+   */
   add(direction, magnitude) {
-    const vector = new Vector(direction, magnitude)
-
-    this.x += vector.x
-    this.y += vector.y
+    this.x += offsetX(0, magnitude, direction)
+    this.y += offsetY(0, magnitude, direction)
   }
 }

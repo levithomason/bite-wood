@@ -175,17 +175,17 @@ class Globby extends GameObject {
   step() {
     super.step()
 
-    if (gameKeyboard.active.ArrowLeft) {
+    if (gameKeyboard.active.ARROWLEFT) {
       this.motionAdd(gamePhysics.DIRECTION_LEFT, this.acceleration)
-    } else if (gameKeyboard.active.ArrowRight) {
+    } else if (gameKeyboard.active.ARROWRIGHT) {
       this.motionAdd(gamePhysics.DIRECTION_RIGHT, this.acceleration)
     } else {
       this.hspeed *= 1 - this.friction
     }
 
-    if (gameKeyboard.active.ArrowUp) {
+    if (gameKeyboard.active.ARROWUP) {
       this.motionAdd(gamePhysics.DIRECTION_UP, this.acceleration)
-    } else if (gameKeyboard.active.ArrowDown) {
+    } else if (gameKeyboard.active.ARROWDOWN) {
       this.motionAdd(gamePhysics.DIRECTION_DOWN, this.acceleration)
     } else {
       this.vspeed *= 1 - this.friction

@@ -1,18 +1,21 @@
 import { gameRooms } from './game-rooms.js'
 
 /**
- * Checks if a point is colliding with an object.
- * @param {number} x
- * @param {number} y
- * @param {GameObject} object
+ * Checks if a point is colliding with a rectangle.
+ * @param {number} x - The x position of the point.
+ * @param {number} y - The y position of the point.
+ * @param {number} x1 - The x1 of the rectangle.
+ * @param {number} y1 - The y1 of the rectangle.
+ * @param {number} x2 - The x2 of the rectangle.
+ * @param {number} y2 - The y2 of the rectangle.
  * @returns {boolean}
  */
-export const point = (x, y, object) => {
+export const collisionPointRectangle = (x, y, x1, y1, x2, y2) => {
   return (
-    x >= object.boundingBoxLeft &&
-    x <= object.boundingBoxRight &&
-    y >= object.boundingBoxTop &&
-    y <= object.boundingBoxBottom
+    x >= Math.min(x1, x2) &&
+    x <= Math.max(x1, x2) &&
+    y >= Math.min(y1, y2) &&
+    y <= Math.max(y1, y2)
   )
 }
 
@@ -66,38 +69,73 @@ export const onRight = (self, other) => {
 }
 
 /**
- * Checks if an object is colliding with some other object.
+ * List of tuples of objects that are currently colliding.
+ * @type {[GameObject, GameObject][]}
+ */
+const _activeCollisions = []
+
+/**
+ * Calculates collisions between all `objects`, calls their `onCollision` methods,
+ * and
+ * @param {GameObject[]} objects
+ */
+export const handleCollisions = (objects) => {
+  // clear active collisions
+  _activeCollisions.length = 0
+
+  const visited = new Set()
+
+  objects.forEach((self) => {
+    // track visited objects, so we don't check collisions twice
+    // this also prevents:
+    // 1. adding duplicate collisions to the _activeCollisions list
+    // 2. colliding with self
+    visited.add(self)
+
+    objects.forEach((other) => {
+      if (visited.has(other)) return
+
+      // Simple check for overlapping AABB
+      if (
+        self.boundingBoxRight >= other.boundingBoxLeft &&
+        self.boundingBoxLeft <= other.boundingBoxRight &&
+        self.boundingBoxBottom >= other.boundingBoxTop &&
+        self.boundingBoxTop <= other.boundingBoxBottom
+      ) {
+        _activeCollisions.push([self, other])
+      }
+    })
+  })
+
+  // TODO: resolve dynamic to static
+  // TODO: resolve dynamic to dynamic
+
+  // call user code for collisions
+  _activeCollisions.forEach(([objectA, objectB]) => {
+    objectA.onCollision(objectB)
+    objectB.onCollision(objectA)
+  })
+}
+
+/**
+ * Returns true if the object is colliding with some other object.
+ * Use the callback to define custom logic for determining if a collision has occurred.
+ *
+ * @example
+ * // Check if the player is colliding with any object
+ * if (isColliding(player)) { ... }
+ *
+ * // Check if the player is colliding with a specific class of object
+ * if (isColliding(player, CoinClass)) { ... }
+ *
  * @param {GameObject} self
- * @param {'any'|'solid'|string} [other='any'] - If set to string, collisions only happen when the other object's name matches the string.
- * @param {Function} [cb] - A callback for custom logic in determining if a collision has occurred. It is called with two arguments: self, other.
+ * @param {GameObject|undefined} [other] - A game object to check collisions against
+ * or a callback that returns true if the collision is valid.
  * @returns {boolean}
  */
-export const objects = (self, other = 'any', cb) => {
-  const withAny = other === 'any'
-  const withSolid = other === 'solid'
-  const name = !withAny && !withSolid ? other : ''
-
-  return gameRooms.currentRoom.objects.some((object) => {
-    // TODO: introduce object ids so as not to rely on instance equality, could be over network
-    if (self === object) return false
-
-    const isColliding =
-      self.boundingBoxRight >= object.boundingBoxLeft &&
-      self.boundingBoxLeft <= object.boundingBoxRight &&
-      self.boundingBoxBottom >= object.boundingBoxTop &&
-      self.boundingBoxTop <= object.boundingBoxBottom
-
-    if (!isColliding) return false
-
-    // Defer to custom collision detection logic
-    if (typeof cb === 'function') {
-      return cb(self, object)
-    }
-
-    // Fallback to default collision detection logic
-    if (withAny) return true
-    if (withSolid) return !!object.solid
-
-    return name === object.name
+export const isColliding = (self, other) => {
+  return _activeCollisions.some(([a, b]) => {
+    if (a === self) return !other || b instanceof other
+    if (b === self) return !other || a instanceof other
   })
 }

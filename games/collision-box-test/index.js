@@ -1,11 +1,15 @@
-import { Game } from '../../core/game.js'
-import { GameObject, GameRoom, gameRooms, gameState } from '../../core/index.js'
+import {
+  Game,
+  GameObject,
+  GameRoom,
+  gameRooms,
+  gameState,
+} from '../../core/index.js'
 import { random } from '../../core/math.js'
-import * as collision from '../../core/collision.js'
 
-let OBJECT_SIZE_MIN = 10
-let OBJECT_SIZE_MAX = 80
-let OBJECT_COUNT = 20
+const OBJECT_SIZE_MIN = 10
+const OBJECT_SIZE_MAX = 80
+const OBJECT_COUNT = 20
 
 class Object extends GameObject {
   constructor() {
@@ -46,23 +50,6 @@ class Object extends GameObject {
     } else if (this.boundingBoxBottom >= room.height) {
       this.vspeed = -Math.abs(this.vspeed)
     }
-
-    // TODO bounce objects off each other
-    // collision.objects(this, 'any', (other /** @type GameObject */) => {
-    //   // bounce
-    //   if (collision.onTop(this, other) || collision.onBottom(this, other)) {
-    //     this.vspeed = -this.vspeed
-    //   } else if (
-    //     collision.onLeft(this, other) ||
-    //     collision.onRight(this, other)
-    //   ) {
-    //     this.hspeed = -this.hspeed
-    //   }
-    // })
-  }
-
-  draw(drawing) {
-    super.draw(drawing)
   }
 }
 

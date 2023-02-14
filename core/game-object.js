@@ -2,7 +2,7 @@ import { gameKeyboard } from './game-keyboard-controller.js'
 import { gameMouse } from './game-mouse-controller.js'
 import { gamePhysics } from './game-physics-controller.js'
 import { gameState } from './game-state-controller.js'
-import { Vector } from './math.js'
+import { offsetX, offsetY, Vector } from './math.js'
 import { gameRooms } from './game-rooms.js'
 import { gameDrawing } from './game-drawing-controller.js'
 
@@ -41,11 +41,17 @@ export class GameObject {
   /** @type number */
   #boundingBoxTop
 
+  /** @type {Vector} */
+  #vector
+
   /**
    * An array of all instantiated game objects.
    * @type {GameObject[]}
    */
   static instances = []
+
+  // TODO: introduce object ids, replace instance equality checks
+  // id = uuidv4()
 
   /**
    * @param {object} [config]
@@ -99,7 +105,10 @@ export class GameObject {
     this.acceleration = acceleration
     this.friction = friction
     this.gravity = gravity
-    this._vector = new Vector(direction, speed)
+    this.#vector = new Vector(
+      offsetX(this.x, speed, direction),
+      offsetY(this.y, speed, direction),
+    )
     this.events = events
 
     // assign any custom properties the developer passed in
@@ -123,35 +132,35 @@ export class GameObject {
   }
 
   get speed() {
-    return this._vector.magnitude
+    return this.#vector.magnitude
   }
 
   set speed(speed) {
-    this._vector.magnitude = speed
+    this.#vector.magnitude = speed
   }
 
   get hspeed() {
-    return this._vector.x
+    return this.#vector.x
   }
 
   set hspeed(hspeed) {
-    this._vector.x = hspeed
+    this.#vector.x = hspeed
   }
 
   get vspeed() {
-    return this._vector.y
+    return this.#vector.y
   }
 
   set vspeed(vspeed) {
-    this._vector.y = vspeed
+    this.#vector.y = vspeed
   }
 
   get direction() {
-    return this._vector.direction
+    return this.#vector.direction
   }
 
   set direction(direction) {
-    this._vector.direction = direction
+    this.#vector.direction = direction
   }
 
   get boundingBoxTop() {
@@ -162,12 +171,20 @@ export class GameObject {
     return this.y + this.#boundingBoxTop
   }
 
+  set boundingBoxTop(val) {
+    this.#boundingBoxTop = val
+  }
+
   get boundingBoxLeft() {
     if (this.sprite) {
       return this.x - this.sprite.insertionX + this.sprite.boundingBoxLeft
     }
 
     return this.x + this.#boundingBoxLeft
+  }
+
+  set boundingBoxLeft(val) {
+    this.#boundingBoxLeft = val
   }
 
   get boundingBoxRight() {
@@ -190,8 +207,16 @@ export class GameObject {
     return Math.abs(this.boundingBoxRight - this.boundingBoxLeft)
   }
 
+  set boundingBoxWidth(val) {
+    this.#boundingBoxWidth = val
+  }
+
   get boundingBoxHeight() {
     return Math.abs(this.boundingBoxBottom - this.boundingBoxTop)
+  }
+
+  set boundingBoxHeight(val) {
+    this.#boundingBoxHeight = val
   }
 
   /**
@@ -231,6 +256,14 @@ export class GameObject {
     return this.spriteTop + this.sprite.height
   }
 
+  // events
+
+  /**
+   * Called when this object has registered a collision.
+   * @param {GameObject} other
+   */
+  onCollision(other) {}
+
   /**
    * Called when the object is created in the room.
    */
@@ -256,15 +289,12 @@ export class GameObject {
   }
 
   move(direction, distance) {
-    const newX = this.x + distance * Math.cos((direction * Math.PI) / 180)
-    const newY = this.y + distance * Math.sin((direction * Math.PI) / 180)
-
-    this.x = newX
-    this.y = newY
+    this.x = offsetX(this.x, distance, direction)
+    this.y = offsetY(this.y, distance, direction)
   }
 
   motionAdd(direction, speed) {
-    this._vector.add(direction, speed)
+    this.#vector.add(direction, speed)
   }
 
   setSprite(sprite) {
@@ -341,32 +371,12 @@ export class GameObject {
     // Physics
     //
 
-    // TODO: this requires having a bounding box at all times to compute collision.
-    //       currently, only sprites have bounding boxes.
-    //       GameObject should have a bounding box, and it should defer to the sprite's bounding box if present.
-    //       This way, objects can have collisions without sprites, such as when custom drawing an object with GameDrawing.
-    // stop on solid objects
-    // TODO: this is naive and shouldn't assume platformer (collision on bottom, stop vspeed)
-    //       should instead check collisions on all sides and stop each direction if appropriate
-    // if (
-    //   collision.objects(this, 'solid', o => {
-    //     return collision.onBottom(this, o)
-    //   })
-    // ) {
-    //   this.vspeed = 0
-    // }
-
     //
     // Movement
     //
 
     // apply final calculated movement values
     this.move(this.direction, this.speed)
-
-    // TODO: if ! solid collision below:
-    //   moveToCollisionPoint()
-    //   keep outside solid objects!
-    //   this is the same as moving outside the room and stopping / moving back to room edge
   }
 
   /**

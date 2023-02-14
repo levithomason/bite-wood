@@ -1,5 +1,6 @@
 import * as collision from './collision.js'
 import { gameMouse } from './game-mouse-controller.js'
+import { isColliding } from './collision.js'
 
 /** Provides a canvas and helpful methods for drawing on it. */
 export class GameDrawing {
@@ -554,7 +555,7 @@ export class GameDrawing {
     }
 
     // bounding box
-    if (collision.objects(object, 'any')) {
+    if (isColliding(object)) {
       this.setStrokeColor('#F80')
     } else {
       this.setStrokeColor('#08F')
@@ -584,14 +585,14 @@ export class GameDrawing {
     const lines = [
       `${name}`,
       // TODO: make state a required abstraction of game objects
-      `state     ${state?.name}`,
+      state && `state     ${state.name}`,
       `x         ${fixed(x)}`,
       `y         ${fixed(y)}`,
       `direction ${fixed(direction)}`,
       `speed     ${fixed(speed)} (${fixed(hspeed)}, ${fixed(vspeed)})`,
-      `gravity   ${fixed(gravity.magnitude)}`,
-      `friction  ${fixed(friction)}`,
-    ]
+      gravity && `gravity   ${fixed(gravity.magnitude)}`,
+      friction && `friction  ${fixed(friction)}`,
+    ].filter(Boolean)
     lines.reverse().forEach((line, i) => {
       const x = object.spriteLeft
       const y = object.spriteTop - (i + 1) * 14
@@ -608,22 +609,26 @@ export class GameDrawing {
    * @param {number} x
    * @param {number} y
    * @param {Vector} vector
+   * @param {string} [color='black'] - A CSS color for the debug lines.
    * @return {GameDrawing}
    */
-  vectorDebug(x, y, vector) {
+  vectorDebug(x, y, vector, color = 'black') {
     this.saveSettings()
+    const mainColor = 'magenta'
+
+    this.setStrokeColor(color)
+    this.setFillColor('transparent')
 
     // adjacent
     this.line(x, y, x + vector.x, y)
     // opposite
     this.line(x + vector.x, y, x + vector.x, y + vector.y)
     // hypotenuse
-    this.setStrokeColor('red')
+    this.setStrokeColor(mainColor)
     this.arrow(x, y, x + vector.x, y + vector.y)
 
     // 90° box
-    this.setStrokeColor('black')
-    this.setFillColor('transparent')
+    this.setStrokeColor(color)
     this.rectangle(
       x + vector.x + 10 * -Math.sign(vector.x),
       y,
@@ -632,15 +637,17 @@ export class GameDrawing {
     )
 
     // labels: x, y, angle, magnitude
+    const fontSize = 12
+    this.setFontSize(fontSize)
     this.setTextAlign('center')
-    this.setFillColor('red')
+    this.setFillColor(mainColor)
     this.text(
       Math.round(vector.magnitude),
       x + vector.x / 2 - 20 * Math.sign(vector.x),
-      y + vector.y / 2,
+      y + vector.y / 2 + fontSize * 1.2 * Math.sign(vector.y),
     )
 
-    this.setFillColor('black')
+    this.setFillColor(color)
     this.text(
       'x ' + Math.round(vector.x),
       x + vector.x / 2,
@@ -660,6 +667,18 @@ export class GameDrawing {
     this.loadSettings()
 
     return this
+  }
+
+  // TODO: move to game loop, put particles on a separate layer
+  //       don't extend GameObject for GameParticles
+  //       otherwise, GameParticles get GameObject treatment (like debug drawing)
+  particlesDebug(particles) {
+    this.saveSettings()
+    // this.#ctx.setLineDash([1, 2])
+    this.setFillColor('transparent')
+    this.setStrokeColor('red')
+    this.rectangle(particles.x, particles.y, particles.width, particles.height)
+    this.loadSettings()
   }
 
   //

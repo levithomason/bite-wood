@@ -8,8 +8,8 @@ import {
   gameKeyboard,
 } from '../../../core/index.js'
 
-import * as utils from '../../../core/math.js'
-import * as collision from '../../../core/collision.js'
+import * as math from '../../../core/math.js'
+import { onBottom } from '../../../core/collision.js'
 
 // ----------------------------------------
 // Player
@@ -101,10 +101,10 @@ class Player extends GameObject {
         mouseActive: {
           left(self) {
             const speed =
-              utils.distance(self.x, self.y, gameMouse.x, gameMouse.y) / 500
+              math.distance(self.x, self.y, gameMouse.x, gameMouse.y) / 500
 
             self.motionAdd(
-              utils.direction(self.x, self.y, gameMouse.x, gameMouse.y),
+              math.direction(self.x, self.y, gameMouse.x, gameMouse.y),
               Math.min(1, speed),
             )
           },
@@ -112,7 +112,7 @@ class Player extends GameObject {
 
         keyDown: {
           ArrowUp(self) {
-            if (collision.onBottom(self, 'solid')) {
+            if (onBottom(self, 'solid')) {
               self.motionAdd(gamePhysics.DIRECTION_UP, self.jump)
             }
           },
@@ -162,7 +162,7 @@ class Player extends GameObject {
     //
 
     // walking
-    if (gameKeyboard.active.ArrowRight || gameKeyboard.active.ArrowLeft) {
+    if (gameKeyboard.active.ARROWRIGHT || gameKeyboard.active.ARROWLEFT) {
       this.friction = 0
       this.hspeed =
         Math.sign(this.hspeed) * Math.min(Math.abs(this.hspeed), this.maxSpeed)

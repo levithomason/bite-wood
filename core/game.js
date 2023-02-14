@@ -4,6 +4,7 @@ import { gameMouse } from './game-mouse-controller.js'
 import { gameState } from './game-state-controller.js'
 import { gameKeyboard } from './game-keyboard-controller.js'
 import { avg } from './math.js'
+import { handleCollisions } from './collision.js'
 
 // Tracks whether the game loop is running
 let _isRunning = false
@@ -29,24 +30,12 @@ export class Game {
    * @param {HTMLElement} [parentElement=document.body] - A DOM element where the canvas should be placed.
    * @param {number} [width=800] - The width of the game in pixels.
    * @param {number} [height=600] - The height of the game in pixels.
-   * @param {boolean} [pauseOnBlur=false] Pause/Play on window blur/focus.
-   * Sometimes the game loses focus due to the player clicking outsite or switching windows.
-   * When this happens, control is lost as keystrokes and mouse movements aren't happening inside
-   * the game canvas, but outside in some other location. To help inform the user when they aren't playing
-   * due to focus being lost, you can enable this option to pause the game automatically when the game
-   * loses focus and resume the game when the player restores focus to the game.
    */
   constructor(
-    {
-      parentElement = document.body,
-      width = 800,
-      height = 600,
-      pauseOnBlur = false,
-    } = {
+    { parentElement = document.body, width = 800, height = 600 } = {
       parentElement: document.body,
       width: 800,
       height: 600,
-      pauseOnBlur: false,
     },
   ) {
     this.start = this.start.bind(this)
@@ -62,19 +51,6 @@ export class Game {
     gameDrawing.setCanvasWidth(this.width)
     gameDrawing.setCanvasHeight(this.height)
     parentElement.append(gameDrawing.canvas)
-
-    if (pauseOnBlur) {
-      let pausedOnBlur = false
-      window.addEventListener('blur', () => {
-        pausedOnBlur = true
-        gameState.pause()
-      })
-      window.addEventListener('focus', () => {
-        if (pausedOnBlur) {
-          gameState.play()
-        }
-      })
-    }
   }
 
   start() {
@@ -99,37 +75,43 @@ export class Game {
     //         frames = Math.round((timeNow - lastTickTime) / 16.667)
     //         for frames, tick()
     //         draw()
-    if (timeSinceTick >= 15) {
-      _lastTickTimestamp = timestamp
-      this.step()
-      this.draw()
-
-      // track FPS
-      if (gameState.debug) {
-        const fps = 1000 / timeSinceTick
-        this.#fps.unshift(fps)
-        this.#fps.splice(120) // 2 seconds worth of frames
-      }
-
-      // handle play/pause/debug global keybindings
-      if (gameKeyboard.down.p) {
-        if (gameState.isPlaying) {
-          gameState.pause()
-        } else {
-          gameState.play()
-        }
-      } else if (gameKeyboard.down['`']) {
-        gameState.debug = !gameState.debug
-      }
-
-      // TODO: seems the keyboard should have a tick as well
-      //       the game loop shouldn't know what gameKeyboard needs to do
-      // Key up/down and mouse up/down should only fire once per tick, clear their values
-      gameKeyboard.down = {}
-      gameKeyboard.up = {}
-      gameMouse.down = {}
-      gameMouse.up = {}
+    if (timeSinceTick < 15) {
+      _raf = requestAnimationFrame(this.tick)
+      return
     }
+
+    _lastTickTimestamp = timestamp
+
+    // track FPS
+    if (gameState.debug) {
+      const fps = 1000 / timeSinceTick
+      this.#fps.unshift(fps)
+      this.#fps.splice(120) // 2 seconds worth of frames
+    }
+
+    // handle play/pause/debug global keybindings
+    if (gameKeyboard.down.P) {
+      if (gameState.isPlaying) {
+        gameState.pause()
+      } else {
+        gameState.play()
+      }
+    }
+
+    if (gameKeyboard.down['`']) {
+      gameState.debug = !gameState.debug
+    }
+
+    this.step()
+    this.draw()
+
+    // TODO: seems the keyboard should have a tick as well
+    //       the game loop shouldn't know what gameKeyboard needs to do
+    // Key up/down and mouse up/down should only fire once per tick, clear their values
+    gameKeyboard.down = {}
+    gameKeyboard.up = {}
+    gameMouse.down = {}
+    gameMouse.up = {}
 
     _raf = requestAnimationFrame(this.tick)
   }
@@ -138,6 +120,14 @@ export class Game {
     if (!gameState.isPlaying) return
     if (!gameRooms.currentRoom) return
 
+    //
+    // Collisions
+    //
+    handleCollisions(gameRooms.currentRoom.objects)
+
+    //
+    // Step - user code should "win", call step after collisions
+    //
     gameRooms.currentRoom.objects.forEach((object) => {
       try {
         object.step?.(object)
