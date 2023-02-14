@@ -1,5 +1,3 @@
-import { gameState } from './game-state-controller.js'
-
 /**
  * Gives the current state of the keyboard keys.
  */
@@ -20,28 +18,28 @@ class GameKeyboard {
 
   /** @param {KeyboardEvent} e */
   #handleKeyDown = (e) => {
+    // CASING_COMMENT:
+    // Upper case keys are tracked in down/up/active to ensure expected handling for the developer.
+    // If a user presses "w" then "Shift" then releases "W", only the upper case key would be cleared.
+    // There would be an active "w" key that is not cleared.
+    // To avoid this, the upper case version of the key is tracked instead.
     this.active[e.key.toUpperCase()] = true
 
     // Key up/down should only fire for one step in the game loop.
     // The game loop will clear key up/down state after each tick.
     // Only set keydown on the first press, not on repeats.
     if (!e.repeat) {
-      this.down[e.key.toUpperCase()] = true
-      delete this.up[e.key.toUpperCase()]
+      this.down[e.key.toUpperCase()] = true /* see CASING_COMMENT */
+      delete this.up[e.key.toUpperCase()] /* see NOTE_1 */
     }
   }
 
   /** @param {KeyboardEvent} e */
   #handleKeyUp = (e) => {
-    this.up[e.key.toUpperCase()] = true
+    this.up[e.key.toUpperCase()] = true /* see CASING_COMMENT */
 
-    delete this.active[e.key.toUpperCase()]
-    delete this.down[e.key.toUpperCase()]
-
-    // if (e.shiftKey) {
-    // remove the lowercase version of the key
-    // delete this.active[e.key.toLowerCase()]
-    // }
+    delete this.active[e.key.toUpperCase()] /* see CASING_COMMENT */
+    delete this.down[e.key.toUpperCase()] /* see CASING_COMMENT */
   }
 }
 
