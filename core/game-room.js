@@ -57,7 +57,6 @@ export class GameRoom {
 
     const horizontalRange = this.width - pxLeft - pxRight
 
-    // TODO: avoid solid objects
     return pxLeft + random(horizontalRange)
   }
 
