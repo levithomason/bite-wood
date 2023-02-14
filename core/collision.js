@@ -20,25 +20,6 @@ export const collisionPointRectangle = (x, y, x1, y1, x2, y2) => {
 }
 
 /**
- * Checks if a point is colliding with an object.
- * @param {number} x - The x position of the point.
- * @param {number} y - The y position of the point.
- * @param {GameObject} object
- * @returns {boolean}
- */
-export const collisionPointObject = (x, y, object) => {
-  return gameRooms.currentRoom.objects.some((obj) => {
-    return (
-      obj instanceof object &&
-      x >= obj.boundingBoxLeft &&
-      x <= obj.boundingBoxRight &&
-      y >= obj.boundingBoxTop &&
-      y <= obj.boundingBoxBottom
-    )
-  })
-}
-
-/**
  * Checks if the top side of an object is colliding with some other object.
  * @param {GameObject} self
  * @param {GameObject} other
