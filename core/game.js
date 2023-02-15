@@ -57,8 +57,7 @@ export class Game {
     this.height = height
     this.stepsPerSecond = stepsPerSecond
 
-    gameDrawing.setCanvasWidth(this.width)
-    gameDrawing.setCanvasHeight(this.height)
+    gameDrawing.setCanvasSize(this.width, this.height)
     parentElement.append(gameDrawing.canvas)
 
     window.biteWood = window.biteWood || {}

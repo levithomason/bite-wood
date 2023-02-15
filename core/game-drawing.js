@@ -18,8 +18,7 @@ export class GameDrawing {
     this.canvas = document.createElement('canvas')
     this.#ctx = this.canvas.getContext('2d')
 
-    this.setCanvasWidth(width)
-    this.setCanvasHeight(height)
+    this.setCanvasSize(width, height)
 
     return this
   }
@@ -55,20 +54,22 @@ export class GameDrawing {
   }
 
   /**
-   * Sets the height of the canvas.
-   * @param {number} height
+   * Sets the width and height of the canvas.
+   * @param {number} width - Set display size in pixels.
+   * @param {number} height - Set display size in pixels.
    */
-  setCanvasHeight(height) {
-    this.canvas.setAttribute('height', height)
-    return this
-  }
+  setCanvasSize(width, height) {
+    this.canvas.style.width = `${width}px`
+    this.canvas.style.height = `${height}px`
 
-  /**
-   * Sets the width of the canvas.
-   * @param {number} width
-   */
-  setCanvasWidth(width) {
-    this.canvas.setAttribute('width', width)
+    // Set actual width and height in memory (scaled to account for extra pixel density).
+    const scale = window.devicePixelRatio // prevent blurriness on high-res displays
+    this.canvas.width = Math.floor(width * scale)
+    this.canvas.height = Math.floor(height * scale)
+
+    // Normalize coordinate system to use CSS pixels.
+    this.#ctx.scale(scale, scale)
+
     return this
   }
 
