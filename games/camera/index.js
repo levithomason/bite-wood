@@ -4,6 +4,7 @@ import {
   GameObject,
   GameRoom,
   gameRooms,
+  gameState,
 } from '../../core/index.js'
 import { random, randomChoice } from '../../core/math.js'
 import { gameCamera } from '../../core/game-camera-controller.js'
@@ -11,7 +12,7 @@ import { gameCamera } from '../../core/game-camera-controller.js'
 class Character extends GameObject {
   constructor() {
     super({
-      boundingBoxTop: -40,
+      boundingBoxTop: -80,
       boundingBoxLeft: -25,
       boundingBoxWidth: 50,
       boundingBoxHeight: 80,
@@ -49,12 +50,12 @@ class Character extends GameObject {
   draw(drawing) {
     super.draw(drawing)
 
-    drawing.setLineWidth(3)
+    drawing.setLineWidth(2)
     drawing.setStrokeColor('#000')
-    drawing.setFillColor('#fff')
+    drawing.setFillColor('#f8f')
     drawing.rectangle(
       this.x - this.boundingBoxWidth / 2,
-      this.y - this.boundingBoxHeight / 2,
+      this.y - this.boundingBoxHeight,
       this.boundingBoxWidth,
       this.boundingBoxHeight,
     )
@@ -62,49 +63,50 @@ class Character extends GameObject {
 }
 
 class Sun extends GameObject {
+  static radius = 200
   constructor() {
     super({
-      boundingBoxTop: -50,
-      boundingBoxLeft: -50,
-      boundingBoxWidth: 100,
-      boundingBoxHeight: 100,
-      size: 200,
+      radius: Sun.radius,
+      boundingBoxTop: -Sun.radius,
+      boundingBoxLeft: -Sun.radius,
+      boundingBoxWidth: Sun.radius * 2,
+      boundingBoxHeight: Sun.radius * 2,
     })
 
-    this.flareGapMin = 40
-    this.flareGapMax = 80
-    this.flareGap = 60
-    this.flareGapDirection = 1
-    this.flareGapSpeed = 0.05
+    this.rayGapMin = Sun.radius * 0.8
+    this.rayGapMax = Sun.radius * 1.2
+    this.rayGap = Sun.radius * 0.8
+    this.rayGapDirection = -1
+    this.rayGapSpeed = 0.05
   }
 
   draw(drawing) {
     super.draw(drawing)
 
-    // sun flares
-    if (this.flareGap >= this.flareGapMax) {
-      this.flareGapDirection = -1
-    } else if (this.flareGap <= this.flareGapMin) {
-      this.flareGapDirection = 1
+    // sun rays
+    if (this.rayGap >= this.rayGapMax) {
+      this.rayGapDirection = -1
+    } else if (this.rayGap <= this.rayGapMin) {
+      this.rayGapDirection = 1
     }
-    this.flareGap += this.flareGapDirection * this.flareGapSpeed
+    this.rayGap += this.rayGapDirection * this.rayGapSpeed
 
-    const numFlares = 12
-    const alphaInit = 0.5
+    const numRays = 20
+    const alphaInit = 1
     let alpha = alphaInit
 
     drawing.setLineWidth(1)
     drawing.setFillColor('transparent')
-    for (let i = 0; i < numFlares; i++) {
+    for (let i = 0; i < numRays; i++) {
       drawing.setStrokeColor(`rgba(255, 219, 96, ${alpha})`)
-      drawing.circle(this.x, this.y, this.size / 2 + i * this.flareGap)
-      alpha -= alphaInit / numFlares
+      drawing.circle(this.x, this.y, Sun.radius + this.rayGap + i * this.rayGap)
+      alpha -= alphaInit / numRays
     }
 
     // draw the sun
     drawing.setStrokeColor('transparent')
     drawing.setFillColor('#ffb700')
-    drawing.circle(this.x, this.y, 100)
+    drawing.circle(this.x, this.y, Sun.radius)
   }
 }
 
@@ -133,13 +135,14 @@ class Cloud extends GameObject {
 
     // tops
     drawing.setStrokeColor('transparent')
-    // shadow
+
+    // shadow then poof
     drawing.setFillColor('rgba(0, 0, 0, 0.05)')
     drawing.circle(this.x - 40, this.y - 25, 40)
     drawing.setFillColor('#fff')
     drawing.circle(this.x - 30, this.y - 40, 50)
 
-    // shadow
+    // shadow then poof
     drawing.setFillColor('rgba(0, 0, 0, 0.05)')
     drawing.circle(this.x + 30, this.y - 35, 40)
     drawing.setFillColor('#fff')
@@ -334,18 +337,19 @@ class Flower extends GameObject {
 
 class Room extends GameRoom {
   constructor() {
-    super(3000, 600)
+    super(8000, 1500)
 
     // add sun
-    this.instanceCreate(Sun, 1100, 100)
+    this.instanceCreate(Sun, this.width / 2 - 300, Sun.radius * 2)
 
     // add clouds
-    const numClouds = random(5, 10)
+    const numClouds = this.width / 400
     const cloudGap = this.width / numClouds
 
     for (let i = 0; i < numClouds; i += 1) {
-      const x = i * cloudGap + cloudGap / 2
-      const y = random(100, 250)
+      const x =
+        i * cloudGap + cloudGap / 2 + random(-cloudGap * 0.5, cloudGap * 0.5)
+      const y = random(100, this.height - 400)
       this.instanceCreate(Cloud, x, y)
     }
 
@@ -367,7 +371,11 @@ class Room extends GameRoom {
     }
 
     // create the character
-    this.character = this.instanceCreate(Character, 1400, 500)
+    this.character = this.instanceCreate(
+      Character,
+      this.width / 2,
+      this.height - 50,
+    )
     gameCamera.target = this.character
   }
 

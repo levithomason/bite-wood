@@ -31,12 +31,19 @@ export class Game {
    * @param {HTMLElement} [parentElement=document.body] - A DOM element where the canvas should be placed.
    * @param {number} [width=800] - The width of the game in pixels.
    * @param {number} [height=600] - The height of the game in pixels.
+   * @param {number} stepsPerSecond - The number of times the game loop should run per second.
    */
   constructor(
-    { parentElement = document.body, width = 800, height = 600 } = {
+    {
+      parentElement = document.body,
+      width = 800,
+      height = 600,
+      stepsPerSecond = 60,
+    } = {
       parentElement: document.body,
       width: 800,
       height: 600,
+      stepsPerSecond: 60,
     },
   ) {
     this.start = this.start.bind(this)
@@ -48,10 +55,14 @@ export class Game {
 
     this.width = width
     this.height = height
+    this.stepsPerSecond = stepsPerSecond
 
     gameDrawing.setCanvasWidth(this.width)
     gameDrawing.setCanvasHeight(this.height)
     parentElement.append(gameDrawing.canvas)
+
+    window.biteWood = window.biteWood || {}
+    window.biteWood.game = this
   }
 
   start() {
@@ -65,18 +76,15 @@ export class Game {
     cancelAnimationFrame(_raf)
   }
 
-  tick() {
-    const timestamp = Date.now()
+  tick(timestamp) {
+    if (!_lastTickTimestamp) _lastTickTimestamp = timestamp
+
     const timeSinceTick = timestamp - _lastTickTimestamp
 
-    // TODO: This is a hacky way of ensuring 120hz displays tick at 60 FPS
-    //       A better way is to calc the number of frames that should be ticked.
-    //       since the last time they were drawn.
-    //       Example:
-    //         frames = Math.round((timeNow - lastTickTime) / 16.667)
-    //         for frames, tick()
-    //         draw()
-    if (timeSinceTick < 15) {
+    let steps = Math.round(timeSinceTick / (1000 / this.stepsPerSecond))
+
+    // No work to do, wait for the next tick
+    if (steps === 0) {
       _raf = requestAnimationFrame(this.tick)
       return
     }
@@ -105,7 +113,11 @@ export class Game {
       gameState.debug = !gameState.debug
     }
 
-    this.step()
+    while (steps) {
+      this.step()
+      steps--
+    }
+
     this.draw()
 
     // TODO: seems the typing should have a tick as well
@@ -148,11 +160,25 @@ export class Game {
     // accelerate the camera towards the target
     if (gameCamera.target) {
       gameDrawing.setCamera(gameCamera.x, gameCamera.y)
-      const cameraAcceleration = 0.1
+      const cameraAcceleration = 1
+
       const cameraXDiff = gameCamera.target.x - gameCamera.x - this.width / 2
-      const cameraXDiffAbs = Math.abs(cameraXDiff)
-      const cameraXDiffSign = Math.sign(cameraXDiff)
-      gameCamera.x += cameraXDiffAbs * cameraXDiffSign * cameraAcceleration
+      gameCamera.x +=
+        Math.abs(cameraXDiff) * Math.sign(cameraXDiff) * cameraAcceleration
+
+      const cameraYDiff = gameCamera.target.y - gameCamera.y - this.height / 2
+      gameCamera.y +=
+        Math.abs(cameraYDiff) * Math.sign(cameraYDiff) * cameraAcceleration
+
+      // limit the camera to the room
+      gameCamera.x = Math.max(
+        0,
+        Math.min(gameCamera.x, gameRooms.currentRoom.width - this.width),
+      )
+      gameCamera.y = Math.max(
+        0,
+        Math.min(gameCamera.y, gameRooms.currentRoom.height - this.height),
+      )
     }
 
     // room - continue drawing if the room fails
