@@ -1,6 +1,6 @@
-import * as collision from './collision.js'
 import { gameMouse } from './game-mouse-controller.js'
 import { isColliding } from './collision.js'
+import { toRadians } from './math.js'
 
 /** Provides a canvas and helpful methods for drawing on it. */
 export class GameDrawing {
@@ -18,10 +18,13 @@ export class GameDrawing {
     this.canvas = document.createElement('canvas')
     this.#ctx = this.canvas.getContext('2d')
 
-    this.setCanvasWidth(width)
-    this.setCanvasHeight(height)
+    this.setCanvasSize(width, height)
 
     return this
+  }
+
+  setCamera(x, y) {
+    this.#ctx.translate(-x, -y)
   }
 
   //
@@ -51,27 +54,41 @@ export class GameDrawing {
   }
 
   /**
-   * Sets the height of the canvas.
-   * @param {number} height
+   * Sets the width and height of the canvas.
+   * @param {number} width - Set display size in pixels.
+   * @param {number} height - Set display size in pixels.
    */
-  setCanvasHeight(height) {
-    this.canvas.setAttribute('height', height)
+  setCanvasSize(width, height) {
+    this.canvas.style.width = `${width}px`
+    this.canvas.style.height = `${height}px`
+
+    // Set actual width and height in memory (scaled to account for extra pixel density).
+    const scale = window.devicePixelRatio // prevent blurriness on high-res displays
+    this.canvas.width = Math.floor(width * scale)
+    this.canvas.height = Math.floor(height * scale)
+
+    // Normalize coordinate system to use CSS pixels.
+    this.#ctx.scale(scale, scale)
+
+    return this
+  }
+
+  /** @param {CanvasFillStrokeStyles.fillStyle} color */
+  setFillColor(color) {
+    this.#ctx.fillStyle = color
     return this
   }
 
   /**
-   * Sets the width of the canvas.
-   * @param {number} width
+   * Creates a linear gradient fill color.
+   * @param {number} x1
+   * @param {number} y1
+   * @param {number} x2
+   * @param {number} y2
+   * @return {CanvasGradient}
    */
-  setCanvasWidth(width) {
-    this.canvas.setAttribute('width', width)
-    return this
-  }
-
-  /** @param {string} color */
-  setFillColor(color) {
-    this.#ctx.fillStyle = color
-    return this
+  createLinearGradient(x1, y1, x2, y2) {
+    return this.#ctx.createLinearGradient(x1, y1, x2, y2)
   }
 
   /**
@@ -218,15 +235,23 @@ export class GameDrawing {
 
   /**
    * Strokes and fills an ellipse centered on x, y.
-   * @param x
-   * @param y
-   * @param radiusX
-   * @param radiusY
-   * @param rotation
+   * @param {number} x
+   * @param {number} y
+   * @param {number} radiusX
+   * @param {number} radiusY
+   * @param {number} rotation - In degrees.
    */
   ellipse(x, y, radiusX, radiusY, rotation = 0) {
     this.#ctx.beginPath()
-    this.#ctx.ellipse(x, y, radiusX, radiusY, rotation, 0, 2 * Math.PI)
+    this.#ctx.ellipse(
+      x,
+      y,
+      radiusX,
+      radiusY,
+      toRadians(rotation),
+      0,
+      2 * Math.PI,
+    )
     this.#ctx.stroke()
     this.#ctx.fill()
 
