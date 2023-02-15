@@ -68,12 +68,8 @@ describe('GameDrawing', () => {
       expect(drawing.setBlendMode('difference') === drawing).toBe(true)
     })
 
-    it('setCanvasHeight() returns this', () => {
-      expect(drawing.setCanvasHeight(0) === drawing).toBe(true)
-    })
-
-    it('setCanvasWidth() returns this', () => {
-      expect(drawing.setCanvasWidth(0) === drawing).toBe(true)
+    it('setCanvasSize() returns this', () => {
+      expect(drawing.setCanvasSize(0, 0) === drawing).toBe(true)
     })
 
     it('setFillColor() returns this', () => {

@@ -5,6 +5,7 @@ import { gameState } from './game-state-controller.js'
 import { gameKeyboard } from './game-keyboard-controller.js'
 import { avg } from './math.js'
 import { handleCollisions } from './collision.js'
+import { gameCamera } from './game-camera-controller.js'
 
 // Tracks whether the game loop is running
 let _isRunning = false
@@ -30,12 +31,19 @@ export class Game {
    * @param {HTMLElement} [parentElement=document.body] - A DOM element where the canvas should be placed.
    * @param {number} [width=800] - The width of the game in pixels.
    * @param {number} [height=600] - The height of the game in pixels.
+   * @param {number} stepsPerSecond - The number of times the game loop should run per second.
    */
   constructor(
-    { parentElement = document.body, width = 800, height = 600 } = {
+    {
+      parentElement = document.body,
+      width = 800,
+      height = 600,
+      stepsPerSecond = 60,
+    } = {
       parentElement: document.body,
       width: 800,
       height: 600,
+      stepsPerSecond: 60,
     },
   ) {
     this.start = this.start.bind(this)
@@ -47,10 +55,13 @@ export class Game {
 
     this.width = width
     this.height = height
+    this.stepsPerSecond = stepsPerSecond
 
-    gameDrawing.setCanvasWidth(this.width)
-    gameDrawing.setCanvasHeight(this.height)
+    gameDrawing.setCanvasSize(this.width, this.height)
     parentElement.append(gameDrawing.canvas)
+
+    window.biteWood = window.biteWood || {}
+    window.biteWood.game = this
   }
 
   start() {
@@ -64,18 +75,15 @@ export class Game {
     cancelAnimationFrame(_raf)
   }
 
-  tick() {
-    const timestamp = Date.now()
+  tick(timestamp) {
+    if (!_lastTickTimestamp) _lastTickTimestamp = timestamp
+
     const timeSinceTick = timestamp - _lastTickTimestamp
 
-    // TODO: This is a hacky way of ensuring 120hz displays tick at 60 FPS
-    //       A better way is to calc the number of frames that should be ticked.
-    //       since the last time they were drawn.
-    //       Example:
-    //         frames = Math.round((timeNow - lastTickTime) / 16.667)
-    //         for frames, tick()
-    //         draw()
-    if (timeSinceTick < 15) {
+    let steps = Math.round(timeSinceTick / (1000 / this.stepsPerSecond))
+
+    // No work to do, wait for the next tick
+    if (steps === 0) {
       _raf = requestAnimationFrame(this.tick)
       return
     }
@@ -89,6 +97,8 @@ export class Game {
       this.#fps.splice(120) // 2 seconds worth of frames
     }
 
+    // TODO: Find a better play/pause key that doesn't conflict with the game.
+    //       This collides with the "P" key in the keyboard game, for example.
     // handle play/pause/debug global keybindings
     // if (gameKeyboard.down.P) {
     //   if (gameState.isPlaying) {
@@ -102,7 +112,11 @@ export class Game {
       gameState.debug = !gameState.debug
     }
 
-    this.step()
+    while (steps) {
+      this.step()
+      steps--
+    }
+
     this.draw()
 
     // TODO: seems the typing should have a tick as well
@@ -139,6 +153,32 @@ export class Game {
 
   draw() {
     gameDrawing.clear()
+    gameDrawing.saveSettings()
+
+    // TODO: move to game-camera step(), it should follow the target itself
+    // accelerate the camera towards the target
+    if (gameCamera.target) {
+      gameDrawing.setCamera(gameCamera.x, gameCamera.y)
+      const cameraAcceleration = 1
+
+      const cameraXDiff = gameCamera.target.x - gameCamera.x - this.width / 2
+      gameCamera.x +=
+        Math.abs(cameraXDiff) * Math.sign(cameraXDiff) * cameraAcceleration
+
+      const cameraYDiff = gameCamera.target.y - gameCamera.y - this.height / 2
+      gameCamera.y +=
+        Math.abs(cameraYDiff) * Math.sign(cameraYDiff) * cameraAcceleration
+
+      // limit the camera to the room
+      gameCamera.x = Math.max(
+        0,
+        Math.min(gameCamera.x, gameRooms.currentRoom.width - this.width),
+      )
+      gameCamera.y = Math.max(
+        0,
+        Math.min(gameCamera.y, gameRooms.currentRoom.height - this.height),
+      )
+    }
 
     // room - continue drawing if the room fails
     if (gameRooms.currentRoom) {
@@ -162,6 +202,8 @@ export class Game {
         }
       })
     }
+
+    gameDrawing.loadSettings()
 
     // debug drawings
     if (gameState.debug) {
