@@ -9,13 +9,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
-      - name: Print yarn config
-        uses: yarn config list
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+
       - name: Install dependencies
         run: yarn
-      - name: Run deploy
+
+      - name: Deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
-        run: yarn deploy
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          yarn deploy
