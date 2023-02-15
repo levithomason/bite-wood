@@ -1,0 +1,37 @@
+@import '../../public/css/global.css';
+
+.game-editor {
+  display: grid;
+  justify-content: center;
+  grid-template:
+    'toolbar toolbar' auto
+    'assets  main ' 1fr /
+    auto 1fr auto;
+  padding: var(--macro-space-inside);
+  color: #fff;
+  text-shadow: -1px -1px 0 #0003, 1px -1px 0 #0003, -1px 1px 0 #0003,
+    1px 1px 0 #0003;
+  background: var(--ui-bg);
+  user-select: none;
+}
+
+.toolbar {
+  grid-area: toolbar;
+  padding: var(--macro-space-inside);
+  border-bottom: 1px solid var(--ui-dark);
+}
+
+.assets {
+  grid-area: assets;
+  padding: var(--macro-space-inside);
+  border-right: 1px solid var(--ui-dark);
+}
+
+.main {
+  background: var(--ui-darkest);
+  grid-area: main;
+  padding: var(--macro-space-inside);
+}
+.main iframe {
+  border: none;
+}

@@ -1,0 +1,42 @@
+/****************************
+          Button
+****************************/
+button {
+  position: relative;
+  padding: var(--micro-space-inside);
+  margin: 0;
+  font-size: var(--font-smaller);
+  text-decoration: none;
+  text-transform: uppercase;
+  color: #ccc;
+  background: none;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  outline: none;
+}
+button:hover,
+button:active,
+button.active,
+button:focus {
+  background: var(--ui-active-bg);
+  outline: none;
+}
+button.active,
+button.active .label {
+  color: var(--ui-active-color);
+}
+button > * {
+  margin: var(--micro-space-inside);
+}
+button i {
+  font-size: var(--font-size-large);
+}
+
+button {
+  background: var(--ui-dark);
+}
+button.active {
+  color: var(--ui-active-color);
+  background: var(--ui-active-bg);
+}
