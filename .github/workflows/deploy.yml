@@ -1,0 +1,19 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: yarn
+      - name: Run deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
+        run: yarn deploy
