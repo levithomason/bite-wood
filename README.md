@@ -2,7 +2,9 @@
 
 Minimal game engine with (almost) no dependencies.
 
-## Development
+## [:joystick: 	Play!](https://levithomason.com/bite-wood/)
+
+## Develop
 
 ```
 yarn
