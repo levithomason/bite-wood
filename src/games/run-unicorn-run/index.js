@@ -13,5 +13,5 @@ const game = new Game()
 gameRooms.addRoom(new Room0())
 gameRooms.addRoom(new Room1())
 
-gameState.debug = true
+// gameState.debug = true
 game.start()

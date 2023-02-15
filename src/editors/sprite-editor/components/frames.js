@@ -1,5 +1,5 @@
-import { html } from '../../../node_modules/lit-html/lit-html.js'
-import { classMap } from '../../../node_modules/lit-html/directives/class-map.js'
+import { html } from 'lit-html'
+import { classMap } from 'lit-html/directives/class-map.js'
 
 import { actions, setState } from '../state-manager.js'
 import * as utils from '../../../core/math.js'

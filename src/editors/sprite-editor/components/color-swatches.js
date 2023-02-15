@@ -1,5 +1,5 @@
-import { html } from '../../../node_modules/lit-html/lit-html.js'
-import { classMap } from '../../../node_modules/lit-html/directives/class-map.js'
+import { html } from 'lit-html'
+import { classMap } from 'lit-html/directives/class-map.js'
 
 import DRAWING_TOOLS from '../config/drawing-tools.js'
 import * as imageDataUtils from '../lib/image-data-utils.js'

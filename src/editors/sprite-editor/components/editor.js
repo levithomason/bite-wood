@@ -1,4 +1,4 @@
-import { html } from '../../../node_modules/lit-html/lit-html.js'
+import { html } from 'lit-html'
 import actionTools from './action-tools.js'
 import colorSwatches from './color-swatches.js'
 import drawingTools from './drawing-tools.js'

@@ -1,4 +1,4 @@
-import { render } from '../../node_modules/lit-html/lit-html.js'
+import { render } from 'lit-html'
 
 import editor from './components/editor.js'
 import DRAWING_TOOLS from './config/drawing-tools.js'

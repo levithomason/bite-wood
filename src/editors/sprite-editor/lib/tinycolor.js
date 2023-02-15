@@ -1,4 +1,4 @@
-import '../../../node_modules/tinycolor2/tinycolor.js'
+import 'tinycolor2'
 
 const { tinycolor } = window
 

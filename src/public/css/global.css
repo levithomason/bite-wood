@@ -1,7 +1,7 @@
-@import url(../../node_modules/normalize.css/normalize.css);
+@import url(../../../node_modules/normalize.css/normalize.css);
 @import url(../fonts/Pixellari/web/stylesheet.css);
-@import url(./slider.css);
-@import url(./button.css);
+@import url(slider.css);
+@import url(button.css);
 
 :root {
   --color-brand: rgb(86, 140, 120);

@@ -263,6 +263,6 @@ class Fuego extends GameObject {
 }
 room.instanceCreate(Fuego, room.width - 100, 100)
 
-gameState.debug = true
+// gameState.debug = true
 const game = new Game()
 game.start()
