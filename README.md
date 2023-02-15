@@ -1,6 +1,6 @@
 # Bite Wood
 
-Minimal game engine with (almost) no dependencies.
+Minimal game engine with no dependencies.
 
 ## [:joystick: 	Play!](https://levithomason.com/bite-wood/)
 
