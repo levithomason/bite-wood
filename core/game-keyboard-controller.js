@@ -1,5 +1,5 @@
 /**
- * Gives the current state of the keyboard keys.
+ * Gives the current state of the typing keys.
  */
 class GameKeyboard {
   constructor() {

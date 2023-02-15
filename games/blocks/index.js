@@ -18,20 +18,6 @@ const BLOCK_SIZE_SPAWN_MAX = 32
 const BLOCK_SIZE_MIN = 2
 const BLOCK_SIZE_MAX = 48
 
-const stayInRoom = (object) => {
-  if (object.boundingBoxLeft <= 0) {
-    object.hspeed = Math.abs(object.hspeed)
-  } else if (object.boundingBoxRight >= room.width) {
-    object.hspeed = -Math.abs(object.hspeed)
-  }
-
-  if (object.boundingBoxTop <= 0) {
-    object.vspeed = Math.abs(object.vspeed)
-  } else if (object.boundingBoxBottom >= room.height) {
-    object.vspeed = -Math.abs(object.vspeed)
-  }
-}
-
 /**
  * @param {GameObject} a
  * @param {GameObject} b
@@ -152,7 +138,7 @@ class Block extends GameObject {
     const x = this.x
     const y = this.y
 
-    stayInRoom(this)
+    this.keepInRoom()
 
     if (this.x !== x || this.y !== y) {
       this.speed *= BLOCK_COLLISION_FRICTION

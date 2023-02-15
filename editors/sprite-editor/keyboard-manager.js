@@ -4,7 +4,7 @@ import { actions, getState, setState } from './state-manager.js'
 document.addEventListener('keydown', (e) => {
   const state = getState()
 
-  // only allow keyboard shortcuts when not typing in an input
+  // only allow typing shortcuts when not typing in an input
   if (e.target.tagName === 'INPUT') {
     return
   }

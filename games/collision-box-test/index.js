@@ -39,17 +39,7 @@ class Object extends GameObject {
 
   step() {
     super.step()
-    if (this.boundingBoxLeft <= 0) {
-      this.hspeed = Math.abs(this.hspeed)
-    } else if (this.boundingBoxRight >= room.width) {
-      this.hspeed = -Math.abs(this.hspeed)
-    }
-
-    if (this.boundingBoxTop <= 0) {
-      this.vspeed = Math.abs(this.vspeed)
-    } else if (this.boundingBoxBottom >= room.height) {
-      this.vspeed = -Math.abs(this.vspeed)
-    }
+    this.keepInRoom()
   }
 }
 

@@ -130,6 +130,9 @@ export class GameRoom {
   instanceDestroy(object) {
     const index = this.objects.findIndex((o) => o === object)
 
+    // TODO: get rid of events property and just use methods on the object.
+    //       also use on* naming convention for events.
+    object.destroy()
     this.objects[index]?.events?.destroy?.(this)
     this.objects.splice(index, 1)
   }

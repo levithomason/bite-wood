@@ -90,13 +90,13 @@ export class Game {
     }
 
     // handle play/pause/debug global keybindings
-    if (gameKeyboard.down.P) {
-      if (gameState.isPlaying) {
-        gameState.pause()
-      } else {
-        gameState.play()
-      }
-    }
+    // if (gameKeyboard.down.P) {
+    //   if (gameState.isPlaying) {
+    //     gameState.pause()
+    //   } else {
+    //     gameState.play()
+    //   }
+    // }
 
     if (gameKeyboard.down['`']) {
       gameState.debug = !gameState.debug
@@ -105,7 +105,7 @@ export class Game {
     this.step()
     this.draw()
 
-    // TODO: seems the keyboard should have a tick as well
+    // TODO: seems the typing should have a tick as well
     //       the game loop shouldn't know what gameKeyboard needs to do
     // Key up/down and mouse up/down should only fire once per tick, clear their values
     gameKeyboard.down = {}
