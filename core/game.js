@@ -5,6 +5,7 @@ import { gameState } from './game-state-controller.js'
 import { gameKeyboard } from './game-keyboard-controller.js'
 import { avg } from './math.js'
 import { handleCollisions } from './collision.js'
+import { gameCamera } from './game-camera-controller.js'
 
 // Tracks whether the game loop is running
 let _isRunning = false
@@ -89,6 +90,8 @@ export class Game {
       this.#fps.splice(120) // 2 seconds worth of frames
     }
 
+    // TODO: Find a better play/pause key that doesn't conflict with the game.
+    //       This collides with the "P" key in the keyboard game, for example.
     // handle play/pause/debug global keybindings
     // if (gameKeyboard.down.P) {
     //   if (gameState.isPlaying) {
@@ -139,6 +142,18 @@ export class Game {
 
   draw() {
     gameDrawing.clear()
+    gameDrawing.saveSettings()
+
+    // TODO: move to game-camera step(), it should follow the target itself
+    // accelerate the camera towards the target
+    if (gameCamera.target) {
+      gameDrawing.setCamera(gameCamera.x, gameCamera.y)
+      const cameraAcceleration = 0.1
+      const cameraXDiff = gameCamera.target.x - gameCamera.x - this.width / 2
+      const cameraXDiffAbs = Math.abs(cameraXDiff)
+      const cameraXDiffSign = Math.sign(cameraXDiff)
+      gameCamera.x += cameraXDiffAbs * cameraXDiffSign * cameraAcceleration
+    }
 
     // room - continue drawing if the room fails
     if (gameRooms.currentRoom) {
@@ -162,6 +177,8 @@ export class Game {
         }
       })
     }
+
+    gameDrawing.loadSettings()
 
     // debug drawings
     if (gameState.debug) {

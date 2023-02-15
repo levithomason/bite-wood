@@ -1,6 +1,6 @@
-import * as collision from './collision.js'
 import { gameMouse } from './game-mouse-controller.js'
 import { isColliding } from './collision.js'
+import { toRadians } from './math.js'
 
 /** Provides a canvas and helpful methods for drawing on it. */
 export class GameDrawing {
@@ -22,6 +22,10 @@ export class GameDrawing {
     this.setCanvasHeight(height)
 
     return this
+  }
+
+  setCamera(x, y) {
+    this.#ctx.translate(-x, -y)
   }
 
   //
@@ -68,10 +72,22 @@ export class GameDrawing {
     return this
   }
 
-  /** @param {string} color */
+  /** @param {CanvasFillStrokeStyles.fillStyle} color */
   setFillColor(color) {
     this.#ctx.fillStyle = color
     return this
+  }
+
+  /**
+   * Creates a linear gradient fill color.
+   * @param {number} x1
+   * @param {number} y1
+   * @param {number} x2
+   * @param {number} y2
+   * @return {CanvasGradient}
+   */
+  createLinearGradient(x1, y1, x2, y2) {
+    return this.#ctx.createLinearGradient(x1, y1, x2, y2)
   }
 
   /**
@@ -218,15 +234,23 @@ export class GameDrawing {
 
   /**
    * Strokes and fills an ellipse centered on x, y.
-   * @param x
-   * @param y
-   * @param radiusX
-   * @param radiusY
-   * @param rotation
+   * @param {number} x
+   * @param {number} y
+   * @param {number} radiusX
+   * @param {number} radiusY
+   * @param {number} rotation - In degrees.
    */
   ellipse(x, y, radiusX, radiusY, rotation = 0) {
     this.#ctx.beginPath()
-    this.#ctx.ellipse(x, y, radiusX, radiusY, rotation, 0, 2 * Math.PI)
+    this.#ctx.ellipse(
+      x,
+      y,
+      radiusX,
+      radiusY,
+      toRadians(rotation),
+      0,
+      2 * Math.PI,
+    )
     this.#ctx.stroke()
     this.#ctx.fill()
 
