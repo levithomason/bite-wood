@@ -12,6 +12,7 @@ import {
   GameSprite,
 } from '../../core/index.js'
 import { direction, random, Vector } from '../../core/math.js'
+import { gameCamera } from '../../core/game-camera-controller.js'
 
 // =============================================================================
 // Global State
@@ -409,6 +410,12 @@ class Ape extends GameObject {
     super.step()
     this.state.step.call(this)
   }
+
+  // TODO: remove debug drawing line to mouse
+  draw(drawing) {
+    super.draw(drawing)
+    drawing.line(this.x, this.y, gameMouse.x, gameMouse.y)
+  }
 }
 
 // =============================================================================
@@ -427,7 +434,8 @@ class Room extends GameRoom {
       makeBox(i * 50 + 50)
     }
 
-    this.instanceCreate(Ape, 100, 600)
+    this.player = this.instanceCreate(Ape, 100, 600)
+    gameCamera.target = this.player
     this.instanceCreate(SnowParticles, 0, 0)
 
     setTimeout(() => {

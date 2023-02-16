@@ -13,7 +13,6 @@ import {
   offsetX,
   offsetY,
   scale,
-  toRadians,
 } from '../../core/math.js'
 import { loadState } from '../../editors/sprite-editor/storage-manager.js'
 
@@ -116,7 +115,7 @@ class Globby extends GameObject {
         this.y,
         this.getElongatedSize(),
         this.size,
-        toRadians(this.direction),
+        this.direction,
       )
 
     // eyes

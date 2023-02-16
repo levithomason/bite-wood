@@ -1,6 +1,7 @@
 import {
   Game,
   gameKeyboard,
+  gameMouse,
   GameObject,
   GameRoom,
   gameRooms,
@@ -60,6 +61,9 @@ class Character extends GameObject {
       this.boundingBoxWidth,
       this.boundingBoxHeight,
     )
+
+    // TODO: remove debug drawing line to mouse
+    drawing.line(this.x, this.y, gameMouse.x, gameMouse.y)
   }
 }
 
@@ -120,30 +124,27 @@ class Cloud extends GameObject {
       boundingBoxHeight: 80,
     })
 
-    this.speed = random(0.1, 0.2)
-    this.direction = 0
+    this.speed = random(0.1, 0.5)
+    this.direction = randomChoice([0, 180])
   }
 
   draw(drawing) {
     super.draw(drawing)
 
-    // bottom
-    drawing.setFillColor('#fff')
     drawing.setStrokeColor('transparent')
-    drawing.ellipse(this.x - 40, this.y, 70, 40)
 
+    // bottom poofs
+    drawing.setFillColor('#fff')
+    drawing.ellipse(this.x - 40, this.y, 70, 40)
     drawing.ellipse(this.x + 30, this.y, 60, 40)
 
-    // tops
-    drawing.setStrokeColor('transparent')
-
-    // shadow then poof
+    // top left - shadow then poof
     drawing.setFillColor('rgba(0, 0, 0, 0.05)')
     drawing.circle(this.x - 40, this.y - 25, 40)
     drawing.setFillColor('#fff')
     drawing.circle(this.x - 30, this.y - 40, 50)
 
-    // shadow then poof
+    // top right - shadow then poof
     drawing.setFillColor('rgba(0, 0, 0, 0.05)')
     drawing.circle(this.x + 30, this.y - 35, 40)
     drawing.setFillColor('#fff')
@@ -385,7 +386,7 @@ class Room extends GameRoom {
 
     // draw a gradient sky
     const skyGradient = drawing.createLinearGradient(0, 0, 0, this.height)
-    skyGradient.addColorStop(0, '#79bafc')
+    skyGradient.addColorStop(0.3, '#79bafc')
     skyGradient.addColorStop(1, '#a9edff')
     drawing.setFillColor(skyGradient)
     drawing.setStrokeColor('transparent')

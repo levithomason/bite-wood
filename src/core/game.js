@@ -57,7 +57,6 @@ export class Game {
     this.height = height
     this.stepsPerSecond = stepsPerSecond
 
-    gameDrawing.setCanvasSize(this.width, this.height)
     parentElement.append(gameDrawing.canvas)
 
     window.biteWood = window.biteWood || {}
@@ -69,7 +68,10 @@ export class Game {
 
     // Keep the canvas the same size as the window
     const resizeCanvas = () => {
-      gameDrawing.setCanvasSize(window.innerWidth, window.innerHeight)
+      const room = gameRooms.currentRoom
+      const width = Math.min(window.innerWidth, room.width)
+      const height = Math.min(window.innerHeight, room.height)
+      gameDrawing.setCanvasSize(width, height)
     }
 
     window.addEventListener('resize', () => {
@@ -164,30 +166,37 @@ export class Game {
 
   draw() {
     gameDrawing.clear()
-    gameDrawing.saveSettings()
 
     // TODO: move to game-camera step(), it should follow the target itself
     // accelerate the camera towards the target
+    gameDrawing.saveSettings()
     if (gameCamera.target) {
+      const { innerWidth, innerHeight } = window
       gameDrawing.setCamera(gameCamera.x, gameCamera.y)
       const cameraAcceleration = 1
 
-      const cameraXDiff = gameCamera.target.x - gameCamera.x - this.width / 2
-      gameCamera.x +=
-        Math.abs(cameraXDiff) * Math.sign(cameraXDiff) * cameraAcceleration
+      const xDelta = gameCamera.target.x - gameCamera.x - innerWidth / 2
+      const xChange = Math.abs(xDelta) * Math.sign(xDelta) * cameraAcceleration
+      gameCamera.x += xChange
+      // TODO: Keep mouse in the same place.
+      //       Not working in camera example near edges of room.
+      // gameMouse.x += xChange
 
-      const cameraYDiff = gameCamera.target.y - gameCamera.y - this.height / 2
-      gameCamera.y +=
-        Math.abs(cameraYDiff) * Math.sign(cameraYDiff) * cameraAcceleration
+      const yDelta = gameCamera.target.y - gameCamera.y - innerHeight / 2
+      const yChange = Math.abs(yDelta) * Math.sign(yDelta) * cameraAcceleration
+      gameCamera.y += yChange
+      // TODO: Keep mouse in the same place.
+      //       Not working in camera example near edges of room.
+      // gameMouse.y += yChange
 
       // limit the camera to the room
       gameCamera.x = Math.max(
         0,
-        Math.min(gameCamera.x, gameRooms.currentRoom.width - this.width),
+        Math.min(gameCamera.x, gameRooms.currentRoom.width - innerWidth),
       )
       gameCamera.y = Math.max(
         0,
-        Math.min(gameCamera.y, gameRooms.currentRoom.height - this.height),
+        Math.min(gameCamera.y, gameRooms.currentRoom.height - innerHeight),
       )
     }
 

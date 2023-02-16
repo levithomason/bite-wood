@@ -1,3 +1,6 @@
+import { gameDrawing } from './game-drawing-controller.js'
+import { gameCamera } from './game-camera-controller.js'
+
 /** Map of mouse buttons to numbers and back. */
 export const MOUSE_BUTTONS = {
   0: 'left',
@@ -63,8 +66,8 @@ class GameMouse {
       return
     }
 
-    this.x = e.layerX // e.pageX - canvasX
-    this.y = e.layerY // e.pageY - canvasY
+    this.x = e.pageX - gameDrawing.canvas.offsetLeft + gameCamera.x
+    this.y = e.pageY - gameDrawing.canvas.offsetTop + gameCamera.y
   }
 
   /** @param {MouseEvent} e */
