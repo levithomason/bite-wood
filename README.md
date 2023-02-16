@@ -2,7 +2,7 @@
 
 Minimal game engine with no dependencies.
 
-## [:joystick: 	Play!](https://levithomason.com/bite-wood/)
+## [:joystick: Play!](https://levithomason.com/bite-wood/)
 
 ## Develop
 
