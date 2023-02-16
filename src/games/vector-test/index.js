@@ -1,9 +1,9 @@
 import {
   Game,
-  GameRoom,
-  gameMouse,
-  gameRooms,
   gameKeyboard,
+  gameMouse,
+  GameRoom,
+  gameRooms,
 } from '../../core/index.js'
 import { Vector } from '../../core/math.js'
 

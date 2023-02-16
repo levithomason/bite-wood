@@ -10,7 +10,6 @@ import {
   GameRoom,
   gameRooms,
   GameSprite,
-  gameState,
 } from '../../core/index.js'
 import { direction, random, Vector } from '../../core/math.js'
 

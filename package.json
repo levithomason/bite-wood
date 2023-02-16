@@ -23,11 +23,7 @@
       }
     ]
   },
-  "dependencies": {
-    "lit-html": "^1.0.0",
-    "normalize.css": "^8.0.1",
-    "tinycolor2": "^1.4.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@jest/globals": "^29.3.1",
     "gh-pages": "^5.0.0",

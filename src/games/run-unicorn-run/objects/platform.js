@@ -1,9 +1,4 @@
-import {
-  GameImage,
-  GameObject,
-  GameSprite,
-  gameState,
-} from '../../../core/index.js'
+import { GameImage, GameObject, GameSprite } from '../../../core/index.js'
 
 // ----------------------------------------
 // Player

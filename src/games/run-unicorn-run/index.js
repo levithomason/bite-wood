@@ -1,4 +1,4 @@
-import { Game, gameRooms, gameState } from '../../core/index.js'
+import { Game, gameRooms } from '../../core/index.js'
 
 import Room0 from './rooms/room0.js'
 import Room1 from './rooms/room1.js'

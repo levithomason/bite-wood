@@ -1,8 +1,8 @@
 import {
   GameImage,
-  GameSprite,
   GameObject,
   gameRooms,
+  GameSprite,
 } from '../../../core/index.js'
 
 // ----------------------------------------

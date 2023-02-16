@@ -1,5 +1,5 @@
 import { html } from 'lit-html'
-import { setState, getState } from '../state-manager.js'
+import { getState, setState } from '../state-manager.js'
 
 let __previewLoopTimer
 let __frameIndexPreview = 0

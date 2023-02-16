@@ -1,11 +1,11 @@
 import {
   GameImage,
-  GameSprite,
+  gameKeyboard,
+  gameMouse,
   GameObject,
   gamePhysics,
-  gameMouse,
   gameRooms,
-  gameKeyboard,
+  GameSprite,
 } from '../../../core/index.js'
 
 import * as math from '../../../core/math.js'
