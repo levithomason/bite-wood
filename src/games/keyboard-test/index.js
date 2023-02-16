@@ -1,4 +1,4 @@
-import { Game, GameRoom, gameKeyboard, gameRooms } from '../../core/index.js'
+import { Game, gameKeyboard, GameRoom, gameRooms } from '../../core/index.js'
 
 class Room extends GameRoom {
   constructor() {

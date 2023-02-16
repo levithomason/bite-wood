@@ -1,5 +1,5 @@
 import { Game, GameObject, GameRoom, gameRooms } from '../../core/index.js'
-import { direction, random, randomChoice, Vector } from '../../core/math.js'
+import { direction, random, randomChoice } from '../../core/math.js'
 
 const WIDTH = 800
 const HEIGHT = 600

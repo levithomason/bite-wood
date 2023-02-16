@@ -4,7 +4,6 @@ import {
   GameObject,
   GameRoom,
   gameRooms,
-  gameState,
 } from '../../core/index.js'
 import { random, randomChoice } from '../../core/math.js'
 import { gameCamera } from '../../core/game-camera-controller.js'

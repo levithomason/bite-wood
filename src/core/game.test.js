@@ -1,6 +1,4 @@
 import { Game } from './game.js'
-import { GameObject } from './game-object.js'
-import { GameRoom } from './game-room.js'
 import { gameRooms } from './game-rooms.js'
 import { gameState } from './game-state-controller.js'
 

@@ -1,5 +1,3 @@
-import { gameRooms } from './game-rooms.js'
-
 export class GameCamera {
   constructor() {
     this.x = 0
