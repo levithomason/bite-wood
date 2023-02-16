@@ -2,8 +2,8 @@ import {
   GameAudio,
   GameImage,
   GameObject,
-  GameSprite,
   gameRooms,
+  GameSprite,
 } from '../../../core/index.js'
 import * as math from '../../../core/math.js'
 import { isColliding } from '../../../core/collision.js'

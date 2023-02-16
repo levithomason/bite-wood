@@ -1,11 +1,11 @@
 import {
   Game,
-  GameRoom,
+  GameAudio,
   gameKeyboard,
-  gameRooms,
   GameObject,
   GameParticles,
-  GameAudio,
+  GameRoom,
+  gameRooms,
 } from '../../core/index.js'
 import { direction, randomChoice } from '../../core/math.js'
 

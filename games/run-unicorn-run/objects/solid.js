@@ -1,12 +1,11 @@
-import * as collision from '../../../core/collision.js'
+import { isColliding } from '../../../core/collision.js'
 import {
   GameImage,
+  gameMouse,
   GameObject,
   GameSprite,
-  gameMouse,
   gameState,
 } from '../../../core/index.js'
-import { isColliding } from '../../../core/collision.js'
 
 // ----------------------------------------
 // Solid
