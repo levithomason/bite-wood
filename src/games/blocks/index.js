@@ -138,7 +138,7 @@ class Block extends GameObject {
     const x = this.x
     const y = this.y
 
-    this.keepInRoom()
+    this.keepInRoom(1)
 
     if (this.x !== x || this.y !== y) {
       this.speed *= BLOCK_COLLISION_FRICTION

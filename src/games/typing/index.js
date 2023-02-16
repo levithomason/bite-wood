@@ -44,7 +44,7 @@ class Key extends GameObject {
 
   step() {
     super.step()
-    this.keepInRoom()
+    this.keepInRoom(1)
   }
 
   draw(drawing) {

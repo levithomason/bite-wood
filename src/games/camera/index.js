@@ -16,8 +16,8 @@ class Character extends GameObject {
       boundingBoxLeft: -25,
       boundingBoxWidth: 50,
       boundingBoxHeight: 80,
-      acceleration: 1.5,
-      maxSpeed: 8,
+      acceleration: 2,
+      maxSpeed: 12,
       friction: 0.15,
     })
   }
@@ -45,6 +45,8 @@ class Character extends GameObject {
     // friction
     this.hspeed *= 1 - this.friction
     this.vspeed *= 1 - this.friction
+
+    this.keepInRoom(0, { bottom: 50 })
   }
 
   draw(drawing) {
@@ -54,8 +56,8 @@ class Character extends GameObject {
     drawing.setStrokeColor('#000')
     drawing.setFillColor('#f8f')
     drawing.rectangle(
-      this.x - this.boundingBoxWidth / 2,
-      this.y - this.boundingBoxHeight,
+      this.x - this.insertionX,
+      this.y - this.insertionY,
       this.boundingBoxWidth,
       this.boundingBoxHeight,
     )

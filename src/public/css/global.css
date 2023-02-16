@@ -55,11 +55,6 @@ body {
 img,
 canvas {
   image-rendering: pixelated;
-
-  /* animate sizes smoothly */
-  transition: width 100ms, height 100ms;
-  transition-timing-function: var(--timing-function-bounce);
-  transform: translateZ(0);
   backface-visibility: hidden;
 }
 

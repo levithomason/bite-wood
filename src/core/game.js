@@ -67,6 +67,17 @@ export class Game {
   start() {
     if (_isRunning) return
 
+    // Keep the canvas the same size as the window
+    const resizeCanvas = () => {
+      gameDrawing.setCanvasSize(window.innerWidth, window.innerHeight)
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas()
+    })
+
+    resizeCanvas()
+
     _isRunning = true
     this.tick()
   }
@@ -75,7 +86,7 @@ export class Game {
     cancelAnimationFrame(_raf)
   }
 
-  tick(timestamp) {
+  tick(timestamp = 0) {
     if (!_lastTickTimestamp) _lastTickTimestamp = timestamp
 
     const timeSinceTick = timestamp - _lastTickTimestamp
@@ -90,11 +101,11 @@ export class Game {
 
     _lastTickTimestamp = timestamp
 
-    // track FPS
+    // track FPS over 2 seconds
     if (gameState.debug) {
       const fps = 1000 / timeSinceTick
       this.#fps.unshift(fps)
-      this.#fps.splice(120) // 2 seconds worth of frames
+      this.#fps.splice(this.stepsPerSecond * 2)
     }
 
     // TODO: Find a better play/pause key that doesn't conflict with the game.
@@ -208,7 +219,7 @@ export class Game {
     // debug drawings
     if (gameState.debug) {
       gameDrawing.mouseDebug(this.width, this.height)
-      gameDrawing.fpsDebug(this.width, avg(this.#fps))
+      gameDrawing.fpsDebug(avg(this.#fps))
     }
 
     // paused - overlay

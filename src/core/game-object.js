@@ -220,8 +220,24 @@ export class GameObject {
   }
 
   /**
+   * The x offset of the object's insertion point relative to the top left corner of the bounding box.
+   * @return {number}
+   */
+  get insertionX() {
+    return -this.#boundingBoxLeft
+  }
+
+  /**
+   * The y offset of the object's insertion point relative to the top left corner of the bounding box.
+   * @return {number}
+   */
+  get insertionY() {
+    return -this.#boundingBoxTop
+  }
+
+  /**
    * This is the current sprite's top position in the room.
-   * Returns 0 if there is no sprite
+   * Returns 0 if there is no sprite.
    * @return {number}
    */
   get spriteTop() {
@@ -230,7 +246,7 @@ export class GameObject {
   }
   /**
    * This is the current sprite's left position in the room.
-   * Returns 0 if there is no sprite
+   * Returns 0 if there is no sprite.
    * @return {number}
    */
   get spriteLeft() {
@@ -239,7 +255,7 @@ export class GameObject {
   }
   /**
    * This is the current sprite's right position in the room.
-   * Returns 0 if there is no sprite
+   * Returns 0 if there is no sprite.
    * @return {number}
    */
   get spriteRight() {
@@ -248,7 +264,7 @@ export class GameObject {
   }
   /**
    * This is the current sprite's bottom position in the room.
-   * Returns 0 if there is no sprite
+   * Returns 0 if there is no sprite.
    * @return {number}
    */
   get spriteBottom() {
@@ -408,19 +424,55 @@ export class GameObject {
     )
   }
 
-  keepInRoom() {
+  /**
+   * Keep the object in the room.
+   * Optionally `bounce` off the walls and define `padding` to keep away from the edges.
+   *
+   * @param {number} [bounce=0] - How much to bounce when hitting the walls. 0 = stop, 1 = full bounce.
+   * @param {object} [padding={}] - Number of pixels to keep away from the top of the room.
+   * @param {number} [padding.top=0] - Number of pixels to keep away from the top of the room.
+   * @param {number} [padding.right=0] - Number of pixels to keep away from the right of the room.
+   * @param {number} [padding.bottom=0] - Number of pixels to keep away from the bottom of the room.
+   * @param {number} [padding.left=0] - Number of pixels to keep away from the left of the room.
+   *
+   * @example
+   * // Bounce off the walls with 100% of the original speed
+   * this.bounceOffRoom(1)
+   * @example
+   * // Bounce off the walls with 50% of the original speed
+   * this.bounceOffRoom(0.5)
+   * @example
+   * // Stop when hitting walls, 0% of the original speed.
+   * this.bounceOffRoom(0)
+   * this.bounceOffRoom()
+   * @example
+   * // Stop at the walls, but keep 50px away from the bottom.
+   * this.bounceOffRoom(0, { bottom: 50 })
+   */
+  keepInRoom(bounce = {}, padding = {}) {
+    const { top = 0, right = 0, bottom = 0, left = 0 } = padding
     const room = gameRooms.currentRoom
 
-    if (this.boundingBoxLeft <= 0) {
-      this.hspeed = Math.abs(this.hspeed)
-    } else if (this.boundingBoxRight >= room.width) {
-      this.hspeed = -Math.abs(this.hspeed)
+    // outside left
+    if (this.boundingBoxLeft < left) {
+      this.hspeed = Math.abs(this.hspeed) * bounce
+      this.x = left + this.insertionX
+    }
+    // outside right
+    else if (this.boundingBoxRight > room.width - right) {
+      this.hspeed = -Math.abs(this.hspeed) * bounce
+      this.x = room.width - right - this.boundingBoxWidth + this.insertionX
     }
 
-    if (this.boundingBoxTop <= 0) {
-      this.vspeed = Math.abs(this.vspeed)
-    } else if (this.boundingBoxBottom >= room.height) {
-      this.vspeed = -Math.abs(this.vspeed)
+    // outside top
+    if (this.boundingBoxTop < top) {
+      this.vspeed = Math.abs(this.vspeed) * bounce
+      this.y = top + this.insertionY
+    }
+    // outside bottom
+    else if (this.boundingBoxBottom > room.height - bottom) {
+      this.vspeed = -Math.abs(this.vspeed) * bounce
+      this.y = room.height - bottom - this.boundingBoxHeight + this.insertionY
     }
   }
 }

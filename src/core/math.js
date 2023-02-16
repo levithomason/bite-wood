@@ -25,7 +25,7 @@ export const direction = (x1, y1, x2 = 0, y2 = 0) => {
  * @param {number[]} values - An array of numbers
  * @return {number}
  */
-export const sum = (values) => values.reduce((a, b) => a + b, 0)
+export const sum = (values) => values.reduce((a = 0, b = 0) => a + b, 0)
 
 /**
  * Returns the average of an array of values.
