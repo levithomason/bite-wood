@@ -1,7 +1,6 @@
 import {
   Game,
   gameKeyboard,
-  gameMouse,
   GameObject,
   GameRoom,
   gameRooms,
@@ -25,16 +24,16 @@ class Character extends GameObject {
   step() {
     super.step()
 
-    if (gameKeyboard.active.ARROWUP) {
+    if (gameKeyboard.active.W) {
       this.vspeed -= this.acceleration
     }
-    if (gameKeyboard.active.ARROWDOWN) {
+    if (gameKeyboard.active.S) {
       this.vspeed += this.acceleration
     }
-    if (gameKeyboard.active.ARROWLEFT) {
+    if (gameKeyboard.active.A) {
       this.hspeed -= this.acceleration
     }
-    if (gameKeyboard.active.ARROWRIGHT) {
+    if (gameKeyboard.active.D) {
       this.hspeed += this.acceleration
     }
 
@@ -61,9 +60,6 @@ class Character extends GameObject {
       this.boundingBoxWidth,
       this.boundingBoxHeight,
     )
-
-    // TODO: remove debug drawing line to mouse
-    drawing.line(this.x, this.y, gameMouse.x, gameMouse.y)
   }
 }
 
@@ -391,8 +387,6 @@ class Room extends GameRoom {
     drawing.setFillColor(skyGradient)
     drawing.setStrokeColor('transparent')
     drawing.rectangle(0, 0, this.width, this.height)
-
-    // TODO: add GameRoom a step method
   }
 }
 

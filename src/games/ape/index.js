@@ -410,12 +410,6 @@ class Ape extends GameObject {
     super.step()
     this.state.step.call(this)
   }
-
-  // TODO: remove debug drawing line to mouse
-  draw(drawing) {
-    super.draw(drawing)
-    drawing.line(this.x, this.y, gameMouse.x, gameMouse.y)
-  }
 }
 
 // =============================================================================

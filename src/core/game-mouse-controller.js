@@ -62,9 +62,8 @@ class GameMouse {
     //
     // By using the layerX/Y of any canvas, we get the added benefit of a proper mouse
     // position on any canvas.
-    if (e.target.tagName !== 'CANVAS') {
-      return
-    }
+
+    // This tracks the mouse position anywhere in the document, including outside the canvas.
 
     this.x = e.pageX - gameDrawing.canvas.offsetLeft + gameCamera.x
     this.y = e.pageY - gameDrawing.canvas.offsetTop + gameCamera.y

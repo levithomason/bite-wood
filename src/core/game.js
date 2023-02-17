@@ -171,33 +171,31 @@ export class Game {
     // accelerate the camera towards the target
     gameDrawing.saveSettings()
     if (gameCamera.target) {
-      const { innerWidth, innerHeight } = window
-      gameDrawing.setCamera(gameCamera.x, gameCamera.y)
-      const cameraAcceleration = 1
+      const cameraAcceleration = 0.1
 
-      const xDelta = gameCamera.target.x - gameCamera.x - innerWidth / 2
+      const xDelta = gameCamera.target.x - gameCamera.x - window.innerWidth / 2
       const xChange = Math.abs(xDelta) * Math.sign(xDelta) * cameraAcceleration
-      gameCamera.x += xChange
-      // TODO: Keep mouse in the same place.
-      //       Not working in camera example near edges of room.
-      // gameMouse.x += xChange
 
-      const yDelta = gameCamera.target.y - gameCamera.y - innerHeight / 2
+      const yDelta = gameCamera.target.y - gameCamera.y - window.innerHeight / 2
       const yChange = Math.abs(yDelta) * Math.sign(yDelta) * cameraAcceleration
-      gameCamera.y += yChange
-      // TODO: Keep mouse in the same place.
-      //       Not working in camera example near edges of room.
-      // gameMouse.y += yChange
 
       // limit the camera to the room
-      gameCamera.x = Math.max(
+      const cameraEndX = Math.max(
         0,
-        Math.min(gameCamera.x, gameRooms.currentRoom.width - innerWidth),
+        Math.min(
+          gameCamera.x + xChange,
+          gameRooms.currentRoom.width - window.innerWidth,
+        ),
       )
-      gameCamera.y = Math.max(
+      const cameraEndY = Math.max(
         0,
-        Math.min(gameCamera.y, gameRooms.currentRoom.height - innerHeight),
+        Math.min(
+          gameCamera.y + yChange,
+          gameRooms.currentRoom.height - window.innerHeight,
+        ),
       )
+
+      gameCamera.move(cameraEndX, cameraEndY)
     }
 
     // room - continue drawing if the room fails
