@@ -39,7 +39,7 @@ class Object extends GameObject {
 
   step() {
     super.step()
-    this.keepInRoom()
+    this.keepInRoom(1)
   }
 }
 

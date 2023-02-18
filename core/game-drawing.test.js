@@ -178,7 +178,7 @@ describe('GameDrawing', () => {
     })
 
     it('fpsDebug() returns this', () => {
-      expect(drawing.fpsDebug(100, 60) === drawing).toBe(true)
+      expect(drawing.fpsDebug(60) === drawing).toBe(true)
     })
 
     it('mouseDebug() returns this', () => {

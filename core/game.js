@@ -57,7 +57,6 @@ export class Game {
     this.height = height
     this.stepsPerSecond = stepsPerSecond
 
-    gameDrawing.setCanvasSize(this.width, this.height)
     parentElement.append(gameDrawing.canvas)
 
     window.biteWood = window.biteWood || {}
@@ -67,6 +66,20 @@ export class Game {
   start() {
     if (_isRunning) return
 
+    // Keep the canvas the same size as the window
+    const resizeCanvas = () => {
+      const room = gameRooms.currentRoom
+      const width = Math.min(window.innerWidth, room.width)
+      const height = Math.min(window.innerHeight, room.height)
+      gameDrawing.setCanvasSize(width, height)
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas()
+    })
+
+    resizeCanvas()
+
     _isRunning = true
     this.tick()
   }
@@ -75,7 +88,7 @@ export class Game {
     cancelAnimationFrame(_raf)
   }
 
-  tick(timestamp) {
+  tick(timestamp = 0) {
     if (!_lastTickTimestamp) _lastTickTimestamp = timestamp
 
     const timeSinceTick = timestamp - _lastTickTimestamp
@@ -90,11 +103,11 @@ export class Game {
 
     _lastTickTimestamp = timestamp
 
-    // track FPS
+    // track FPS over 2 seconds
     if (gameState.debug) {
       const fps = 1000 / timeSinceTick
       this.#fps.unshift(fps)
-      this.#fps.splice(120) // 2 seconds worth of frames
+      this.#fps.splice(this.stepsPerSecond * 2)
     }
 
     // TODO: Find a better play/pause key that doesn't conflict with the game.
@@ -153,31 +166,36 @@ export class Game {
 
   draw() {
     gameDrawing.clear()
-    gameDrawing.saveSettings()
 
     // TODO: move to game-camera step(), it should follow the target itself
     // accelerate the camera towards the target
+    gameDrawing.saveSettings()
     if (gameCamera.target) {
-      gameDrawing.setCamera(gameCamera.x, gameCamera.y)
-      const cameraAcceleration = 1
+      const cameraAcceleration = 0.1
 
-      const cameraXDiff = gameCamera.target.x - gameCamera.x - this.width / 2
-      gameCamera.x +=
-        Math.abs(cameraXDiff) * Math.sign(cameraXDiff) * cameraAcceleration
+      const xDelta = gameCamera.target.x - gameCamera.x - window.innerWidth / 2
+      const xChange = Math.abs(xDelta) * Math.sign(xDelta) * cameraAcceleration
 
-      const cameraYDiff = gameCamera.target.y - gameCamera.y - this.height / 2
-      gameCamera.y +=
-        Math.abs(cameraYDiff) * Math.sign(cameraYDiff) * cameraAcceleration
+      const yDelta = gameCamera.target.y - gameCamera.y - window.innerHeight / 2
+      const yChange = Math.abs(yDelta) * Math.sign(yDelta) * cameraAcceleration
 
       // limit the camera to the room
-      gameCamera.x = Math.max(
+      const cameraEndX = Math.max(
         0,
-        Math.min(gameCamera.x, gameRooms.currentRoom.width - this.width),
+        Math.min(
+          gameCamera.x + xChange,
+          gameRooms.currentRoom.width - window.innerWidth,
+        ),
       )
-      gameCamera.y = Math.max(
+      const cameraEndY = Math.max(
         0,
-        Math.min(gameCamera.y, gameRooms.currentRoom.height - this.height),
+        Math.min(
+          gameCamera.y + yChange,
+          gameRooms.currentRoom.height - window.innerHeight,
+        ),
       )
+
+      gameCamera.move(cameraEndX, cameraEndY)
     }
 
     // room - continue drawing if the room fails
@@ -208,7 +226,7 @@ export class Game {
     // debug drawings
     if (gameState.debug) {
       gameDrawing.mouseDebug(this.width, this.height)
-      gameDrawing.fpsDebug(this.width, avg(this.#fps))
+      gameDrawing.fpsDebug(avg(this.#fps))
     }
 
     // paused - overlay

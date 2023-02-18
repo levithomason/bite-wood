@@ -144,9 +144,13 @@
 }
 
 .stage .drawing-canvas {
+  /*animate sizes smoothly */
+  transition: width 100ms, height 100ms;
+  transition-timing-function: var(--timing-function-bounce);
+  transform: translateZ(0);
   background-image: var(--transparent-background);
-  cursor: crosshair;
   background-color: #fff;
+  cursor: crosshair;
 }
 
 .stage .grid-canvas {
