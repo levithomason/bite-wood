@@ -1,6 +1,7 @@
 import { gameMouse } from './game-mouse-controller.js'
 import { isColliding } from './collision.js'
 import { toRadians } from './math.js'
+import { gameDrawing } from './game-drawing-controller.js'
 
 /** Provides a canvas and helpful methods for drawing on it. */
 export class GameDrawing {
@@ -23,7 +24,7 @@ export class GameDrawing {
     return this
   }
 
-  setCamera(x, y) {
+  moveCamera(x, y) {
     this.#ctx.translate(-x, -y)
   }
 
@@ -453,10 +454,11 @@ export class GameDrawing {
   // Debug
   //
 
-  fpsDebug(gameWidth, fps) {
+  fpsDebug(fps) {
     this.saveSettings()
     this.setStrokeColor('transparent')
 
+    const canvasWidth = parseInt(gameDrawing.canvas.style.width, 10)
     const top = 0
     const text = Math.round(fps) + ' FPS'
     const textPaddingX = 8
@@ -471,7 +473,7 @@ export class GameDrawing {
 
     this.setFillColor('rgba(0, 0, 0, 0.25)')
     this.rectangle(
-      gameWidth - textMargin - textPaddingX * 2 - textWidth,
+      canvasWidth - textMargin - textPaddingX * 2 - textWidth,
       top + textMargin,
       textWidth + textPaddingX * 2,
       textHeight + textPaddingY * 2,
@@ -480,7 +482,7 @@ export class GameDrawing {
     this.setFillColor('rgba(255, 255, 255, 0.75)')
     this.text(
       text,
-      gameWidth - textMargin - textPaddingX - textWidth / 2,
+      canvasWidth - textMargin - textPaddingX - textWidth / 2,
       textMargin + textPaddingY + textHeight / 2,
     )
 

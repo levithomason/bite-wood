@@ -1,3 +1,6 @@
+import { gameDrawing } from './game-drawing-controller.js'
+import { gameCamera } from './game-camera-controller.js'
+
 /** Map of mouse buttons to numbers and back. */
 export const MOUSE_BUTTONS = {
   0: 'left',
@@ -59,12 +62,11 @@ class GameMouse {
     //
     // By using the layerX/Y of any canvas, we get the added benefit of a proper mouse
     // position on any canvas.
-    if (e.target.tagName !== 'CANVAS') {
-      return
-    }
 
-    this.x = e.layerX // e.pageX - canvasX
-    this.y = e.layerY // e.pageY - canvasY
+    // This tracks the mouse position anywhere in the document, including outside the canvas.
+
+    this.x = e.pageX - gameDrawing.canvas.offsetLeft + gameCamera.x
+    this.y = e.pageY - gameDrawing.canvas.offsetTop + gameCamera.y
   }
 
   /** @param {MouseEvent} e */

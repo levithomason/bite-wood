@@ -13,7 +13,6 @@ import {
   offsetX,
   offsetY,
   scale,
-  toRadians,
 } from '../../core/math.js'
 import { loadState } from '../../editors/sprite-editor/storage-manager.js'
 
@@ -116,7 +115,7 @@ class Globby extends GameObject {
         this.y,
         this.getElongatedSize(),
         this.size,
-        toRadians(this.direction),
+        this.direction,
       )
 
     // eyes
@@ -170,17 +169,17 @@ class Globby extends GameObject {
   step() {
     super.step()
 
-    if (gameKeyboard.active.ARROWLEFT) {
+    if (gameKeyboard.active.A) {
       this.motionAdd(gamePhysics.DIRECTION_LEFT, this.acceleration)
-    } else if (gameKeyboard.active.ARROWRIGHT) {
+    } else if (gameKeyboard.active.D) {
       this.motionAdd(gamePhysics.DIRECTION_RIGHT, this.acceleration)
     } else {
       this.hspeed *= 1 - this.friction
     }
 
-    if (gameKeyboard.active.ARROWUP) {
+    if (gameKeyboard.active.W) {
       this.motionAdd(gamePhysics.DIRECTION_UP, this.acceleration)
-    } else if (gameKeyboard.active.ARROWDOWN) {
+    } else if (gameKeyboard.active.S) {
       this.motionAdd(gamePhysics.DIRECTION_DOWN, this.acceleration)
     } else {
       this.vspeed *= 1 - this.friction

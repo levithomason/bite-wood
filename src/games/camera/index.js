@@ -15,8 +15,8 @@ class Character extends GameObject {
       boundingBoxLeft: -25,
       boundingBoxWidth: 50,
       boundingBoxHeight: 80,
-      acceleration: 1.5,
-      maxSpeed: 8,
+      acceleration: 2,
+      maxSpeed: 12,
       friction: 0.15,
     })
   }
@@ -24,16 +24,16 @@ class Character extends GameObject {
   step() {
     super.step()
 
-    if (gameKeyboard.active.ARROWUP) {
+    if (gameKeyboard.active.W) {
       this.vspeed -= this.acceleration
     }
-    if (gameKeyboard.active.ARROWDOWN) {
+    if (gameKeyboard.active.S) {
       this.vspeed += this.acceleration
     }
-    if (gameKeyboard.active.ARROWLEFT) {
+    if (gameKeyboard.active.A) {
       this.hspeed -= this.acceleration
     }
-    if (gameKeyboard.active.ARROWRIGHT) {
+    if (gameKeyboard.active.D) {
       this.hspeed += this.acceleration
     }
 
@@ -44,6 +44,8 @@ class Character extends GameObject {
     // friction
     this.hspeed *= 1 - this.friction
     this.vspeed *= 1 - this.friction
+
+    this.keepInRoom(0, { bottom: 50 })
   }
 
   draw(drawing) {
@@ -53,8 +55,8 @@ class Character extends GameObject {
     drawing.setStrokeColor('#000')
     drawing.setFillColor('#f8f')
     drawing.rectangle(
-      this.x - this.boundingBoxWidth / 2,
-      this.y - this.boundingBoxHeight,
+      this.x - this.insertionX,
+      this.y - this.insertionY,
       this.boundingBoxWidth,
       this.boundingBoxHeight,
     )
@@ -118,30 +120,27 @@ class Cloud extends GameObject {
       boundingBoxHeight: 80,
     })
 
-    this.speed = random(0.1, 0.2)
-    this.direction = 0
+    this.speed = random(0.1, 0.5)
+    this.direction = randomChoice([0, 180])
   }
 
   draw(drawing) {
     super.draw(drawing)
 
-    // bottom
-    drawing.setFillColor('#fff')
     drawing.setStrokeColor('transparent')
-    drawing.ellipse(this.x - 40, this.y, 70, 40)
 
+    // bottom poofs
+    drawing.setFillColor('#fff')
+    drawing.ellipse(this.x - 40, this.y, 70, 40)
     drawing.ellipse(this.x + 30, this.y, 60, 40)
 
-    // tops
-    drawing.setStrokeColor('transparent')
-
-    // shadow then poof
+    // top left - shadow then poof
     drawing.setFillColor('rgba(0, 0, 0, 0.05)')
     drawing.circle(this.x - 40, this.y - 25, 40)
     drawing.setFillColor('#fff')
     drawing.circle(this.x - 30, this.y - 40, 50)
 
-    // shadow then poof
+    // top right - shadow then poof
     drawing.setFillColor('rgba(0, 0, 0, 0.05)')
     drawing.circle(this.x + 30, this.y - 35, 40)
     drawing.setFillColor('#fff')
@@ -383,13 +382,11 @@ class Room extends GameRoom {
 
     // draw a gradient sky
     const skyGradient = drawing.createLinearGradient(0, 0, 0, this.height)
-    skyGradient.addColorStop(0, '#79bafc')
+    skyGradient.addColorStop(0.3, '#79bafc')
     skyGradient.addColorStop(1, '#a9edff')
     drawing.setFillColor(skyGradient)
     drawing.setStrokeColor('transparent')
     drawing.rectangle(0, 0, this.width, this.height)
-
-    // TODO: add GameRoom a step method
   }
 }
 
