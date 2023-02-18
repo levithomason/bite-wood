@@ -1,7 +1,6 @@
 import {
   Game,
   gameKeyboard,
-  gameMouse,
   GameObject,
   GameRoom,
   gameRooms,
@@ -146,11 +145,6 @@ class Cloud extends GameObject {
     drawing.circle(this.x + 30, this.y - 35, 40)
     drawing.setFillColor('#fff')
     drawing.circle(this.x + 30, this.y - 30, 40)
-
-    // line to gameMouse
-    drawing.setLineWidth(1)
-    drawing.setStrokeColor('#000')
-    drawing.line(this.x, this.y, gameMouse.x, gameMouse.y)
   }
 }
 
