@@ -12,16 +12,22 @@ export class GameCamera {
   }
 
   move(x, y) {
+    // Avoids sub-pixel rendering errors.
+    // When rendering two filled rectangles beside each other, there can be a
+    // 1px (or partial pixel) gap between them due to partial pixel camera position.
+    const xRound = Math.round(x)
+    const yRound = Math.round(y)
+
     // We need to move the mouse by the same amount as the camera.
     // Move the mouse first since we need to compute the camera delta
     // and the delta is lost once the camera is already moved.
     gameMouse.x += x - this.#x
     gameMouse.y += y - this.#y
 
-    gameDrawing.moveCamera(x, y)
+    gameDrawing.moveCamera(xRound, yRound)
 
-    this.#x = x
-    this.#y = y
+    this.#x = xRound
+    this.#y = yRound
   }
 
   get x() {
