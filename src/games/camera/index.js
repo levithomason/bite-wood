@@ -2,10 +2,11 @@ import {
   Game,
   gameKeyboard,
   GameObject,
+  gamePhysics,
   GameRoom,
   gameRooms,
 } from '../../core/index.js'
-import { direction, distance, random, randomChoice } from '../../core/math.js'
+import { direction, random, randomChoice } from '../../core/math.js'
 import { gameCamera } from '../../core/game-camera-controller.js'
 
 class Character extends GameObject {
@@ -72,37 +73,45 @@ class UFO extends GameObject {
       boundingBoxHeight: 100,
     })
 
-    this.offsetY = 0
-    this.acceleration = 0.05
-    this.offsetDirection = this.acceleration
-    this.maxSpeed = 8
+    this.accelerationChase = 0.2
+    this.accelerationRest = 0.1
+    this.maxSpeedChase = 6
+    this.maxSpeedRest = 3
 
-    this.direction = randomChoice([0, 180])
+    this.direction = gamePhysics.DIRECTION_RIGHT
   }
 
   step() {
     super.step()
-    this.keepInRoom()
-
-    if (this.offsetY > 2) {
-      this.offsetDirection = -this.acceleration
-    } else if (this.offsetY < -2) {
-      this.offsetDirection = this.acceleration
-    }
-    this.offsetY += this.offsetDirection
-
-    this.y += this.offsetY
 
     const player = gameRooms.currentRoom.objects.find((o) => {
       return o instanceof Character
     })
-    this.motionAdd(
-      direction(this.x, this.y, player.x, player.y),
-      distance(this.x, this.y, player.x, player.y) / 100,
-    )
 
-    // terminal velocity
-    this.speed = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.speed))
+    // follow the player if the player is in space
+    if (player.y < gameRooms.currentRoom.elevation.spaceStart) {
+      this.motionAdd(
+        direction(this.x, this.y, player.x, player.y),
+        this.accelerationChase,
+      )
+      this.speed = Math.min(this.maxSpeedChase, this.speed)
+    }
+    // otherwise, go back to the top left corner
+    else {
+      const restPoint = {
+        x: gameRooms.currentRoom.width / 2,
+        y:
+          gameRooms.currentRoom.height -
+          gameRooms.currentRoom.elevation.spaceEnd,
+      }
+      this.motionAdd(
+        direction(this.x, this.y, restPoint.x, restPoint.y),
+        this.accelerationRest,
+      )
+      this.speed = Math.min(this.maxSpeedRest, this.speed)
+    }
+
+    this.keepInRoom()
   }
 
   draw(drawing) {
@@ -431,7 +440,7 @@ class Room extends GameRoom {
       airStart: 0.3,
     }
 
-    this.evelvation = {
+    this.elevation = {
       spaceEnd: this.layers.spaceEnd * this.height,
       spaceStart: this.layers.spaceStart * this.height,
       airEnd: this.layers.airEnd * this.height,
@@ -447,8 +456,8 @@ class Room extends GameRoom {
     for (let i = 0; i < numClouds; i += 1) {
       const x = random(100, this.width - 100)
       const y = random(
-        this.height - this.evelvation.airStart * 0.5,
-        this.height - this.evelvation.airStart * 0.8,
+        this.height - this.elevation.airStart * 0.5,
+        this.height - this.elevation.airStart * 0.8,
       )
       this.instanceCreate(Cloud, x, y)
     }
