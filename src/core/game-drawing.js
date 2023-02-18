@@ -24,7 +24,7 @@ export class GameDrawing {
     return this
   }
 
-  setCamera(x, y) {
+  moveCamera(x, y) {
     this.#ctx.translate(-x, -y)
   }
 
