@@ -5,7 +5,7 @@ import {
   GameRoom,
   gameRooms,
 } from '../../core/index.js'
-import { random, randomChoice } from '../../core/math.js'
+import { direction, distance, random, randomChoice } from '../../core/math.js'
 import { gameCamera } from '../../core/game-camera-controller.js'
 
 class Character extends GameObject {
@@ -60,6 +60,89 @@ class Character extends GameObject {
       this.boundingBoxWidth,
       this.boundingBoxHeight,
     )
+  }
+}
+
+class UFO extends GameObject {
+  constructor() {
+    super({
+      boundingBoxTop: -50,
+      boundingBoxLeft: -50,
+      boundingBoxWidth: 100,
+      boundingBoxHeight: 100,
+    })
+
+    this.offsetY = 0
+    this.acceleration = 0.05
+    this.offsetDirection = this.acceleration
+    this.maxSpeed = 8
+
+    this.direction = randomChoice([0, 180])
+  }
+
+  step() {
+    super.step()
+    this.keepInRoom()
+
+    if (this.offsetY > 2) {
+      this.offsetDirection = -this.acceleration
+    } else if (this.offsetY < -2) {
+      this.offsetDirection = this.acceleration
+    }
+    this.offsetY += this.offsetDirection
+
+    this.y += this.offsetY
+
+    const player = gameRooms.currentRoom.objects.find((o) => {
+      return o instanceof Character
+    })
+    this.motionAdd(
+      direction(this.x, this.y, player.x, player.y),
+      distance(this.x, this.y, player.x, player.y) / 100,
+    )
+
+    // terminal velocity
+    this.speed = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.speed))
+  }
+
+  draw(drawing) {
+    super.draw(drawing)
+
+    drawing.setLineWidth(0)
+    drawing.setStrokeColor('transparent')
+
+    // glass
+    drawing.setFillColor('#99ffff88')
+    drawing.circle(this.x, this.y, 30)
+
+    // shine on glass
+    drawing.setFillColor('#ccffffaa')
+    drawing.ellipse(this.x - 7, this.y - 18, 15, 8, -20)
+
+    // body
+    drawing.setFillColor('#aaa')
+    drawing.ellipse(this.x, this.y + 18, 60, 20)
+    drawing.setFillColor('#777')
+    drawing.ellipse(this.x, this.y + 20, 60, 18)
+
+    drawing.setFillColor('#555')
+    drawing.ellipse(this.x, this.y + 25, 45, 15)
+
+    // rivets
+    drawing.setFillColor('#333')
+    drawing.ellipse(this.x - 52, this.y + 18, 4, 3, -60)
+    drawing.ellipse(this.x + 20, this.y + 8, 5, 3, 8)
+    drawing.ellipse(this.x - 20, this.y + 8, 5, 3, -8)
+    drawing.ellipse(this.x + 52, this.y + 18, 4, 3, 60)
+
+    // antenna
+    drawing.setLineWidth(3)
+    drawing.setStrokeColor('#888')
+    drawing.line(this.x, this.y - 30, this.x, this.y - 50)
+
+    drawing.setStrokeColor('transparent')
+    drawing.setFillColor('#c00')
+    drawing.circle(this.x, this.y - 50, 5)
   }
 }
 
@@ -122,6 +205,11 @@ class Cloud extends GameObject {
 
     this.speed = random(0.1, 0.5)
     this.direction = randomChoice([0, 180])
+  }
+
+  step() {
+    super.step()
+    this.keepInRoom()
   }
 
   draw(drawing) {
@@ -335,19 +423,33 @@ class Flower extends GameObject {
 
 class Room extends GameRoom {
   constructor() {
-    super(8000, 1500)
+    super(3000, 4000)
+    this.layers = {
+      spaceEnd: 0.8,
+      spaceStart: 0.5,
+      airEnd: 0.4,
+      airStart: 0.3,
+    }
+
+    this.evelvation = {
+      spaceEnd: this.layers.spaceEnd * this.height,
+      spaceStart: this.layers.spaceStart * this.height,
+      airEnd: this.layers.airEnd * this.height,
+      airStart: this.layers.airStart * this.height,
+    }
 
     // add sun
     this.instanceCreate(Sun, this.width / 2 - 300, Sun.radius * 2)
 
     // add clouds
     const numClouds = this.width / 400
-    const cloudGap = this.width / numClouds
 
     for (let i = 0; i < numClouds; i += 1) {
-      const x =
-        i * cloudGap + cloudGap / 2 + random(-cloudGap * 0.5, cloudGap * 0.5)
-      const y = random(100, this.height - 400)
+      const x = random(100, this.width - 100)
+      const y = random(
+        this.height - this.evelvation.airStart * 0.5,
+        this.height - this.evelvation.airStart * 0.8,
+      )
       this.instanceCreate(Cloud, x, y)
     }
 
@@ -368,6 +470,9 @@ class Room extends GameRoom {
       this.instanceCreate(Flower, x, y)
     }
 
+    // ufo
+    this.instanceCreate(UFO, 100, 100)
+
     // create the character
     this.character = this.instanceCreate(
       Character,
@@ -382,7 +487,11 @@ class Room extends GameRoom {
 
     // draw a gradient sky
     const skyGradient = drawing.createLinearGradient(0, 0, 0, this.height)
-    skyGradient.addColorStop(0.3, '#79bafc')
+    skyGradient.addColorStop(0, '#000')
+    skyGradient.addColorStop(1 - this.layers.spaceEnd, '#000')
+    skyGradient.addColorStop(1 - this.layers.spaceStart, '#008')
+    skyGradient.addColorStop(1 - this.layers.airEnd, '#404')
+    skyGradient.addColorStop(1 - this.layers.airStart, '#79bafc')
     skyGradient.addColorStop(1, '#a9edff')
     drawing.setFillColor(skyGradient)
     drawing.setStrokeColor('transparent')
