@@ -2,6 +2,7 @@ import { gameMouse } from './game-mouse-controller.js'
 import { isColliding } from './collision.js'
 import { toRadians } from './math.js'
 import { gameDrawing } from './game-drawing-controller.js'
+import { gameCamera } from './game-camera-controller.js'
 
 /** Provides a canvas and helpful methods for drawing on it. */
 export class GameDrawing {
@@ -493,23 +494,29 @@ export class GameDrawing {
 
   /**
    * Draws a debug view of a mouse position.
-   * @param {number} gameWidth
-   * @param {number} gameHeight
    */
-  mouseDebug(gameWidth, gameHeight) {
+  mouseDebug() {
     const height = 16
-    const offsetTop = 24
     const offsetBottom = 20
 
     const padX = 40
-    const padY = height + offsetBottom
 
-    const x =
-      gameMouse.x +
-      (gameMouse.x < 30 ? 30 : gameMouse.x > gameWidth - padX ? -padX : 0)
-    const y =
-      gameMouse.y +
-      (gameMouse.y < gameHeight - padY ? offsetTop : -offsetBottom)
+    let x = gameMouse.x
+
+    if (gameMouse.x < gameCamera.boxLeft + padX) {
+      x = gameCamera.boxLeft + padX
+    } else if (gameMouse.x > gameCamera.boxRight - padX) {
+      x = gameCamera.boxRight - padX
+    }
+
+    let y = gameMouse.y + offsetBottom
+
+    if (gameMouse.y < gameCamera.boxTop + height) {
+      y = height + offsetBottom
+    } else if (gameMouse.y > gameCamera.boxBottom - offsetBottom - height) {
+      y = gameMouse.y - offsetBottom - height
+    }
+
     const text = `(${gameMouse.x}, ${gameMouse.y})`
 
     this.saveSettings()
@@ -539,6 +546,35 @@ export class GameDrawing {
     this.loadSettings()
 
     return this
+  }
+
+  cameraDebug() {
+    this.saveSettings()
+
+    this.setLineWidth(1)
+    this.setStrokeColor('#0ff')
+    this.setFillColor('transparent')
+    this.rectangle(
+      gameCamera.boxLeft + 10,
+      gameCamera.boxTop + 10,
+      gameCamera.width - 20,
+      gameCamera.height - 20,
+    )
+
+    this.setLineWidth(2)
+    this.setStrokeColor('#f0f')
+    this.line(
+      gameCamera.x - 10,
+      gameCamera.y - 10,
+      gameCamera.x + 10,
+      gameCamera.y + 10,
+    )
+    this.line(
+      gameCamera.x + 10,
+      gameCamera.y - 10,
+      gameCamera.x - 10,
+      gameCamera.y + 10,
+    )
   }
 
   /**

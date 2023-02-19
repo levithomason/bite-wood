@@ -449,7 +449,7 @@ export class GameObject {
    * // Stop at the walls, but keep 50px away from the bottom.
    * this.bounceOffRoom(0, { bottom: 50 })
    */
-  keepInRoom(bounce = {}, padding = {}) {
+  keepInRoom(bounce = 0, padding = {}) {
     const { top = 0, right = 0, bottom = 0, left = 0 } = padding
     const room = gameRooms.currentRoom
 

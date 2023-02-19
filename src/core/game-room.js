@@ -160,7 +160,8 @@ export class GameRoom {
    */
   draw(drawing) {
     if (this.backgroundColor) {
-      drawing.fill(this.backgroundColor)
+      drawing.setFillColor(this.backgroundColor)
+      drawing.rectangle(0, 0, this.width, this.height)
     }
 
     if (this.backgroundImage) {

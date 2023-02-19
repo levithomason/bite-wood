@@ -225,7 +225,8 @@ export class Game {
 
     // debug drawings
     if (gameState.debug) {
-      gameDrawing.mouseDebug(this.width, this.height)
+      gameDrawing.mouseDebug()
+      gameDrawing.cameraDebug()
       gameDrawing.fpsDebug(avg(this.#fps))
     }
 

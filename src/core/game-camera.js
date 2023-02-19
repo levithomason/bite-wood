@@ -1,5 +1,6 @@
 import { gameMouse } from './game-mouse-controller.js'
 import { gameDrawing } from './game-drawing-controller.js'
+import { gameRooms } from './game-rooms.js'
 
 export class GameCamera {
   #x = 0
@@ -21,8 +22,8 @@ export class GameCamera {
     // We need to move the mouse by the same amount as the camera.
     // Move the mouse first since we need to compute the camera delta
     // and the delta is lost once the camera is already moved.
-    gameMouse.x += x - this.#x
-    gameMouse.y += y - this.#y
+    gameMouse.x += xRound - this.#x
+    gameMouse.y += yRound - this.#y
 
     gameDrawing.moveCamera(xRound, yRound)
 
@@ -46,5 +47,29 @@ export class GameCamera {
     gameMouse.y += val - this.#y
     gameDrawing.moveCamera(this.#x, val)
     this.#y = val
+  }
+
+  get width() {
+    return Math.min(window.innerWidth, gameRooms.currentRoom.width)
+  }
+
+  get height() {
+    return Math.min(window.innerHeight, gameRooms.currentRoom.height)
+  }
+
+  get boxRight() {
+    return this.#x + this.width
+  }
+
+  get boxLeft() {
+    return this.#x
+  }
+
+  get boxTop() {
+    return this.#y
+  }
+
+  get boxBottom() {
+    return this.#y + this.height
   }
 }

@@ -10,6 +10,7 @@ import {
   GameRoom,
   gameRooms,
   GameSprite,
+  gameState,
 } from '../../core/index.js'
 import { direction, random, Vector } from '../../core/math.js'
 import { gameCamera } from '../../core/game-camera-controller.js'
@@ -401,6 +402,13 @@ class Ape extends GameObject {
     this.setState(STATES.standR)
   }
 
+  draw(drawing) {
+    super.draw(drawing)
+    drawing.setLineWidth(1)
+    drawing.setStrokeColor('#000')
+    drawing.line(this.x, this.y, gameMouse.x, gameMouse.y)
+  }
+
   setState(state) {
     this.state = state
     this.state.enter.call(this)
@@ -409,6 +417,7 @@ class Ape extends GameObject {
   step() {
     super.step()
     this.state.step.call(this)
+    this.keepInRoom()
   }
 }
 
@@ -418,19 +427,23 @@ class Ape extends GameObject {
 
 class Room extends GameRoom {
   constructor() {
-    super(800, 600)
+    super(1200, 900)
     this.backgroundColor = '#94c0aa'
 
-    const makeBox = (x = random(100, 700), y = random(150, 450)) => {
+    const makeBox = (
+      x = random(100, this.width - 100),
+      y = random(150, this.height - 150),
+    ) => {
       this.instanceCreate(Box, x, y)
     }
     for (let i = 0; i < 14; i += 1) {
-      makeBox(i * 50 + 50)
+      makeBox()
     }
 
     this.player = this.instanceCreate(Ape, 100, 600)
     gameCamera.target = this.player
-    this.instanceCreate(SnowParticles, 0, 0)
+    const snow = this.instanceCreate(SnowParticles, 0, 0)
+    snow.width = this.width
 
     setTimeout(() => {
       setInterval(() => {
@@ -450,27 +463,29 @@ class Room extends GameRoom {
       snowDepth += 0.2
     }
 
+    // snow
     drawing.setFillColor('#fff')
-    drawing.rectangle(0, 600 - snowDepth, 800, snowDepth)
+    drawing.setStrokeColor('transparent')
+    drawing.rectangle(0, this.height - snowDepth, this.width, snowDepth)
 
-    if (snowDepth > 600) {
+    if (snowDepth > this.height) {
       drawing.setFillColor('#000')
-      drawing.rectangle(0, 0, 800, 600)
+      drawing.rectangle(0, 0, this.width, this.height)
 
       drawing.setFillColor('#f00')
       drawing.setFontSize(60)
       drawing.setTextAlign('center')
-      drawing.text('DUN DUN DUN!', 400, 300)
+      drawing.text('DUN DUN DUN!', this.width / 2, this.height / 2)
     }
 
     if (this.instanceCount(Box) === 0) {
       drawing.setFillColor('#fff')
-      drawing.rectangle(0, 0, 800, 600)
+      drawing.rectangle(0, 0, this.width, this.height)
 
       drawing.setFillColor('#0a0')
       drawing.setFontSize(60)
       drawing.setTextAlign('center')
-      drawing.text('YOU WIN!', 400, 300)
+      drawing.text('YOU WIN!', this.width / 2, this.height / 2)
     }
   }
 }
@@ -478,7 +493,7 @@ class Room extends GameRoom {
 const room = new Room()
 
 gameRooms.addRoom(room)
-// gameState.debug = true
+gameState.debug = true
 
 // =============================================================================
 // Game

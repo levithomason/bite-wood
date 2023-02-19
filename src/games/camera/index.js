@@ -1,6 +1,7 @@
 import {
   Game,
   gameKeyboard,
+  gameMouse,
   GameObject,
   gamePhysics,
   GameRoom,
@@ -61,6 +62,10 @@ class Character extends GameObject {
       this.boundingBoxWidth,
       this.boundingBoxHeight,
     )
+
+    drawing.setLineWidth(1)
+    drawing.setStrokeColor('#f00')
+    drawing.line(this.x, this.y, gameMouse.x, gameMouse.y)
   }
 }
 

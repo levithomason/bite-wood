@@ -182,7 +182,7 @@ describe('GameDrawing', () => {
     })
 
     it('mouseDebug() returns this', () => {
-      expect(drawing.mouseDebug(0, 0) === drawing).toBe(true)
+      expect(drawing.mouseDebug() === drawing).toBe(true)
     })
 
     it('objectDebug() returns this', () => {
