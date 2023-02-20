@@ -5,7 +5,6 @@ import {
   gamePhysics,
   GameRoom,
   gameRooms,
-  gameState,
 } from '../../core/index.js'
 import { direction, random, randomChoice } from '../../core/math.js'
 import { gameCamera } from '../../core/game-camera-controller.js'
@@ -508,5 +507,5 @@ const room = new Room(800, 600)
 gameRooms.addRoom(room)
 
 const game = new Game()
-gameState.debug = true
+// gameState.debug = true
 game.start()
