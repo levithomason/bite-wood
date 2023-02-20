@@ -49,19 +49,19 @@ export class GameCamera {
     return Math.min(window.innerHeight, gameRooms.currentRoom.height)
   }
 
-  get boxRight() {
+  get right() {
     return this.#x + this.width
   }
 
-  get boxLeft() {
+  get left() {
     return this.#x
   }
 
-  get boxTop() {
+  get top() {
     return this.#y
   }
 
-  get boxBottom() {
+  get bottom() {
     return this.#y + this.height
   }
 

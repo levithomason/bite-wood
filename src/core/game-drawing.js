@@ -543,19 +543,19 @@ export class GameDrawing {
 
     let x = gameMouse.x - gameCamera.x
 
-    if (gameMouse.x < gameCamera.boxLeft + padX) {
-      x = gameCamera.boxLeft + padX - gameCamera.x
-    } else if (gameMouse.x > gameCamera.boxRight - padX) {
-      x = gameCamera.boxRight - padX - gameCamera.x
+    if (gameMouse.x < gameCamera.left + padX) {
+      x = gameCamera.left + padX - gameCamera.x
+    } else if (gameMouse.x > gameCamera.right - padX) {
+      x = gameCamera.right - padX - gameCamera.x
     }
 
     let y = gameMouse.y + offsetBottom - gameCamera.y
 
-    if (gameMouse.y < gameCamera.boxTop) {
+    if (gameMouse.y < gameCamera.top) {
       y = offsetBottom - gameCamera.y
-    } else if (gameMouse.y > gameCamera.boxBottom - height) {
-      y = gameCamera.boxBottom - offsetBottom - height - gameCamera.y
-    } else if (gameMouse.y > gameCamera.boxBottom - offsetBottom - height) {
+    } else if (gameMouse.y > gameCamera.bottom - height) {
+      y = gameCamera.bottom - offsetBottom - height - gameCamera.y
+    } else if (gameMouse.y > gameCamera.bottom - offsetBottom - height) {
       y = gameMouse.y - offsetBottom - gameCamera.y
     }
 
