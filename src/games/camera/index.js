@@ -155,7 +155,7 @@ class UFO extends GameObject {
     drawing.line(this.x, this.y - 30, this.x, this.y - 50)
 
     drawing.setStrokeColor('transparent')
-    drawing.setFillColor('#c00')
+    drawing.setFillColor('#c54')
     drawing.circle(this.x, this.y - 50, 5)
   }
 }
@@ -475,8 +475,8 @@ class Room extends GameRoom {
     // create the character
     this.character = this.instanceCreate(
       Character,
-      this.width / 2 - 300,
-      400, // this.height - 50,
+      this.width / 2,
+      this.height - 50,
     )
     gameCamera.target = this.character
   }

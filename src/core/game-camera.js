@@ -1,6 +1,7 @@
 import { gameMouse } from './game-mouse-controller.js'
 import { gameDrawing } from './game-drawing-controller.js'
 import { gameRooms } from './game-rooms.js'
+import { clamp } from './math.js'
 
 export class GameCamera {
   #x = 0
@@ -49,16 +50,16 @@ export class GameCamera {
     return Math.min(window.innerHeight, gameRooms.currentRoom.height)
   }
 
-  get right() {
-    return this.#x + this.width
+  get top() {
+    return this.#y
   }
 
   get left() {
     return this.#x
   }
 
-  get top() {
-    return this.#y
+  get right() {
+    return this.#x + this.width
   }
 
   get bottom() {
@@ -68,27 +69,18 @@ export class GameCamera {
   step() {
     if (!this.target) return
 
-    const xDelta = this.target.x - this.x - window.innerWidth / 2
+    const xDelta = this.target.x - this.x - this.width / 2
     const xChange = xDelta * this.acceleration
 
-    const yDelta = this.target.y - this.y - window.innerHeight / 2
+    const yDelta = this.target.y - this.y - this.height / 2
     const yChange = yDelta * this.acceleration
 
-    const newX = Math.max(
-      0,
-      Math.min(
-        this.x + xChange,
-        gameRooms.currentRoom.width - window.innerWidth,
-      ),
-    )
-    const newY = Math.max(
-      0,
-      Math.min(
-        this.y + yChange,
-        gameRooms.currentRoom.height - window.innerHeight,
-      ),
-    )
+    // Clamp the camera to the room boundaries
+    const xMax = gameRooms.currentRoom.width - this.width
+    const yMax = gameRooms.currentRoom.height - this.height
 
-    this.moveTo(newX, newY)
+    const x = clamp(this.x + xChange, 0, xMax)
+    const y = clamp(this.y + yChange, 0, yMax)
+    this.moveTo(x, y)
   }
 }
