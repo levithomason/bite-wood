@@ -42,8 +42,7 @@ class Character extends GameObject {
     }
 
     // max speed
-    this.hspeed = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.hspeed))
-    this.vspeed = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.vspeed))
+    this.speed = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.speed))
 
     // friction
     this.hspeed *= 1 - this.friction
@@ -440,7 +439,7 @@ class Room extends GameRoom {
     }
 
     // add sun
-    this.instanceCreate(Sun, this.width / 2 - 300, Sun.radius * 2)
+    this.instanceCreate(Sun, this.width / 2, this.yPosition.spaceStart / 2)
 
     // add clouds
     const numClouds = this.width / 400
