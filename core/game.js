@@ -1,3 +1,4 @@
+import { gameCamera } from './game-camera-controller.js'
 import { gameDrawing } from './game-drawing-controller.js'
 import { gameRooms } from './game-rooms.js'
 import { gameMouse } from './game-mouse-controller.js'
@@ -5,7 +6,6 @@ import { gameState } from './game-state-controller.js'
 import { gameKeyboard } from './game-keyboard-controller.js'
 import { avg } from './math.js'
 import { handleCollisions } from './collision.js'
-import { gameCamera } from './game-camera-controller.js'
 
 // Tracks whether the game loop is running
 let _isRunning = false
@@ -50,7 +50,7 @@ export class Game {
     this.stop = this.stop.bind(this)
     this.tick = this.tick.bind(this)
 
-    this.step = this.step.bind(this)
+    this.stepObjects = this.stepObjects.bind(this)
     this.draw = this.draw.bind(this)
 
     this.width = width
@@ -125,8 +125,9 @@ export class Game {
       gameState.debug = !gameState.debug
     }
 
+    // Objects may need to step multiple times if the game is running slowly
     while (steps) {
-      this.step()
+      this.stepObjects()
       steps--
     }
 
@@ -143,7 +144,7 @@ export class Game {
     _raf = requestAnimationFrame(this.tick)
   }
 
-  step() {
+  stepObjects() {
     if (!gameState.isPlaying) return
     if (!gameRooms.currentRoom) return
 
@@ -165,38 +166,20 @@ export class Game {
   }
 
   draw() {
+    // Order of drawing is important:
+    // 1. Clear the canvas
+    // 2. Save the current canvas settings (prior to camera translation)
+    // 3. Step the camera (translate the canvas)
+    // 4. Draw the room, objects, and anything else (translated by the camera)
+    // 6. Restore the canvas settings (including the camera translation)
+    // 7. Draw debug information in fixed positions (not translated by the camera)
+
     gameDrawing.clear()
-
-    // TODO: move to game-camera step(), it should follow the target itself
-    // accelerate the camera towards the target
     gameDrawing.saveSettings()
-    if (gameCamera.target) {
-      const cameraAcceleration = 0.1
 
-      const xDelta = gameCamera.target.x - gameCamera.x - window.innerWidth / 2
-      const xChange = Math.abs(xDelta) * Math.sign(xDelta) * cameraAcceleration
-
-      const yDelta = gameCamera.target.y - gameCamera.y - window.innerHeight / 2
-      const yChange = Math.abs(yDelta) * Math.sign(yDelta) * cameraAcceleration
-
-      // limit the camera to the room
-      const cameraEndX = Math.max(
-        0,
-        Math.min(
-          gameCamera.x + xChange,
-          gameRooms.currentRoom.width - window.innerWidth,
-        ),
-      )
-      const cameraEndY = Math.max(
-        0,
-        Math.min(
-          gameCamera.y + yChange,
-          gameRooms.currentRoom.height - window.innerHeight,
-        ),
-      )
-
-      gameCamera.move(cameraEndX, cameraEndY)
-    }
+    // Stepping the camera translates the canvas.
+    // All drawings from here forward are relative to the camera until we loadSettings.
+    gameCamera.step()
 
     // room - continue drawing if the room fails
     if (gameRooms.currentRoom) {
@@ -204,6 +187,17 @@ export class Game {
         gameRooms.currentRoom.draw?.(gameDrawing)
       } catch (err) {
         console.error('Failed to draw room:', err)
+      }
+
+      if (gameState.debug) {
+        // TODO: this should use the room's grid size which doesn't exist yet
+        gameDrawing.grid(
+          32,
+          gameCamera.x,
+          gameCamera.y,
+          gameRooms.currentRoom.width,
+          gameRooms.currentRoom.height,
+        )
       }
 
       // objects
@@ -215,18 +209,27 @@ export class Game {
           console.error('Failed to draw object:', err)
         }
 
+        // Object debug needs to draw before gameDrawing.loadSettings()
+        // so that the object's debug info is translated by the camera.
+        // We're also already iterating over the objects here.
         if (gameState.debug) {
           gameDrawing.objectDebug(object)
         }
       })
+
+      if (gameState.debug) {
+        gameDrawing.cameraDebug()
+      }
     }
 
+    // Loading settings also restores the camera translation.
+    // All drawings from here on are "fixed" position the screen.
     gameDrawing.loadSettings()
 
     // debug drawings
     if (gameState.debug) {
-      gameDrawing.mouseDebug(this.width, this.height)
       gameDrawing.fpsDebug(avg(this.#fps))
+      gameDrawing.mouseDebug()
     }
 
     // paused - overlay
@@ -235,15 +238,17 @@ export class Game {
       const y = gameRooms.currentRoom.height / 2
       const text = `PAUSED`
 
-      // backdrop
-      gameDrawing.fill('rgba(16, 16, 16, 0.5)')
-
-      // text
-      gameDrawing.setFontFamily() // default
-      gameDrawing.setFontSize(18)
-      gameDrawing.setFillColor('#fff')
-      gameDrawing.setStrokeColor('#000')
-      gameDrawing.text(text, x, y)
+      gameDrawing
+        .saveSettings()
+        // backdrop
+        .fill('rgba(16, 16, 16, 0.5)')
+        // text
+        .setFontFamily() // default
+        .setFontSize(18)
+        .setFillColor('#fff')
+        .setStrokeColor('#000')
+        .text(text, x, y)
+        .loadSettings()
     }
   }
 }

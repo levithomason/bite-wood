@@ -2,6 +2,7 @@ import { gameMouse } from './game-mouse-controller.js'
 import { isColliding } from './collision.js'
 import { toRadians } from './math.js'
 import { gameDrawing } from './game-drawing-controller.js'
+import { gameCamera } from './game-camera-controller.js'
 
 /** Provides a canvas and helpful methods for drawing on it. */
 export class GameDrawing {
@@ -118,6 +119,15 @@ export class GameDrawing {
    */
   setLineWidth(width) {
     this.#ctx.lineWidth = width
+    return this
+  }
+
+  /**
+   * @param {CanvasLineCap} lineCap
+   * @return {GameDrawing}
+   */
+  setLineCap(lineCap) {
+    this.#ctx.lineCap = lineCap
     return this
   }
 
@@ -290,27 +300,20 @@ export class GameDrawing {
       // horizontals
       for (let i = 0; i < width; i += cellSize) {
         this.line(i, 0, i, height)
-
-        return this
       }
 
       // verticals
       for (let i = 0; i < height; i += cellSize) {
         this.line(0, i, width, i)
       }
-
-      return this
     }
 
-    this.pixel()
-
     this.saveSettings()
-    this.#ctx.setLineDash([1, 2])
-    this.setStrokeColor('rgba(255, 255, 255, 0.33)')
+    this.setStrokeColor('#ffffff22')
+    const { globalCompositeOperation } = this.#ctx
+    this.#ctx.globalCompositeOperation = 'difference'
     _drawLines()
-    this.#ctx.lineDashOffset = 1
-    this.setStrokeColor('rgba(0, 0, 0, 0.33)')
-    _drawLines()
+    this.#ctx.globalCompositeOperation = globalCompositeOperation
 
     this.loadSettings()
 
@@ -454,6 +457,24 @@ export class GameDrawing {
   // Debug
   //
 
+  cameraDebug() {
+    this.saveSettings()
+
+    this.setLineWidth(1)
+    this.setFillColor('transparent')
+    this.setStrokeColor('#00ffff88')
+    this.rectangle(
+      gameCamera.x + 8,
+      gameCamera.y + 8,
+      gameCamera.width - 16,
+      gameCamera.height - 16,
+    )
+
+    this.loadSettings()
+
+    return this
+  }
+
   fpsDebug(fps) {
     this.saveSettings()
     this.setStrokeColor('transparent')
@@ -479,7 +500,7 @@ export class GameDrawing {
       textHeight + textPaddingY * 2,
     )
 
-    this.setFillColor('rgba(255, 255, 255, 0.75)')
+    this.setFillColor('#fff')
     this.text(
       text,
       canvasWidth - textMargin - textPaddingX - textWidth / 2,
@@ -493,23 +514,31 @@ export class GameDrawing {
 
   /**
    * Draws a debug view of a mouse position.
-   * @param {number} gameWidth
-   * @param {number} gameHeight
    */
-  mouseDebug(gameWidth, gameHeight) {
-    const height = 16
-    const offsetTop = 24
-    const offsetBottom = 20
+  mouseDebug() {
+    const height = 15
+    const offsetBottom = 24
 
-    const padX = 40
-    const padY = height + offsetBottom
+    const padX = 60
 
-    const x =
-      gameMouse.x +
-      (gameMouse.x < 30 ? 30 : gameMouse.x > gameWidth - padX ? -padX : 0)
-    const y =
-      gameMouse.y +
-      (gameMouse.y < gameHeight - padY ? offsetTop : -offsetBottom)
+    let x = gameMouse.x - gameCamera.x
+
+    if (gameMouse.x < gameCamera.left + padX) {
+      x = gameCamera.left + padX - gameCamera.x
+    } else if (gameMouse.x > gameCamera.right - padX) {
+      x = gameCamera.right - padX - gameCamera.x
+    }
+
+    let y = gameMouse.y + offsetBottom - gameCamera.y
+
+    if (gameMouse.y < gameCamera.top) {
+      y = offsetBottom - gameCamera.y
+    } else if (gameMouse.y > gameCamera.bottom - height) {
+      y = gameCamera.bottom - offsetBottom - height - gameCamera.y
+    } else if (gameMouse.y > gameCamera.bottom - offsetBottom - height) {
+      y = gameMouse.y - offsetBottom - gameCamera.y
+    }
+
     const text = `(${gameMouse.x}, ${gameMouse.y})`
 
     this.saveSettings()
@@ -526,14 +555,14 @@ export class GameDrawing {
     this.setFillColor('rgba(0, 0, 0, 0.25)')
     this.rectangle(
       x - textWidth / 2 - textPadX,
-      y - 3,
+      y - 2,
       textWidth + textPadX * 2,
       height,
     )
 
     // text
     this.setLineWidth(1)
-    this.setFillColor('rgba(255, 255, 255, 0.75)')
+    this.setFillColor('#fff')
     this.text(text, x, y)
 
     this.loadSettings()
@@ -601,7 +630,7 @@ export class GameDrawing {
     // vector
     if (speed) {
       this.setStrokeColor('#0D0')
-      this.arrow(x, y, x + hspeed * 10, y + vspeed * 10, 4)
+      this.arrow(x, y, x + hspeed * 4, y + vspeed * 4, 4)
     }
 
     // text values
@@ -701,9 +730,9 @@ export class GameDrawing {
   //       otherwise, GameParticles get GameObject treatment (like debug drawing)
   particlesDebug(particles) {
     this.saveSettings()
-    // this.#ctx.setLineDash([1, 2])
+    this.setLineWidth(1)
     this.setFillColor('transparent')
-    this.setStrokeColor('red')
+    this.setStrokeColor('#ff0')
     this.rectangle(particles.x, particles.y, particles.width, particles.height)
     this.loadSettings()
   }

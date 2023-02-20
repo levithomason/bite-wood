@@ -4,7 +4,6 @@ import { gamePhysics } from './game-physics-controller.js'
 import { gameState } from './game-state-controller.js'
 import { offsetX, offsetY, Vector } from './math.js'
 import { gameRooms } from './game-rooms.js'
-import { gameDrawing } from './game-drawing-controller.js'
 
 /**
  * @typedef {function} GameObjectAction
@@ -224,6 +223,7 @@ export class GameObject {
    * @return {number}
    */
   get insertionX() {
+    if (this.sprite) return this.sprite.insertionX
     return -this.#boundingBoxLeft
   }
 
@@ -232,6 +232,7 @@ export class GameObject {
    * @return {number}
    */
   get insertionY() {
+    if (this.sprite) return this.sprite.insertionY
     return -this.#boundingBoxTop
   }
 
@@ -407,10 +408,6 @@ export class GameObject {
     if (gameState.isPlaying) {
       this.events?.draw?.(drawing)
     }
-
-    if (gameState.debug) {
-      gameDrawing.objectDebug(this)
-    }
   }
 
   // TODO: this (like step collision check) needs bounding box apart from the sprite
@@ -449,7 +446,7 @@ export class GameObject {
    * // Stop at the walls, but keep 50px away from the bottom.
    * this.bounceOffRoom(0, { bottom: 50 })
    */
-  keepInRoom(bounce = {}, padding = {}) {
+  keepInRoom(bounce = 0, padding = {}) {
     const { top = 0, right = 0, bottom = 0, left = 0 } = padding
     const room = gameRooms.currentRoom
 

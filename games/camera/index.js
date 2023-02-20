@@ -2,19 +2,23 @@ import {
   Game,
   gameKeyboard,
   GameObject,
+  gamePhysics,
   GameRoom,
   gameRooms,
 } from '../../core/index.js'
-import { random, randomChoice } from '../../core/math.js'
+import { direction, random, randomChoice } from '../../core/math.js'
 import { gameCamera } from '../../core/game-camera-controller.js'
 
 class Character extends GameObject {
+  static height = 80
+  static width = 50
+
   constructor() {
     super({
-      boundingBoxTop: -80,
-      boundingBoxLeft: -25,
-      boundingBoxWidth: 50,
-      boundingBoxHeight: 80,
+      boundingBoxTop: -Character.height,
+      boundingBoxLeft: -Character.width / 2,
+      boundingBoxWidth: Character.width,
+      boundingBoxHeight: Character.height,
       acceleration: 2,
       maxSpeed: 12,
       friction: 0.15,
@@ -38,8 +42,7 @@ class Character extends GameObject {
     }
 
     // max speed
-    this.hspeed = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.hspeed))
-    this.vspeed = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.vspeed))
+    this.speed = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.speed))
 
     // friction
     this.hspeed *= 1 - this.friction
@@ -63,6 +66,98 @@ class Character extends GameObject {
   }
 }
 
+class UFO extends GameObject {
+  constructor() {
+    super({
+      boundingBoxTop: -50,
+      boundingBoxLeft: -50,
+      boundingBoxWidth: 100,
+      boundingBoxHeight: 100,
+    })
+
+    this.accelerationChase = 0.2
+    this.accelerationRest = 0.1
+    this.maxSpeedChase = 6
+    this.maxSpeedRest = 3
+
+    this.direction = gamePhysics.DIRECTION_RIGHT
+  }
+
+  step() {
+    super.step()
+
+    const player = gameRooms.currentRoom.objects.find((o) => {
+      return o instanceof Character
+    })
+
+    // follow the player if the player is in space
+    if (player.y < gameRooms.currentRoom.yPosition.airStart) {
+      this.motionAdd(
+        direction(this.x, this.y, player.x, player.y - Character.height),
+        this.accelerationChase,
+      )
+      this.speed = Math.min(this.maxSpeedChase, this.speed)
+    }
+    // otherwise, go back to the top left corner
+    else {
+      // TODO: why is there no currentRoom when this is called in the constructor?
+      // We would normally instantiate this property in the constructor, but
+      // the room is not yet defined when the constructor is called.
+      const restPoint = {
+        x: gameRooms.currentRoom.width / 2,
+        y: gameRooms.currentRoom.yPosition.spaceStart / 2,
+      }
+      this.motionAdd(
+        direction(this.x, this.y, restPoint.x, restPoint.y),
+        this.accelerationRest,
+      )
+      this.speed = Math.min(this.maxSpeedRest, this.speed)
+    }
+
+    this.keepInRoom()
+  }
+
+  draw(drawing) {
+    super.draw(drawing)
+
+    drawing.setLineWidth(0)
+    drawing.setStrokeColor('transparent')
+
+    // glass
+    drawing.setFillColor('#99ffff88')
+    drawing.circle(this.x, this.y, 30)
+
+    // shine on glass
+    drawing.setFillColor('#ccffffaa')
+    drawing.ellipse(this.x - 7, this.y - 18, 15, 8, -20)
+
+    // body
+    drawing.setFillColor('#aaa')
+    drawing.ellipse(this.x, this.y + 18, 60, 20)
+    drawing.setFillColor('#777')
+    drawing.ellipse(this.x, this.y + 20, 60, 18)
+
+    drawing.setFillColor('#555')
+    drawing.ellipse(this.x, this.y + 25, 45, 15)
+
+    // rivets
+    drawing.setFillColor('#333')
+    drawing.ellipse(this.x - 52, this.y + 18, 4, 3, -60)
+    drawing.ellipse(this.x + 20, this.y + 8, 5, 3, 8)
+    drawing.ellipse(this.x - 20, this.y + 8, 5, 3, -8)
+    drawing.ellipse(this.x + 52, this.y + 18, 4, 3, 60)
+
+    // antenna
+    drawing.setLineWidth(3)
+    drawing.setStrokeColor('#888')
+    drawing.line(this.x, this.y - 30, this.x, this.y - 50)
+
+    drawing.setStrokeColor('transparent')
+    drawing.setFillColor('#c54')
+    drawing.circle(this.x, this.y - 50, 5)
+  }
+}
+
 class Sun extends GameObject {
   static radius = 200
   constructor() {
@@ -73,36 +168,10 @@ class Sun extends GameObject {
       boundingBoxWidth: Sun.radius * 2,
       boundingBoxHeight: Sun.radius * 2,
     })
-
-    this.rayGapMin = Sun.radius * 0.8
-    this.rayGapMax = Sun.radius * 1.2
-    this.rayGap = Sun.radius * 0.8
-    this.rayGapDirection = -1
-    this.rayGapSpeed = 0.05
   }
 
   draw(drawing) {
     super.draw(drawing)
-
-    // sun rays
-    if (this.rayGap >= this.rayGapMax) {
-      this.rayGapDirection = -1
-    } else if (this.rayGap <= this.rayGapMin) {
-      this.rayGapDirection = 1
-    }
-    this.rayGap += this.rayGapDirection * this.rayGapSpeed
-
-    const numRays = 20
-    const alphaInit = 1
-    let alpha = alphaInit
-
-    drawing.setLineWidth(1)
-    drawing.setFillColor('transparent')
-    for (let i = 0; i < numRays; i++) {
-      drawing.setStrokeColor(`rgba(255, 219, 96, ${alpha})`)
-      drawing.circle(this.x, this.y, Sun.radius + this.rayGap + i * this.rayGap)
-      alpha -= alphaInit / numRays
-    }
 
     // draw the sun
     drawing.setStrokeColor('transparent')
@@ -122,6 +191,11 @@ class Cloud extends GameObject {
 
     this.speed = random(0.1, 0.5)
     this.direction = randomChoice([0, 180])
+  }
+
+  step() {
+    super.step()
+    this.keepInRoom()
   }
 
   draw(drawing) {
@@ -335,19 +409,44 @@ class Flower extends GameObject {
 
 class Room extends GameRoom {
   constructor() {
-    super(8000, 1500)
+    super(3000, 4000)
+    this.layers = {
+      starsStart: 0.5,
+      spaceStart: 0.5,
+      airStart: 0.7,
+      cloudStart: 0.75,
+      cloudEnd: 0.85,
+    }
+
+    this.yPosition = {
+      starsStart: this.layers.starsStart * this.height,
+      spaceStart: this.layers.spaceStart * this.height,
+      airStart: this.layers.airStart * this.height,
+      cloudStart: this.layers.cloudStart * this.height,
+      cloudEnd: this.layers.cloudEnd * this.height,
+    }
+
+    // add stars
+    const numStars = this.width / 10
+    this.stars = []
+    for (let i = 0; i < numStars; i += 1) {
+      const x = random(this.width)
+      const y = random(this.yPosition.starsStart)
+      const hue = random(0, 360)
+      const alpha = 1 - random(0.2, 0.8 * (y / this.yPosition.starsStart))
+      const size = random(1, 2)
+      this.stars.push({ x, y, size, hue, alpha })
+    }
 
     // add sun
-    this.instanceCreate(Sun, this.width / 2 - 300, Sun.radius * 2)
+    this.instanceCreate(Sun, this.width / 2, this.yPosition.spaceStart / 2)
 
     // add clouds
     const numClouds = this.width / 400
-    const cloudGap = this.width / numClouds
 
     for (let i = 0; i < numClouds; i += 1) {
-      const x =
-        i * cloudGap + cloudGap / 2 + random(-cloudGap * 0.5, cloudGap * 0.5)
-      const y = random(100, this.height - 400)
+      const x = random(100, this.width - 100)
+      const y = random(this.yPosition.cloudStart, this.yPosition.cloudEnd)
       this.instanceCreate(Cloud, x, y)
     }
 
@@ -368,6 +467,9 @@ class Room extends GameRoom {
       this.instanceCreate(Flower, x, y)
     }
 
+    // ufo
+    this.instanceCreate(UFO, 100, 100)
+
     // create the character
     this.character = this.instanceCreate(
       Character,
@@ -382,11 +484,21 @@ class Room extends GameRoom {
 
     // draw a gradient sky
     const skyGradient = drawing.createLinearGradient(0, 0, 0, this.height)
-    skyGradient.addColorStop(0.3, '#79bafc')
+    skyGradient.addColorStop(0, '#000')
+    skyGradient.addColorStop(this.layers.spaceStart, '#008')
+    skyGradient.addColorStop(this.layers.airStart, '#79bafc')
     skyGradient.addColorStop(1, '#a9edff')
     drawing.setFillColor(skyGradient)
     drawing.setStrokeColor('transparent')
     drawing.rectangle(0, 0, this.width, this.height)
+
+    // draw stars
+    drawing.setStrokeColor('transparent')
+    for (let i = 0; i < this.stars.length; i += 1) {
+      const star = this.stars[i]
+      drawing.setFillColor(`hsla(${star.hue}, 100%, 95%, ${star.alpha}`)
+      drawing.circle(star.x, star.y, star.size)
+    }
   }
 }
 

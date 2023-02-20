@@ -177,12 +177,16 @@ describe('GameDrawing', () => {
       expect(drawing.text() === drawing).toBe(true)
     })
 
+    it('cameraDebug() returns this', () => {
+      expect(drawing.cameraDebug() === drawing).toBe(true)
+    })
+
     it('fpsDebug() returns this', () => {
       expect(drawing.fpsDebug(60) === drawing).toBe(true)
     })
 
     it('mouseDebug() returns this', () => {
-      expect(drawing.mouseDebug(0, 0) === drawing).toBe(true)
+      expect(drawing.mouseDebug() === drawing).toBe(true)
     })
 
     it('objectDebug() returns this', () => {
