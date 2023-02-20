@@ -10,12 +10,15 @@ import { direction, random, randomChoice } from '../../core/math.js'
 import { gameCamera } from '../../core/game-camera-controller.js'
 
 class Character extends GameObject {
+  static height = 80
+  static width = 50
+
   constructor() {
     super({
-      boundingBoxTop: -80,
-      boundingBoxLeft: -25,
-      boundingBoxWidth: 50,
-      boundingBoxHeight: 80,
+      boundingBoxTop: -Character.height,
+      boundingBoxLeft: -Character.width / 2,
+      boundingBoxWidth: Character.width,
+      boundingBoxHeight: Character.height,
       acceleration: 2,
       maxSpeed: 12,
       friction: 0.15,
@@ -39,8 +42,7 @@ class Character extends GameObject {
     }
 
     // max speed
-    this.hspeed = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.hspeed))
-    this.vspeed = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.vspeed))
+    this.speed = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.speed))
 
     // friction
     this.hspeed *= 1 - this.friction
@@ -89,20 +91,21 @@ class UFO extends GameObject {
     })
 
     // follow the player if the player is in space
-    if (player.y < gameRooms.currentRoom.elevation.spaceStart) {
+    if (player.y < gameRooms.currentRoom.yPosition.airStart) {
       this.motionAdd(
-        direction(this.x, this.y, player.x, player.y),
+        direction(this.x, this.y, player.x, player.y - Character.height),
         this.accelerationChase,
       )
       this.speed = Math.min(this.maxSpeedChase, this.speed)
     }
     // otherwise, go back to the top left corner
     else {
+      // TODO: why is there no currentRoom when this is called in the constructor?
+      // We would normally instantiate this property in the constructor, but
+      // the room is not yet defined when the constructor is called.
       const restPoint = {
         x: gameRooms.currentRoom.width / 2,
-        y:
-          gameRooms.currentRoom.height -
-          gameRooms.currentRoom.elevation.spaceEnd,
+        y: gameRooms.currentRoom.yPosition.spaceStart / 2,
       }
       this.motionAdd(
         direction(this.x, this.y, restPoint.x, restPoint.y),
@@ -150,7 +153,7 @@ class UFO extends GameObject {
     drawing.line(this.x, this.y - 30, this.x, this.y - 50)
 
     drawing.setStrokeColor('transparent')
-    drawing.setFillColor('#c00')
+    drawing.setFillColor('#c54')
     drawing.circle(this.x, this.y - 50, 5)
   }
 }
@@ -165,36 +168,10 @@ class Sun extends GameObject {
       boundingBoxWidth: Sun.radius * 2,
       boundingBoxHeight: Sun.radius * 2,
     })
-
-    this.rayGapMin = Sun.radius * 0.8
-    this.rayGapMax = Sun.radius * 1.2
-    this.rayGap = Sun.radius * 0.8
-    this.rayGapDirection = -1
-    this.rayGapSpeed = 0.05
   }
 
   draw(drawing) {
     super.draw(drawing)
-
-    // sun rays
-    if (this.rayGap >= this.rayGapMax) {
-      this.rayGapDirection = -1
-    } else if (this.rayGap <= this.rayGapMin) {
-      this.rayGapDirection = 1
-    }
-    this.rayGap += this.rayGapDirection * this.rayGapSpeed
-
-    const numRays = 20
-    const alphaInit = 1
-    let alpha = alphaInit
-
-    drawing.setLineWidth(1)
-    drawing.setFillColor('transparent')
-    for (let i = 0; i < numRays; i++) {
-      drawing.setStrokeColor(`rgba(255, 219, 96, ${alpha})`)
-      drawing.circle(this.x, this.y, Sun.radius + this.rayGap + i * this.rayGap)
-      alpha -= alphaInit / numRays
-    }
 
     // draw the sun
     drawing.setStrokeColor('transparent')
@@ -434,31 +411,42 @@ class Room extends GameRoom {
   constructor() {
     super(3000, 4000)
     this.layers = {
-      spaceEnd: 0.8,
+      starsStart: 0.5,
       spaceStart: 0.5,
-      airEnd: 0.4,
-      airStart: 0.3,
+      airStart: 0.7,
+      cloudStart: 0.75,
+      cloudEnd: 0.85,
     }
 
-    this.elevation = {
-      spaceEnd: this.layers.spaceEnd * this.height,
+    this.yPosition = {
+      starsStart: this.layers.starsStart * this.height,
       spaceStart: this.layers.spaceStart * this.height,
-      airEnd: this.layers.airEnd * this.height,
       airStart: this.layers.airStart * this.height,
+      cloudStart: this.layers.cloudStart * this.height,
+      cloudEnd: this.layers.cloudEnd * this.height,
+    }
+
+    // add stars
+    const numStars = this.width / 10
+    this.stars = []
+    for (let i = 0; i < numStars; i += 1) {
+      const x = random(this.width)
+      const y = random(this.yPosition.starsStart)
+      const hue = random(0, 360)
+      const alpha = 1 - random(0.2, 0.8 * (y / this.yPosition.starsStart))
+      const size = random(1, 2)
+      this.stars.push({ x, y, size, hue, alpha })
     }
 
     // add sun
-    this.instanceCreate(Sun, this.width / 2 - 300, Sun.radius * 2)
+    this.instanceCreate(Sun, this.width / 2, this.yPosition.spaceStart / 2)
 
     // add clouds
     const numClouds = this.width / 400
 
     for (let i = 0; i < numClouds; i += 1) {
       const x = random(100, this.width - 100)
-      const y = random(
-        this.height - this.elevation.airStart * 0.5,
-        this.height - this.elevation.airStart * 0.8,
-      )
+      const y = random(this.yPosition.cloudStart, this.yPosition.cloudEnd)
       this.instanceCreate(Cloud, x, y)
     }
 
@@ -497,14 +485,20 @@ class Room extends GameRoom {
     // draw a gradient sky
     const skyGradient = drawing.createLinearGradient(0, 0, 0, this.height)
     skyGradient.addColorStop(0, '#000')
-    skyGradient.addColorStop(1 - this.layers.spaceEnd, '#000')
-    skyGradient.addColorStop(1 - this.layers.spaceStart, '#008')
-    skyGradient.addColorStop(1 - this.layers.airEnd, '#404')
-    skyGradient.addColorStop(1 - this.layers.airStart, '#79bafc')
+    skyGradient.addColorStop(this.layers.spaceStart, '#008')
+    skyGradient.addColorStop(this.layers.airStart, '#79bafc')
     skyGradient.addColorStop(1, '#a9edff')
     drawing.setFillColor(skyGradient)
     drawing.setStrokeColor('transparent')
     drawing.rectangle(0, 0, this.width, this.height)
+
+    // draw stars
+    drawing.setStrokeColor('transparent')
+    for (let i = 0; i < this.stars.length; i += 1) {
+      const star = this.stars[i]
+      drawing.setFillColor(`hsla(${star.hue}, 100%, 95%, ${star.alpha}`)
+      drawing.circle(star.x, star.y, star.size)
+    }
   }
 }
 
