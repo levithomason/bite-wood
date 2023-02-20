@@ -462,13 +462,12 @@ export class GameDrawing {
 
     this.setLineWidth(1)
     this.setFillColor('transparent')
-    this.setStrokeColor('#888')
-
+    this.setStrokeColor('#00ffff88')
     this.rectangle(
-      gameCamera.x + 10,
-      gameCamera.y + 10,
-      gameCamera.width - 20,
-      gameCamera.height - 20,
+      gameCamera.x + 8,
+      gameCamera.y + 8,
+      gameCamera.width - 16,
+      gameCamera.height - 16,
     )
 
     this.loadSettings()
@@ -501,7 +500,7 @@ export class GameDrawing {
       textHeight + textPaddingY * 2,
     )
 
-    this.setFillColor('rgba(255, 255, 255, 0.75)')
+    this.setFillColor('#fff')
     this.text(
       text,
       canvasWidth - textMargin - textPaddingX - textWidth / 2,
