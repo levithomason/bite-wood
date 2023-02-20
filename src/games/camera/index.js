@@ -1,7 +1,6 @@
 import {
   Game,
   gameKeyboard,
-  gameMouse,
   GameObject,
   gamePhysics,
   GameRoom,
@@ -62,10 +61,6 @@ class Character extends GameObject {
       this.boundingBoxWidth,
       this.boundingBoxHeight,
     )
-
-    drawing.setLineWidth(1)
-    drawing.setStrokeColor('#f00')
-    drawing.line(this.x, this.y, gameMouse.x, gameMouse.y)
   }
 }
 
@@ -94,7 +89,7 @@ class UFO extends GameObject {
     })
 
     // follow the player if the player is in space
-    if (player.y < gameRooms.currentRoom.elevation.spaceStart) {
+    if (player.y < gameRooms.currentRoom.yPosition.airStart) {
       this.motionAdd(
         direction(this.x, this.y, player.x, player.y),
         this.accelerationChase,
@@ -105,9 +100,7 @@ class UFO extends GameObject {
     else {
       const restPoint = {
         x: gameRooms.currentRoom.width / 2,
-        y:
-          gameRooms.currentRoom.height -
-          gameRooms.currentRoom.elevation.spaceEnd,
+        y: gameRooms.currentRoom.yPosition.spaceStart / 2,
       }
       this.motionAdd(
         direction(this.x, this.y, restPoint.x, restPoint.y),
@@ -190,7 +183,7 @@ class Sun extends GameObject {
     this.rayGap += this.rayGapDirection * this.rayGapSpeed
 
     const numRays = 20
-    const alphaInit = 1
+    const alphaInit = 0.35
     let alpha = alphaInit
 
     drawing.setLineWidth(1)
@@ -439,17 +432,31 @@ class Room extends GameRoom {
   constructor() {
     super(3000, 4000)
     this.layers = {
-      spaceEnd: 0.8,
+      starsStart: 0.5,
       spaceStart: 0.5,
-      airEnd: 0.4,
-      airStart: 0.3,
+      airStart: 0.7,
+      cloudStart: 0.75,
+      cloudEnd: 0.85,
     }
 
-    this.elevation = {
-      spaceEnd: this.layers.spaceEnd * this.height,
+    this.yPosition = {
+      starsStart: this.layers.starsStart * this.height,
       spaceStart: this.layers.spaceStart * this.height,
-      airEnd: this.layers.airEnd * this.height,
       airStart: this.layers.airStart * this.height,
+      cloudStart: this.layers.cloudStart * this.height,
+      cloudEnd: this.layers.cloudEnd * this.height,
+    }
+
+    // add stars
+    const numStars = this.width / 10
+    this.stars = []
+    for (let i = 0; i < numStars; i += 1) {
+      const x = random(this.width)
+      const y = random(this.yPosition.starsStart)
+      const hue = random(0, 360)
+      const alpha = 1 - random(0.2, 0.8 * (y / this.yPosition.starsStart))
+      const size = random(1, 2)
+      this.stars.push({ x, y, size, hue, alpha })
     }
 
     // add sun
@@ -460,10 +467,7 @@ class Room extends GameRoom {
 
     for (let i = 0; i < numClouds; i += 1) {
       const x = random(100, this.width - 100)
-      const y = random(
-        this.height - this.elevation.airStart * 0.5,
-        this.height - this.elevation.airStart * 0.8,
-      )
+      const y = random(this.yPosition.cloudStart, this.yPosition.cloudEnd)
       this.instanceCreate(Cloud, x, y)
     }
 
@@ -491,7 +495,7 @@ class Room extends GameRoom {
     this.character = this.instanceCreate(
       Character,
       this.width / 2,
-      this.height - 50,
+      100, //this.height - 50,
     )
     gameCamera.target = this.character
   }
@@ -502,14 +506,20 @@ class Room extends GameRoom {
     // draw a gradient sky
     const skyGradient = drawing.createLinearGradient(0, 0, 0, this.height)
     skyGradient.addColorStop(0, '#000')
-    skyGradient.addColorStop(1 - this.layers.spaceEnd, '#000')
-    skyGradient.addColorStop(1 - this.layers.spaceStart, '#008')
-    skyGradient.addColorStop(1 - this.layers.airEnd, '#404')
-    skyGradient.addColorStop(1 - this.layers.airStart, '#79bafc')
+    skyGradient.addColorStop(this.layers.spaceStart, '#008')
+    skyGradient.addColorStop(this.layers.airStart, '#79bafc')
     skyGradient.addColorStop(1, '#a9edff')
     drawing.setFillColor(skyGradient)
     drawing.setStrokeColor('transparent')
     drawing.rectangle(0, 0, this.width, this.height)
+
+    // draw stars
+    drawing.setStrokeColor('transparent')
+    for (let i = 0; i < this.stars.length; i += 1) {
+      const star = this.stars[i]
+      drawing.setFillColor(`hsla(${star.hue}, 100%, 95%, ${star.alpha}`)
+      drawing.circle(star.x, star.y, star.size)
+    }
   }
 }
 
