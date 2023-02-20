@@ -499,22 +499,22 @@ export class GameDrawing {
     const height = 16
     const offsetBottom = 20
 
-    const padX = 40
+    const padX = 60
 
-    let x = gameMouse.x
+    let x = gameMouse.x - gameCamera.x
 
     if (gameMouse.x < gameCamera.boxLeft + padX) {
-      x = gameCamera.boxLeft + padX
+      x = gameCamera.boxLeft + padX - gameCamera.x
     } else if (gameMouse.x > gameCamera.boxRight - padX) {
-      x = gameCamera.boxRight - padX
+      x = gameCamera.boxRight - padX - gameCamera.x
     }
 
-    let y = gameMouse.y + offsetBottom
+    let y = gameMouse.y + offsetBottom - gameCamera.y
 
     if (gameMouse.y < gameCamera.boxTop + height) {
-      y = height + offsetBottom
+      y = height + offsetBottom - gameCamera.y
     } else if (gameMouse.y > gameCamera.boxBottom - offsetBottom - height) {
-      y = gameMouse.y - offsetBottom - height
+      y = gameMouse.y - offsetBottom - height - gameCamera.y
     }
 
     const text = `(${gameMouse.x}, ${gameMouse.y})`
@@ -554,12 +554,7 @@ export class GameDrawing {
     this.setLineWidth(1)
     this.setStrokeColor('#0ff')
     this.setFillColor('transparent')
-    this.rectangle(
-      gameCamera.boxLeft + 10,
-      gameCamera.boxTop + 10,
-      gameCamera.width - 20,
-      gameCamera.height - 20,
-    )
+    this.rectangle(10, 10, gameCamera.width - 20, gameCamera.height - 20)
 
     this.setLineWidth(2)
     this.setStrokeColor('#f0f')
