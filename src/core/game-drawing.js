@@ -300,19 +300,15 @@ export class GameDrawing {
       // horizontals
       for (let i = 0; i < width; i += cellSize) {
         this.line(i, 0, i, height)
-
-        return this
       }
 
       // verticals
       for (let i = 0; i < height; i += cellSize) {
         this.line(0, i, width, i)
       }
-
-      return this
     }
 
-    this.pixel()
+    // this.pixel()
 
     this.saveSettings()
     this.#ctx.setLineDash([1, 2])
@@ -524,7 +520,7 @@ export class GameDrawing {
    * Draws a debug view of a mouse position.
    */
   mouseDebug() {
-    const height = 16
+    const height = 15
     const offsetBottom = 24
 
     const padX = 60
@@ -563,14 +559,14 @@ export class GameDrawing {
     this.setFillColor('rgba(0, 0, 0, 0.25)')
     this.rectangle(
       x - textWidth / 2 - textPadX,
-      y - 3,
+      y - 2,
       textWidth + textPadX * 2,
       height,
     )
 
     // text
     this.setLineWidth(1)
-    this.setFillColor('rgba(255, 255, 255, 0.75)')
+    this.setFillColor('#fff')
     this.text(text, x, y)
 
     this.loadSettings()

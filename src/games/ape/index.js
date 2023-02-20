@@ -402,13 +402,6 @@ class Ape extends GameObject {
     this.setState(STATES.standR)
   }
 
-  draw(drawing) {
-    super.draw(drawing)
-    drawing.setLineWidth(1)
-    drawing.setStrokeColor('#000')
-    drawing.line(this.x, this.y, gameMouse.x, gameMouse.y)
-  }
-
   setState(state) {
     this.state = state
     this.state.enter.call(this)
