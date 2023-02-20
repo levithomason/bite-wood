@@ -308,15 +308,12 @@ export class GameDrawing {
       }
     }
 
-    // this.pixel()
-
     this.saveSettings()
-    this.#ctx.setLineDash([1, 2])
-    this.setStrokeColor('rgba(255, 255, 255, 0.33)')
+    this.setStrokeColor('#ffffff22')
+    const { globalCompositeOperation } = this.#ctx
+    this.#ctx.globalCompositeOperation = 'difference'
     _drawLines()
-    this.#ctx.lineDashOffset = 1
-    this.setStrokeColor('rgba(0, 0, 0, 0.33)')
-    _drawLines()
+    this.#ctx.globalCompositeOperation = globalCompositeOperation
 
     this.loadSettings()
 
