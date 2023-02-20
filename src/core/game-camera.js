@@ -5,14 +5,16 @@ import { gameRooms } from './game-rooms.js'
 export class GameCamera {
   #x = 0
   #y = 0
+
   constructor() {
     /**
      * @type {{x: number, y: number} | null}
      */
     this.target = null
+    this.acceleration = 0.1
   }
 
-  move(x, y) {
+  moveTo(x, y) {
     // Avoids sub-pixel rendering errors.
     // When rendering two filled rectangles beside each other, there can be a
     // 1px (or partial pixel) gap between them due to partial pixel camera position.
@@ -34,19 +36,9 @@ export class GameCamera {
   get x() {
     return this.#x
   }
-  set x(val) {
-    gameMouse.x += val - this.#x
-    gameDrawing.moveCamera(val, this.#y)
-    this.#x = val
-  }
 
   get y() {
     return this.#y
-  }
-  set y(val) {
-    gameMouse.y += val - this.#y
-    gameDrawing.moveCamera(this.#x, val)
-    this.#y = val
   }
 
   get width() {
@@ -71,5 +63,32 @@ export class GameCamera {
 
   get boxBottom() {
     return this.#y + this.height
+  }
+
+  step() {
+    if (!this.target) return
+
+    const xDelta = this.target.x - this.x - window.innerWidth / 2
+    const xChange = xDelta * this.acceleration
+
+    const yDelta = this.target.y - this.y - window.innerHeight / 2
+    const yChange = yDelta * this.acceleration
+
+    const newX = Math.max(
+      0,
+      Math.min(
+        this.x + xChange,
+        gameRooms.currentRoom.width - window.innerWidth,
+      ),
+    )
+    const newY = Math.max(
+      0,
+      Math.min(
+        this.y + yChange,
+        gameRooms.currentRoom.height - window.innerHeight,
+      ),
+    )
+
+    this.moveTo(newX, newY)
   }
 }

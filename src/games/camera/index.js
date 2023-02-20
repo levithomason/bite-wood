@@ -5,17 +5,21 @@ import {
   gamePhysics,
   GameRoom,
   gameRooms,
+  gameState,
 } from '../../core/index.js'
 import { direction, random, randomChoice } from '../../core/math.js'
 import { gameCamera } from '../../core/game-camera-controller.js'
 
 class Character extends GameObject {
+  static height = 80
+  static width = 50
+
   constructor() {
     super({
-      boundingBoxTop: -80,
-      boundingBoxLeft: -25,
-      boundingBoxWidth: 50,
-      boundingBoxHeight: 80,
+      boundingBoxTop: -Character.height,
+      boundingBoxLeft: -Character.width / 2,
+      boundingBoxWidth: Character.width,
+      boundingBoxHeight: Character.height,
       acceleration: 2,
       maxSpeed: 12,
       friction: 0.15,
@@ -91,13 +95,16 @@ class UFO extends GameObject {
     // follow the player if the player is in space
     if (player.y < gameRooms.currentRoom.yPosition.airStart) {
       this.motionAdd(
-        direction(this.x, this.y, player.x, player.y),
+        direction(this.x, this.y, player.x, player.y - Character.height),
         this.accelerationChase,
       )
       this.speed = Math.min(this.maxSpeedChase, this.speed)
     }
     // otherwise, go back to the top left corner
     else {
+      // TODO: why is there no currentRoom when this is called in the constructor?
+      // We would normally instantiate this property in the constructor, but
+      // the room is not yet defined when the constructor is called.
       const restPoint = {
         x: gameRooms.currentRoom.width / 2,
         y: gameRooms.currentRoom.yPosition.spaceStart / 2,
@@ -163,36 +170,10 @@ class Sun extends GameObject {
       boundingBoxWidth: Sun.radius * 2,
       boundingBoxHeight: Sun.radius * 2,
     })
-
-    this.rayGapMin = Sun.radius * 0.8
-    this.rayGapMax = Sun.radius * 1.2
-    this.rayGap = Sun.radius * 0.8
-    this.rayGapDirection = -1
-    this.rayGapSpeed = 0.05
   }
 
   draw(drawing) {
     super.draw(drawing)
-
-    // sun rays
-    if (this.rayGap >= this.rayGapMax) {
-      this.rayGapDirection = -1
-    } else if (this.rayGap <= this.rayGapMin) {
-      this.rayGapDirection = 1
-    }
-    this.rayGap += this.rayGapDirection * this.rayGapSpeed
-
-    const numRays = 20
-    const alphaInit = 0.35
-    let alpha = alphaInit
-
-    drawing.setLineWidth(1)
-    drawing.setFillColor('transparent')
-    for (let i = 0; i < numRays; i++) {
-      drawing.setStrokeColor(`rgba(255, 219, 96, ${alpha})`)
-      drawing.circle(this.x, this.y, Sun.radius + this.rayGap + i * this.rayGap)
-      alpha -= alphaInit / numRays
-    }
 
     // draw the sun
     drawing.setStrokeColor('transparent')
@@ -494,8 +475,8 @@ class Room extends GameRoom {
     // create the character
     this.character = this.instanceCreate(
       Character,
-      this.width / 2,
-      100, //this.height - 50,
+      this.width / 2 - 300,
+      400, // this.height - 50,
     )
     gameCamera.target = this.character
   }
@@ -527,5 +508,5 @@ const room = new Room(800, 600)
 gameRooms.addRoom(room)
 
 const game = new Game()
-// gameState.debug = true
+gameState.debug = true
 game.start()

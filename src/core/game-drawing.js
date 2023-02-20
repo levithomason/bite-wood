@@ -123,6 +123,15 @@ export class GameDrawing {
   }
 
   /**
+   * @param {CanvasLineCap} lineCap
+   * @return {GameDrawing}
+   */
+  setLineCap(lineCap) {
+    this.#ctx.lineCap = lineCap
+    return this
+  }
+
+  /**
    * @param {string} color
    * @return {GameDrawing}
    */
@@ -455,6 +464,37 @@ export class GameDrawing {
   // Debug
   //
 
+  cameraDebug() {
+    this.saveSettings()
+
+    this.setLineWidth(1)
+    this.setFillColor('transparent')
+
+    this.setStrokeColor('#ffffff04')
+    this.rectangle(
+      gameCamera.x + 10,
+      gameCamera.y + 10,
+      gameCamera.width - 20,
+      gameCamera.height - 20,
+    )
+    this.setStrokeColor('#00000004')
+    this.rectangle(
+      gameCamera.x + 9,
+      gameCamera.y + 9,
+      gameCamera.width - 18,
+      gameCamera.height - 18,
+    )
+
+    this.setLineWidth(20)
+    this.setStrokeColor('transparent')
+    this.setFillColor('#00ff0011')
+    this.circle(gameCamera.x, gameCamera.y, 40)
+
+    this.loadSettings()
+
+    return this
+  }
+
   fpsDebug(fps) {
     this.saveSettings()
     this.setStrokeColor('transparent')
@@ -497,7 +537,7 @@ export class GameDrawing {
    */
   mouseDebug() {
     const height = 16
-    const offsetBottom = 20
+    const offsetBottom = 24
 
     const padX = 60
 
@@ -511,10 +551,12 @@ export class GameDrawing {
 
     let y = gameMouse.y + offsetBottom - gameCamera.y
 
-    if (gameMouse.y < gameCamera.boxTop + height) {
-      y = height + offsetBottom - gameCamera.y
+    if (gameMouse.y < gameCamera.boxTop) {
+      y = offsetBottom - gameCamera.y
+    } else if (gameMouse.y > gameCamera.boxBottom - height) {
+      y = gameCamera.boxBottom - offsetBottom - height - gameCamera.y
     } else if (gameMouse.y > gameCamera.boxBottom - offsetBottom - height) {
-      y = gameMouse.y - offsetBottom - height - gameCamera.y
+      y = gameMouse.y - offsetBottom - gameCamera.y
     }
 
     const text = `(${gameMouse.x}, ${gameMouse.y})`
@@ -546,30 +588,6 @@ export class GameDrawing {
     this.loadSettings()
 
     return this
-  }
-
-  cameraDebug() {
-    this.saveSettings()
-
-    this.setLineWidth(1)
-    this.setStrokeColor('#0ff')
-    this.setFillColor('transparent')
-    this.rectangle(10, 10, gameCamera.width - 20, gameCamera.height - 20)
-
-    this.setLineWidth(2)
-    this.setStrokeColor('#f0f')
-    this.line(
-      gameCamera.x - 10,
-      gameCamera.y - 10,
-      gameCamera.x + 10,
-      gameCamera.y + 10,
-    )
-    this.line(
-      gameCamera.x + 10,
-      gameCamera.y - 10,
-      gameCamera.x - 10,
-      gameCamera.y + 10,
-    )
   }
 
   /**
@@ -632,7 +650,7 @@ export class GameDrawing {
     // vector
     if (speed) {
       this.setStrokeColor('#0D0')
-      this.arrow(x, y, x + hspeed * 10, y + vspeed * 10, 4)
+      this.arrow(x, y, x + hspeed * 4, y + vspeed * 4, 4)
     }
 
     // text values
@@ -732,9 +750,9 @@ export class GameDrawing {
   //       otherwise, GameParticles get GameObject treatment (like debug drawing)
   particlesDebug(particles) {
     this.saveSettings()
-    // this.#ctx.setLineDash([1, 2])
+    this.setLineWidth(1)
     this.setFillColor('transparent')
-    this.setStrokeColor('red')
+    this.setStrokeColor('#ff0')
     this.rectangle(particles.x, particles.y, particles.width, particles.height)
     this.loadSettings()
   }

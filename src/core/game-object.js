@@ -4,7 +4,6 @@ import { gamePhysics } from './game-physics-controller.js'
 import { gameState } from './game-state-controller.js'
 import { offsetX, offsetY, Vector } from './math.js'
 import { gameRooms } from './game-rooms.js'
-import { gameDrawing } from './game-drawing-controller.js'
 
 /**
  * @typedef {function} GameObjectAction
@@ -224,6 +223,7 @@ export class GameObject {
    * @return {number}
    */
   get insertionX() {
+    if (this.sprite) return this.sprite.insertionX
     return -this.#boundingBoxLeft
   }
 
@@ -232,6 +232,7 @@ export class GameObject {
    * @return {number}
    */
   get insertionY() {
+    if (this.sprite) return this.sprite.insertionY
     return -this.#boundingBoxTop
   }
 
@@ -406,10 +407,6 @@ export class GameObject {
 
     if (gameState.isPlaying) {
       this.events?.draw?.(drawing)
-    }
-
-    if (gameState.debug) {
-      gameDrawing.objectDebug(this)
     }
   }
 
