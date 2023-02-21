@@ -10,7 +10,6 @@ import {
   GameRoom,
   gameRooms,
   GameSprite,
-  gameState,
 } from '../../core/index.js'
 import { direction, random, Vector } from '../../core/math.js'
 import { gameCamera } from '../../core/game-camera-controller.js'
@@ -486,7 +485,7 @@ class Room extends GameRoom {
 const room = new Room()
 
 gameRooms.addRoom(room)
-gameState.debug = true
+// gameState.debug = true
 
 // =============================================================================
 // Game
