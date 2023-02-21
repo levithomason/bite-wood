@@ -450,6 +450,8 @@ export class GameObject {
     const { top = 0, right = 0, bottom = 0, left = 0 } = padding
     const room = gameRooms.currentRoom
 
+    // TODO: objects are getting stuck on the edges of the room
+
     // outside left
     if (this.boundingBoxLeft < left) {
       this.hspeed = Math.abs(this.hspeed) * bounce
