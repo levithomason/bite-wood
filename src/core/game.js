@@ -28,21 +28,10 @@ export class Game {
   #fps = []
 
   /**
-   * @param {HTMLElement} [parentElement=document.body] - A DOM element where the canvas should be placed.
-   * @param {number} [width=800] - The width of the game in pixels.
-   * @param {number} [height=600] - The height of the game in pixels.
    * @param {number} stepsPerSecond - The number of times the game loop should run per second.
    */
   constructor(
-    {
-      parentElement = document.body,
-      width = 800,
-      height = 600,
-      stepsPerSecond = 60,
-    } = {
-      parentElement: document.body,
-      width: 800,
-      height: 600,
+    { stepsPerSecond = 60 } = {
       stepsPerSecond: 60,
     },
   ) {
@@ -53,32 +42,27 @@ export class Game {
     this.stepObjects = this.stepObjects.bind(this)
     this.draw = this.draw.bind(this)
 
-    this.width = width
-    this.height = height
     this.stepsPerSecond = stepsPerSecond
 
-    parentElement.append(gameDrawing.canvas)
+    document.body.append(gameDrawing.canvas)
+
+    window.addEventListener('resize', this.resizeCanvas)
+    this.resizeCanvas()
 
     window.biteWood = window.biteWood || {}
     window.biteWood.game = this
   }
 
+  // Keep the canvas the same size as the window
+  resizeCanvas() {
+    const room = gameRooms.currentRoom
+    const width = Math.min(window.innerWidth, room.width)
+    const height = Math.min(window.innerHeight, room.height)
+    gameDrawing.setCanvasSize(width, height)
+  }
+
   start() {
     if (_isRunning) return
-
-    // Keep the canvas the same size as the window
-    const resizeCanvas = () => {
-      const room = gameRooms.currentRoom
-      const width = Math.min(window.innerWidth, room.width)
-      const height = Math.min(window.innerHeight, room.height)
-      gameDrawing.setCanvasSize(width, height)
-    }
-
-    window.addEventListener('resize', () => {
-      resizeCanvas()
-    })
-
-    resizeCanvas()
 
     _isRunning = true
     this.tick()
