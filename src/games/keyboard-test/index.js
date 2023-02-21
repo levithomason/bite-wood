@@ -9,25 +9,40 @@ class Room extends GameRoom {
   draw(drawing) {
     super.draw(drawing)
 
-    drawing.setFillColor('#fff')
-    const headerFontSize = 24
+    const headerFontSize = 30
     const headerBottomMargin = 8
-    const itemFontSize = 21
+    const itemFontSize = 24
 
     Object.entries(gameKeyboard).forEach(([category, values], columnIndex) => {
       const columnWidth = 200
-      const columnX = 100 + columnWidth * columnIndex
+      const columnX = 200 + columnWidth * columnIndex
       const columnY = 100
 
-      drawing.setFontSize(headerFontSize).text(category, columnX, columnY)
+      drawing
+        .setFontFamily('monospace')
+        .setTextAlign('center')
+        .setFillColor('#fff')
+        .setFontSize(headerFontSize)
+        .text(category, columnX, columnY)
 
       Object.entries(values).forEach(([keyName, keyState], rowIndex) => {
         const rowOffset =
           (rowIndex + 1) * (headerFontSize * 1.15) + headerBottomMargin
 
+        const textWidth = drawing.measureText(keyName)
+        const padX = 4
+
         drawing
+          .setFillColor('#000')
+          .rectangle(
+            columnX - padX - textWidth / 2,
+            columnY + rowOffset - itemFontSize,
+            textWidth + padX * 2,
+            itemFontSize * 1.2,
+          )
           .setFontSize(itemFontSize)
-          .text(JSON.stringify(keyName), columnX, columnY + rowOffset)
+          .setFillColor('#fff')
+          .text(keyName, columnX, columnY + rowOffset)
       })
     })
   }
