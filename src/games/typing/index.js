@@ -97,9 +97,13 @@ class Room extends GameRoom {
     const rightHand = 'JKL;'
     const bothHands = leftHand + rightHand
 
+    // Create a new unique key to avoid duplicates.
+    // Otherwise, pressing a key matching multiple "Key" objects will destroy them all.
+    // This makes for awkward gameplay.
     const uniqueUpperCaseLetters = leftHand.split('').filter((letter) => {
-      // TODO: can't use gameRooms here because objects property is not set yet???
-      //       had to use GameObject.instances instead
+      // TODO: Can't use gameRooms here because objects property is not set yet???
+      //       Had to use GameObject.instances instead
+      //       Remove GameObject.instances once this is fixed.
       return GameObject.instances.every((obj) => obj.key !== letter)
     })
 
