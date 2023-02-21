@@ -7,7 +7,7 @@ document.body.appendChild(mountNode)
 function gameEditor() {
   const playPopout = () => {
     window.open(
-      './../../games/ape',
+      './../../games/camera',
       '_blank',
       // TODO: need to know game size programmatically
       'popup,noopener,noreferrer,width=800,height=600',
@@ -33,13 +33,7 @@ function gameEditor() {
         </ul>
       </div>
       <div class="main">
-        <!-- TODO: need to know what url:port we're on programmatically -->
-        <iframe
-          id="game-iframe"
-          src="../../games/ape/index.html"
-          width="800"
-          height="600"
-        ></iframe>
+        <iframe id="game-iframe" src="../../games/camera/index.html"></iframe>
       </div>
     </div>
   `
