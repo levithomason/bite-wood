@@ -75,7 +75,7 @@ export class GameDrawing {
     return this
   }
 
-  /** @param {CanvasFillStrokeStyles.fillStyle} color */
+  /** @param {string|CanvasGradient|CanvasPattern} color */
   setFillColor(color) {
     this.#ctx.fillStyle = color
     return this
@@ -132,7 +132,7 @@ export class GameDrawing {
   }
 
   /**
-   * @param {string} color
+   * @param {string|CanvasGradient|CanvasPattern} color
    * @return {GameDrawing}
    */
   setStrokeColor(color) {

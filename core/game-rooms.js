@@ -24,7 +24,7 @@ class GameRooms {
 
   /**
    * Adds the room to the game's list of rooms.
-   * If this is the only room in the list, it is made the active game.room.
+   * If this is the only room in the list, it is made the currentRoom.
    * @param {GameRoom} room
    */
   addRoom(room) {

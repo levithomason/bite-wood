@@ -28,8 +28,6 @@ import { GameImage } from './game-image.js'
  * A GameSprite takes a GameImage and adds additional information to manage
  */
 export class GameSprite {
-  static instances = []
-
   /** @type {number} */
   #insertionX
 
@@ -109,8 +107,6 @@ export class GameSprite {
 
     this.#stepsThisFrame = 0
     this.step = this.step.bind(this)
-
-    GameSprite.instances.push(this)
   }
 
   /**

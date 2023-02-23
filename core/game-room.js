@@ -1,22 +1,26 @@
 import { random } from './math.js'
 
+/**
+ * @typedef {object} GameRoomConfig
+ * @property {number} width
+ * @property {number} height
+ * @property {string|CanvasGradient|CanvasPattern} [backgroundColor]
+ * @property {GameImage} [backgroundImage]
+ * @property {GameAudio} [backgroundMusic]
+ */
+
 export class GameRoom {
-  static instances = []
-
-  /** @type GameImage */
-  backgroundImage
-  /** @type GameAudio */
-  backgroundMusic
-
   /**
-   * @param {number} width
-   * @param {number} height
+   * @param {GameRoomConfig} config
    */
-  constructor(width, height) {
-    this.width = width
-    this.height = height
+  constructor(config) {
+    this.width = config.width
+    this.height = config.height
 
-    /** @type {GameObject[]} */
+    this.backgroundColor = config.backgroundColor
+    this.backgroundImage = config.backgroundImage
+    this.backgroundMusic = config.backgroundMusic
+
     this.objects = []
 
     this.create = this.create.bind(this)
@@ -25,13 +29,7 @@ export class GameRoom {
     this.instanceCount = this.instanceCount.bind(this)
     this.instanceDestroy = this.instanceDestroy.bind(this)
 
-    this.setBackgroundColor = this.setBackgroundColor.bind(this)
-    this.setBackgroundMusic = this.setBackgroundMusic.bind(this)
-    this.setBackgroundImage = this.setBackgroundImage.bind(this)
-
     this.draw = this.draw.bind(this)
-
-    GameRoom.instances.push(this)
   }
 
   create() {
@@ -135,23 +133,6 @@ export class GameRoom {
     object.destroy()
     this.objects[index]?.events?.destroy?.(this)
     this.objects.splice(index, 1)
-  }
-
-  /** @param cssColor {string} */
-  setBackgroundColor(cssColor) {
-    this.backgroundColor = cssColor
-  }
-
-  /** @param image {GameImage} */
-  setBackgroundImage(image) {
-    this.backgroundImage = image
-  }
-
-  /** @param audio {GameAudio} */
-  setBackgroundMusic(audio) {
-    audio.loop = true
-    audio.volume = 0.25
-    this.backgroundMusic = audio
   }
 
   /**
