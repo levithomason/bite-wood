@@ -20,7 +20,7 @@ class Room extends GameRoom {
   backgroundColor = '#a5de93'
 }
 
-const room = new Room(800, 600)
+const room = new Room({ width: 800, height: 600 })
 
 gameRooms.addRoom(room)
 

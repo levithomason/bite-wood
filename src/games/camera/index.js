@@ -409,7 +409,7 @@ class Flower extends GameObject {
 
 class Room extends GameRoom {
   constructor() {
-    super(3000, 4000)
+    super({ width: 3000, height: 4000 })
     this.layers = {
       starsStart: 0.5,
       spaceStart: 0.5,
@@ -502,7 +502,7 @@ class Room extends GameRoom {
   }
 }
 
-const room = new Room(800, 600)
+const room = new Room({ width: 800, height: 600 })
 gameRooms.addRoom(room)
 
 const game = new Game()

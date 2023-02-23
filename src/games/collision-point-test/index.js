@@ -3,7 +3,7 @@ import { collisionPointRectangle } from '../../core/collision.js'
 
 class Room extends GameRoom {
   constructor() {
-    super(800, 600)
+    super({ width: 800, height: 600 })
     this.backgroundColor = '#123'
 
     this.rect = { x: 250, y: 150, width: 300, height: 300 }

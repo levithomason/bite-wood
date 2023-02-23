@@ -237,12 +237,12 @@ class Block extends GameObject {
 
 class Room extends GameRoom {
   constructor() {
-    super(WIDTH, HEIGHT)
+    super({ width: WIDTH, height: HEIGHT })
     this.backgroundColor = '#17171f'
   }
 }
 
-const room = new Room(WIDTH, HEIGHT)
+const room = new Room({ width: WIDTH, height: HEIGHT })
 gameRooms.addRoom(room)
 
 // create blocks
@@ -251,5 +251,5 @@ for (let i = 0; i < BLOCK_INITIAL_COUNT; i += 1) {
 }
 setInterval(Block.spawn, BLOCK_SPAWN_INTERVAL)
 
-const game = new Game({ width: WIDTH, height: HEIGHT })
+const game = new Game()
 game.start()
