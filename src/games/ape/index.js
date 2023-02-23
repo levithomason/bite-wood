@@ -419,7 +419,7 @@ class Ape extends GameObject {
 
 class Room extends GameRoom {
   constructor() {
-    super(1200, 900)
+    super({ width: 2000, height: 900 })
     this.backgroundColor = '#94c0aa'
 
     const makeBox = (

@@ -45,7 +45,7 @@ class Object extends GameObject {
 
 class Room extends GameRoom {
   constructor() {
-    super(800, 600)
+    super({ width: 800, height: 600 })
     this.backgroundColor = '#234'
   }
 }

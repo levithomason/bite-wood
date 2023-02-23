@@ -2,7 +2,7 @@ import { GameAudio, GameRoom, gameRooms } from '../../../core/index.js'
 
 export default class Room1 extends GameRoom {
   constructor() {
-    super(800, 600)
+    super({ width: 800, height: 600 })
     this.backgroundColor = '#124'
     this.backgroundMusic = new GameAudio(
       'https://soundimage.org/wp-content/uploads/2017/05/Hypnotic-Puzzle.mp3',

@@ -6,6 +6,26 @@ import { offsetX, offsetY, Vector } from './math.js'
 import { gameRooms } from './game-rooms.js'
 
 /**
+ * @typedef {Object} GameObjectConfig
+ * @property {number} [boundingBoxTop=0] - The bounding box's distance away from the object's y position.
+ * @property {number} [boundingBoxLeft=0] - The bounding box's distance away from the object's x position.
+ * @property {number} [boundingBoxWidth=0] - How wide the bounding box starting from boundingBoxLeft.
+ * @property {number} [boundingBoxHeight=0] - How tall the bounding box starting from boundingBoxTop.
+ * @property {boolean} [persist=false] - Determines whether this object should still exist when the room changes.
+ * @property {GameSprite|undefined} [sprite]
+ * @property {boolean} [solid=false]
+ * @property {number} [x=0]
+ * @property {number} [y=0]
+ * @property {number} [acceleration=0]
+ * @property {Vector} [gravity=gamePhysics.gravity]
+ * @property {number} [friction=gamePhysics.friction]
+ * @property {number} [speed=0]
+ * @property {number} [direction=0]
+ * @property {GameObjectEvents} [events={}]
+ * @property {...object} ...properties
+ */
+
+/**
  * @typedef {function} GameObjectAction
  * @param {GameObject} self
  */
@@ -31,13 +51,13 @@ import { gameRooms } from './game-rooms.js'
  */
 
 export class GameObject {
-  /** @type number */
+  /** @type {number} */
   #boundingBoxWidth
-  /** @type number */
+  /** @type {number} */
   #boundingBoxHeight
-  /** @type number */
+  /** @type {number} */
   #boundingBoxLeft
-  /** @type number */
+  /** @type {number} */
   #boundingBoxTop
 
   /** @type {Vector} */
@@ -53,23 +73,7 @@ export class GameObject {
   // id = uuidv4()
 
   /**
-   * @param {object} [config]
-   * @param {number} [config.boundingBoxTop=0] - The bounding box's distance away from the object's y position.
-   * @param {number} [config.boundingBoxLeft=0] - The bounding box's distance away from the object's x position.
-   * @param {number} [config.boundingBoxWidth=0] - How wide the bounding box starting from boundingBoxLeft.
-   * @param {number} [config.boundingBoxHeight=0] - How tall the bounding box starting from boundingBoxTop.
-   * @param {boolean} [config.persist=false] - Determines whether this object should still exist when the room changes.
-   * @param {GameSprite|undefined} [config.sprite]
-   * @param {boolean} [config.solid=false]
-   * @param {number} [config.x=0]
-   * @param {number} [config.y=0]
-   * @param {number} [config.acceleration=0]
-   * @param {Vector} [config.gravity=gamePhysics.gravity]
-   * @param {number} [config.friction=gamePhysics.friction]
-   * @param {number} [config.speed=0]
-   * @param {number} [config.direction=0]
-   * @param {GameObjectEvents} [config.events={}]
-   * @param {...object} ...properties
+   * @param {GameObjectConfig} [config]
    */
   constructor(config = {}) {
     const {
@@ -449,6 +453,8 @@ export class GameObject {
   keepInRoom(bounce = 0, padding = {}) {
     const { top = 0, right = 0, bottom = 0, left = 0 } = padding
     const room = gameRooms.currentRoom
+
+    // TODO: objects are getting stuck on the edges of the room
 
     // outside left
     if (this.boundingBoxLeft < left) {

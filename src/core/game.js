@@ -28,21 +28,10 @@ export class Game {
   #fps = []
 
   /**
-   * @param {HTMLElement} [parentElement=document.body] - A DOM element where the canvas should be placed.
-   * @param {number} [width=800] - The width of the game in pixels.
-   * @param {number} [height=600] - The height of the game in pixels.
    * @param {number} stepsPerSecond - The number of times the game loop should run per second.
    */
   constructor(
-    {
-      parentElement = document.body,
-      width = 800,
-      height = 600,
-      stepsPerSecond = 60,
-    } = {
-      parentElement: document.body,
-      width: 800,
-      height: 600,
+    { stepsPerSecond = 60 } = {
       stepsPerSecond: 60,
     },
   ) {
@@ -53,32 +42,27 @@ export class Game {
     this.stepObjects = this.stepObjects.bind(this)
     this.draw = this.draw.bind(this)
 
-    this.width = width
-    this.height = height
     this.stepsPerSecond = stepsPerSecond
 
-    parentElement.append(gameDrawing.canvas)
+    document.body.append(gameDrawing.canvas)
+
+    window.addEventListener('resize', this.resizeCanvas)
+    this.resizeCanvas()
 
     window.biteWood = window.biteWood || {}
     window.biteWood.game = this
   }
 
+  // Keep the canvas the same size as the window
+  resizeCanvas() {
+    const room = gameRooms.currentRoom
+    const width = Math.min(window.innerWidth, room.width)
+    const height = Math.min(window.innerHeight, room.height)
+    gameDrawing.setCanvasSize(width, height)
+  }
+
   start() {
     if (_isRunning) return
-
-    // Keep the canvas the same size as the window
-    const resizeCanvas = () => {
-      const room = gameRooms.currentRoom
-      const width = Math.min(window.innerWidth, room.width)
-      const height = Math.min(window.innerHeight, room.height)
-      gameDrawing.setCanvasSize(width, height)
-    }
-
-    window.addEventListener('resize', () => {
-      resizeCanvas()
-    })
-
-    resizeCanvas()
 
     _isRunning = true
     this.tick()
@@ -110,16 +94,16 @@ export class Game {
       this.#fps.splice(this.stepsPerSecond * 2)
     }
 
-    // TODO: Find a better play/pause key that doesn't conflict with the game.
-    //       This collides with the "P" key in the keyboard game, for example.
-    // handle play/pause/debug global keybindings
-    // if (gameKeyboard.down.P) {
-    //   if (gameState.isPlaying) {
-    //     gameState.pause()
-    //   } else {
-    //     gameState.play()
-    //   }
-    // }
+    // Handle play/pause/debug global keybindings.
+    // We check active.Shift vs down.SHIFT to ensure the key combo is caught.
+    // Keydown only fires once per step and the user may press them at different times.
+    if (gameKeyboard.active.SHIFT && gameKeyboard.down.P) {
+      if (gameState.isPlaying) {
+        gameState.pause()
+      } else {
+        gameState.play()
+      }
+    }
 
     if (gameKeyboard.down['`']) {
       gameState.debug = !gameState.debug
@@ -234,17 +218,24 @@ export class Game {
 
     // paused - overlay
     if (!gameState.isPlaying) {
-      const x = gameRooms.currentRoom.width / 2 - 40
-      const y = gameRooms.currentRoom.height / 2
       const text = `PAUSED`
+      // TODO: This is drawn after the gameDrawing translation is restored (loadSettings).
+      //       This means 0 represents the top left of the screen, not the top left of the room.
+      //       In other words, it is the "fixed" position.
+      //       We should have a way to reference "fixed" positions and "room" positions.
+      const x = gameCamera.width / 2
+      const y = gameCamera.height / 2
 
+      gameDrawing.saveSettings()
+
+      // backdrop
+      gameDrawing.fill('rgba(16, 16, 16, 0.5)')
+
+      // text
       gameDrawing
-        .saveSettings()
-        // backdrop
-        .fill('rgba(16, 16, 16, 0.5)')
-        // text
         .setFontFamily() // default
         .setFontSize(18)
+        .setTextAlign('center')
         .setFillColor('#fff')
         .setStrokeColor('#000')
         .text(text, x, y)

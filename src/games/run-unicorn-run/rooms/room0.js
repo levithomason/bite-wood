@@ -11,7 +11,7 @@ await imgBackground.loaded
 
 export default class Room0 extends GameRoom {
   constructor() {
-    super(800, 600)
+    super({ width: 800, height: 600 })
 
     this.backgroundImage = imgBackground
 
