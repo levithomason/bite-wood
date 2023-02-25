@@ -103,10 +103,7 @@ class UFO extends GameObject {
       // TODO: why is there no currentRoom when this is called in the constructor?
       // We would normally instantiate this property in the constructor, but
       // the room is not yet defined when the constructor is called.
-      const restPoint = {
-        x: gameRooms.currentRoom.width / 2,
-        y: gameRooms.currentRoom.yPosition.spaceStart / 2,
-      }
+      const restPoint = { x: gameRooms.currentRoom.width / 2, y: 100 }
       this.motionAdd(
         direction(this.x, this.y, restPoint.x, restPoint.y),
         this.accelerationRest,
