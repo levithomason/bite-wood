@@ -35,16 +35,16 @@ const gameFile = {
             self.speed *= 1 - self.friction
           },
           keyActive: {
-            ARROWRIGHT: (self) => {
+            D: (self) => {
               self.motionAdd(gamePhysics.DIRECTION_RIGHT, self.acceleration)
             },
-            ARROWLEFT: (self) => {
+            A: (self) => {
               self.motionAdd(gamePhysics.DIRECTION_LEFT, self.acceleration)
             },
-            ARROWUP: (self) => {
+            W: (self) => {
               self.motionAdd(gamePhysics.DIRECTION_UP, self.acceleration)
             },
-            ARROWDOWN: (self) => {
+            S: (self) => {
               self.motionAdd(gamePhysics.DIRECTION_DOWN, self.acceleration)
             },
           },
