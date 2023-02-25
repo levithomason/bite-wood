@@ -64,7 +64,7 @@ class GameRooms {
     if (!hasNextRoom) return false
 
     // Current room:
-    // - Collect all objects that should persist
+    // - Collect all objects that should persist to the next room
     // - Stop background music
     // New room:
     // - Create the room if it hasn't been created yet
