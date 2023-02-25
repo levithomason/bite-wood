@@ -2,6 +2,7 @@ import {
   Game,
   GameDrawing,
   gameKeyboard,
+  gameMouse,
   GameObject,
   gamePhysics,
   GameRoom,
@@ -73,22 +74,15 @@ class Globby extends GameObject {
       boundingBoxWidth: -14 * 2,
       boundingBoxHeight: -14 * 2,
       events: {
-        keyDown: {
-          ' ': () => {
+        mouseDown: {
+          left: () => {
+            const dir = direction(this.x, this.y, gameMouse.x, gameMouse.y)
             const bullet = gameRooms.currentRoom.instanceCreate(
               Bullet,
-              offsetX(
-                this.x,
-                this.getElongatedSize() + this.strokeWidth,
-                this.direction,
-              ),
-              offsetY(
-                this.y,
-                this.getElongatedSize() + this.strokeWidth,
-                this.direction,
-              ),
+              offsetX(this.x, this.getElongatedSize() + this.strokeWidth, dir),
+              offsetY(this.y, this.getElongatedSize() + this.strokeWidth, dir),
             )
-            bullet.direction = this.direction
+            bullet.direction = dir
           },
         },
       },
