@@ -88,7 +88,7 @@ class Player extends GameObject {
         },
 
         keyDown: {
-          ARROWUP(self) {
+          W(self) {
             if (onBottom(self, 'solid')) {
               self.motionAdd(gamePhysics.DIRECTION_UP, self.jump)
             }
@@ -96,21 +96,21 @@ class Player extends GameObject {
         },
 
         keyUp: {
-          ARROWRIGHT(self) {
+          D(self) {
             self.setSprite(sprPlayerIdleR)
           },
-          ARROWLEFT(self) {
+          A(self) {
             self.setSprite(sprPlayerIdleL)
           },
         },
 
         keyActive: {
-          ARROWRIGHT(self) {
+          D(self) {
             self.setSprite(sprPlayerWalkR)
             self.motionAdd(gamePhysics.DIRECTION_RIGHT, self.acceleration)
           },
 
-          ARROWLEFT(self) {
+          A(self) {
             self.setSprite(sprPlayerWalkL)
             self.motionAdd(gamePhysics.DIRECTION_LEFT, self.acceleration)
           },
@@ -141,8 +141,8 @@ class Player extends GameObject {
     // walking
     if (
       this.y < gameRooms.currentRoom.height ||
-      gameKeyboard.active.ARROWRIGHT ||
-      gameKeyboard.active.ARROWLEFT
+      gameKeyboard.active.D ||
+      gameKeyboard.active.A
     ) {
       this.friction = 0
       this.hspeed =

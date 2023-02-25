@@ -29,15 +29,15 @@ class Room extends GameRoom {
     let horizontalOperation = ''
     let verticalOperation = ''
 
-    if (gameKeyboard.active.ARROWUP) {
+    if (gameKeyboard.active.W) {
       this.vector.magnitude += 5
       verticalOperation = '+ magnitude'
-    } else if (gameKeyboard.active.ARROWDOWN) {
+    } else if (gameKeyboard.active.S) {
       this.vector.magnitude -= this.vector.magnitude <= 5 ? 0 : 5
       verticalOperation = '- magnitude'
     }
 
-    if (gameKeyboard.active.ARROWLEFT) {
+    if (gameKeyboard.active.A) {
       if (gameKeyboard.active.SHIFT) {
         this.vector.angle -= 0.036
         horizontalOperation = '- angle'
@@ -45,7 +45,7 @@ class Room extends GameRoom {
         this.vector.direction -= 2
         horizontalOperation = '- direction'
       }
-    } else if (gameKeyboard.active.ARROWRIGHT) {
+    } else if (gameKeyboard.active.D) {
       if (gameKeyboard.active.SHIFT) {
         this.vector.angle += 0.036
         horizontalOperation = '+ angle'
@@ -65,9 +65,9 @@ class Room extends GameRoom {
       .setFontFamily('monospace')
       .setFillColor('#fff')
       .setFontSize(12)
-      .text('magnitude = up/down', 16, 20)
-      .text('direction = left/right', 16, 40)
-      .text('angle     = shift + left/right', 16, 60)
+      .text('magnitude = w/s', 16, 20)
+      .text('direction = a/d', 16, 40)
+      .text('angle     = shift + a/d', 16, 60)
       .text('move      = click', 16, 80)
 
     // show the current operation being performed on the vector
