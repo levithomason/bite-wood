@@ -1,4 +1,5 @@
 import { clamp } from './math.js'
+import { gameDrawing } from './game-drawing-controller.js'
 
 class GameRooms {
   /** @type GameRoom[] */
@@ -6,6 +7,19 @@ class GameRooms {
 
   /** @type number */
   #roomIndex = -1
+
+  #fitCanvasToWindow() {
+    if (!this.currentRoom) return
+
+    const width = Math.min(window.innerWidth, this.currentRoom.width)
+    const height = Math.min(window.innerHeight, this.currentRoom.height)
+    gameDrawing.setCanvasSize(width, height)
+  }
+
+  constructor() {
+    // Keep the canvas the same size as the window
+    window.addEventListener('resize', () => this.#fitCanvasToWindow())
+  }
 
   /**
    * @returns GameRoom|undefined
@@ -42,39 +56,49 @@ class GameRooms {
    */
   setRoomIndex(index) {
     const nextIndex = clamp(index, -1, this.#rooms.length - 1)
+
     const didChange = nextIndex !== this.#roomIndex
+    if (!didChange) return false
 
-    if (didChange) {
-      const persistedObjects = []
+    const hasNextRoom = this.#rooms[nextIndex]
+    if (!hasNextRoom) return false
 
-      if (this.currentRoom) {
-        this.currentRoom.objects = this.currentRoom.objects.filter((object) => {
-          if (object.persist) persistedObjects.push(object)
+    // Current room:
+    // - Collect all objects that should persist
+    // - Stop background music
+    // New room:
+    // - Create the room if it hasn't been created yet
+    // - Add the persisted objects to the new room
+    // - Start background music
+    // - Fit the canvas to the window
 
-          return !object.persist
-        })
+    const persistedObjects = []
+    if (this.currentRoom) {
+      this.currentRoom.objects = this.currentRoom.objects.filter((object) => {
+        if (object.persist) persistedObjects.push(object)
 
-        if (this.currentRoom.backgroundMusic) {
-          this.currentRoom.backgroundMusic.pause()
-        }
-      }
+        return !object.persist
+      })
 
-      this.#roomIndex = nextIndex
-
-      if (this.currentRoom) {
-        if (!this.currentRoom.initialized) {
-          this.currentRoom.create()
-        }
-        this.currentRoom.objects =
-          this.currentRoom.objects.concat(persistedObjects)
-        if (this.currentRoom.backgroundMusic) {
-          this.currentRoom.backgroundMusic.loop = true
-          this.currentRoom.backgroundMusic.playOne()
-        }
+      if (this.currentRoom.backgroundMusic) {
+        this.currentRoom.backgroundMusic.pause()
       }
     }
 
-    return didChange && !!this.currentRoom
+    this.#roomIndex = nextIndex
+
+    if (!this.currentRoom.initialized) this.currentRoom.create()
+
+    this.currentRoom.objects = this.currentRoom.objects.concat(persistedObjects)
+
+    if (this.currentRoom.backgroundMusic) {
+      this.currentRoom.backgroundMusic.loop = true
+      this.currentRoom.backgroundMusic.playOne()
+    }
+
+    this.#fitCanvasToWindow()
+
+    return true
   }
 
   /**

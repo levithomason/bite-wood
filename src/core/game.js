@@ -46,19 +46,8 @@ export class Game {
 
     document.body.append(gameDrawing.canvas)
 
-    window.addEventListener('resize', this.resizeCanvas)
-    this.resizeCanvas()
-
     window.biteWood = window.biteWood || {}
     window.biteWood.game = this
-  }
-
-  // Keep the canvas the same size as the window
-  resizeCanvas() {
-    const room = gameRooms.currentRoom
-    const width = Math.min(window.innerWidth, room.width)
-    const height = Math.min(window.innerHeight, room.height)
-    gameDrawing.setCanvasSize(width, height)
   }
 
   start() {
