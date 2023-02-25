@@ -407,9 +407,102 @@ class Flower extends GameObject {
   }
 }
 
+// create a tree class which draws 3 layers of leaves on random branches
+class Tree extends GameObject {
+  constructor() {
+    super(
+      (() => {
+        const trunkWidth = random(20, 40)
+        const trunkHeight = random(trunkWidth * 6, trunkWidth * 8)
+
+        return {
+          trunkWidth,
+          trunkHeight,
+          boundingBoxTop: -trunkHeight,
+          boundingBoxLeft: -trunkWidth / 2,
+          boundingBoxWidth: trunkWidth,
+          boundingBoxHeight: trunkHeight,
+        }
+      })(),
+    )
+
+    const xRadius = random(this.trunkWidth * 2, this.trunkWidth * 4)
+    const yRadius = random(xRadius * 1.1, xRadius * 1.6)
+    this.leaves = {
+      xOffset: random(-this.trunkWidth, this.trunkWidth) * 0.25,
+      yOffset: yRadius + this.trunkHeight - 10,
+      xRadius,
+      yRadius,
+      rotation: random(-10, 10),
+      lightColor: '#0fba0f',
+      darkColor: '#0e800e',
+    }
+  }
+
+  draw(drawing) {
+    super.draw(drawing)
+
+    // trunk
+    drawing.setStrokeColor('transparent')
+    const trunkGradient = drawing.createLinearGradient(
+      this.x,
+      this.y,
+      this.x,
+      this.y - this.trunkHeight,
+    )
+    trunkGradient.addColorStop(1, '#603415')
+    trunkGradient.addColorStop(0.7, '#91592b')
+    drawing.setFillColor(trunkGradient)
+    drawing.rectangle(
+      this.x - this.trunkWidth / 2,
+      this.y - this.trunkHeight,
+      this.trunkWidth,
+      this.trunkHeight,
+    )
+    const trunkVerticalGradient = drawing.createLinearGradient(
+      this.x - this.trunkWidth / 2,
+      this.y,
+      this.x + this.trunkWidth / 2,
+      this.y,
+    )
+    trunkVerticalGradient.addColorStop(0, 'rgba(63,28,4,0.2)')
+    trunkVerticalGradient.addColorStop(0.3, '#91592b00')
+    trunkVerticalGradient.addColorStop(0.4, '#91592b00')
+    trunkVerticalGradient.addColorStop(0.8, 'rgba(63,28,4,0.2)')
+    drawing.setFillColor(trunkVerticalGradient)
+    drawing.rectangle(
+      this.x - this.trunkWidth / 2,
+      this.y - this.trunkHeight,
+      this.trunkWidth,
+      this.trunkHeight,
+    )
+
+    // leaves
+    drawing.setStrokeColor('transparent')
+
+    const leafGradient = drawing.createLinearGradient(
+      this.x + this.leaves.xOffset,
+      this.y - this.leaves.yOffset - this.leaves.yRadius * 0.5,
+      this.x + this.leaves.xOffset,
+      this.y - this.leaves.yOffset + this.leaves.yRadius * 0.5,
+    )
+    leafGradient.addColorStop(0, this.leaves.lightColor)
+    leafGradient.addColorStop(1, this.leaves.darkColor)
+    drawing.setFillColor(leafGradient)
+
+    drawing.ellipse(
+      this.x + this.leaves.xOffset,
+      this.y - this.leaves.yOffset,
+      this.leaves.xRadius,
+      this.leaves.yRadius,
+      this.leaves.rotation,
+    )
+  }
+}
+
 class Room extends GameRoom {
   constructor() {
-    super({ width: 3000, height: 4000 })
+    super({ width: 4000, height: 4000 })
     this.layers = {
       starsStart: 0.5,
       spaceStart: 0.5,
@@ -448,6 +541,16 @@ class Room extends GameRoom {
       const x = random(100, this.width - 100)
       const y = random(this.yPosition.cloudStart, this.yPosition.cloudEnd)
       this.instanceCreate(Cloud, x, y)
+    }
+
+    // add trees
+    const treeGap = random(400, 600)
+    const numTrees = this.width / treeGap
+    for (let i = 0; i < numTrees; i += 1) {
+      const randomOffset = random(-treeGap * 0.5, treeGap * 0.5)
+      const x = i * treeGap + treeGap / 2 + randomOffset
+      const y = this.height - 50
+      this.instanceCreate(Tree, x, y)
     }
 
     // add dirt
@@ -502,7 +605,7 @@ class Room extends GameRoom {
   }
 }
 
-const room = new Room({ width: 800, height: 600 })
+const room = new Room()
 gameRooms.addRoom(room)
 
 const game = new Game()
