@@ -108,8 +108,8 @@ export const handleCollisions = (objects) => {
   // TODO: resolve dynamic to static
   // TODO: resolve dynamic to dynamic
 
-  // call user code for collisions
   _activeCollisions.forEach(([objectA, objectB]) => {
+    // call user code for collisions
     objectA.onCollision(objectB)
     objectB.onCollision(objectA)
   })
