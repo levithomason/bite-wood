@@ -116,6 +116,10 @@ export class GameObject {
 
     // assign any custom properties the developer passed in
     Object.keys(properties).forEach((property) => {
+      if (property in this) {
+        const message = `Cannot create ${this.name} with property ${property} because it is already defined by GameObject.`
+        throw new Error(message)
+      }
       this[property] = properties[property]
     })
 
