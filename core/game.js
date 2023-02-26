@@ -61,13 +61,18 @@ export class Game {
     cancelAnimationFrame(_raf)
   }
 
-  tick(timestamp = 0) {
-    if (!_lastTickTimestamp) _lastTickTimestamp = timestamp
+  tick(timestamp) {
+    // First tick has no timestamp, but we still want to draw the initial state
+    if (timestamp === undefined) {
+      this.draw()
+      _raf = requestAnimationFrame(this.tick)
+      return
+    }
 
+    if (!_lastTickTimestamp) _lastTickTimestamp = timestamp
     const timeSinceTick = timestamp - _lastTickTimestamp
 
     let steps = Math.round(timeSinceTick / (1000 / this.stepsPerSecond))
-
     // No work to do, wait for the next tick
     if (steps === 0) {
       _raf = requestAnimationFrame(this.tick)
