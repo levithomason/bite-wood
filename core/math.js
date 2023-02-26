@@ -32,7 +32,11 @@ export const sum = (values) => values.reduce((a = 0, b = 0) => a + b, 0)
  * @param {number[]} values - An array of numbers
  * @return {number}
  */
-export const avg = (values) => sum(values) / values.length
+export const avg = (values) => {
+  if (!values.length) return 0
+
+  return sum(values) / values.length
+}
 
 /**
  * Returns `min` when `val` is less than `min` and `max` when `val` is greater than `max.

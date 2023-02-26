@@ -69,8 +69,15 @@ export class Game {
       return
     }
 
+    // First tick should have timeSinceTick of 0.
+    // _lastTickTimestamp is null on the first tick.
+    // Set it to the current timestamp so that we have a starting point.
+    // Technically, the time since last tick is the same as the first tick.
     if (!_lastTickTimestamp) _lastTickTimestamp = timestamp
-    const timeSinceTick = timestamp - _lastTickTimestamp
+
+    const timeSinceTick = !_lastTickTimestamp
+      ? 0
+      : timestamp - _lastTickTimestamp
 
     let steps = Math.round(timeSinceTick / (1000 / this.stepsPerSecond))
     // No work to do, wait for the next tick
