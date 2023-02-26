@@ -1,5 +1,23 @@
+const getKey = (e) => e.key.toUpperCase()
+
 /**
  * Gives the current state of the typing keys.
+ *
+ * CASING:
+ * Upper case keys are tracked in down/up/active to ensure expected handling for the developer.
+ * If a user presses "w" then "Shift" then releases "W", only the upper case key would be cleared.
+ * There would be an active "w" key that is not cleared.
+ * To avoid this, the upper case version of the key is tracked instead.
+ *
+ * ORDER:
+ * We want all key presses to be captured and handled by the game loop tick.
+ * This means the game loop tick needs to handle clearing the key up/down state.
+ * Otherwise, if we clear down state on key up, we could do so before the next tick fires.
+ * This causes some key presses to happen without the game reacting to them.
+ * Because of this, we only set key values to true here, never false.
+ * TODO: This should be handled by a stack of key presses, not a single value.
+ *       This would allow for multiple key presses to be handled in a single tick.
+ *       This would also allow for key presses to be handled in the order they were pressed/released.
  */
 class GameKeyboard {
   constructor() {
@@ -18,29 +36,24 @@ class GameKeyboard {
 
   /** @param {KeyboardEvent} e */
   #handleKeyDown = (e) => {
-    // CASING_COMMENT:
-    // Upper case keys are tracked in down/up/active to ensure expected handling for the developer.
-    // If a user presses "w" then "Shift" then releases "W", only the upper case key would be cleared.
-    // There would be an active "w" key that is not cleared.
-    // To avoid this, the upper case version of the key is tracked instead.
-    this.active[e.key.toUpperCase()] = true
+    const key = getKey(e.key)
+    this.active[key] = true
 
     // Key up/down should only fire for one step in the game loop.
     // The game loop will clear key up/down state after each tick.
     // Only set keydown on the first press, not on repeats.
     if (!e.repeat) {
-      this.down[e.key.toUpperCase()] = true /* see CASING_COMMENT */
-      delete this.up[e.key.toUpperCase()] /* see NOTE_1 */
+      this.down[key] = true
     }
   }
 
   /** @param {KeyboardEvent} e */
   #handleKeyUp = (e) => {
-    this.up[e.key.toUpperCase()] = true /* see CASING_COMMENT */
-
-    delete this.active[e.key.toUpperCase()] /* see CASING_COMMENT */
-    delete this.down[e.key.toUpperCase()] /* see CASING_COMMENT */
+    const key = getKey(e.key)
+    this.up[key] = true
   }
 }
 
 export const gameKeyboard = new GameKeyboard()
+window.biteWood = window.biteWood || {}
+window.biteWood.gameKeyboard = gameKeyboard
