@@ -36,7 +36,7 @@ class GameKeyboard {
 
   /** @param {KeyboardEvent} e */
   #handleKeyDown = (e) => {
-    const key = getKey(e.key)
+    const key = getKey(e)
     this.active[key] = true
 
     // Key up/down should only fire for one step in the game loop.
@@ -49,7 +49,7 @@ class GameKeyboard {
 
   /** @param {KeyboardEvent} e */
   #handleKeyUp = (e) => {
-    const key = getKey(e.key)
+    const key = getKey(e)
     this.up[key] = true
   }
 }
