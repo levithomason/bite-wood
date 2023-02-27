@@ -81,11 +81,8 @@ class GameMouse {
     // the position hasn't been set if the user hasn't moved the mouse yet
     this.#setMousePosition(e)
 
-    this.active.left = e.button === MOUSE_BUTTONS.left
-    this.active.middle = e.button === MOUSE_BUTTONS.middle
-    this.active.right = e.button === MOUSE_BUTTONS.right
-
     this.down[button] = true
+    this.active[button] = true
   }
 
   /** @param {MouseEvent} e */
@@ -96,9 +93,18 @@ class GameMouse {
     this.#setMousePosition(e)
 
     this.up[button] = true
+  }
 
-    delete this.active[button]
-    delete this.down[button]
+  step() {
+    // clear active buttons that are in up state
+    for (const button in this.active) {
+      if (this.up[button]) {
+        delete this.active[button]
+      }
+    }
+
+    this.down = {}
+    this.up = {}
   }
 }
 
