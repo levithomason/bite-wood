@@ -6,6 +6,10 @@ import { offsetX, offsetY, Vector } from './math.js'
 import { gameRooms } from './game-rooms.js'
 
 /**
+ * @typedef {'static'|'dynamic'} GameObjectCollider
+ */
+
+/**
  * @typedef {Object} GameObjectConfig
  * @property {number} [boundingBoxTop=0] - The bounding box's distance away from the object's y position.
  * @property {number} [boundingBoxLeft=0] - The bounding box's distance away from the object's x position.
@@ -13,7 +17,7 @@ import { gameRooms } from './game-rooms.js'
  * @property {number} [boundingBoxHeight=0] - How tall the bounding box starting from boundingBoxTop.
  * @property {boolean} [persist=false] - Determines whether this object should still exist when the room changes.
  * @property {GameSprite|undefined} [sprite]
- * @property {boolean} [solid=false]
+ * @property {GameObjectCollider} [collider='dynamic']
  * @property {number} [x=0]
  * @property {number} [y=0]
  * @property {number} [acceleration=0]
@@ -83,10 +87,10 @@ export class GameObject {
       boundingBoxHeight = 0,
       persist = false,
       sprite,
-      solid = false,
       x = 0,
       y = 0,
       acceleration = 0,
+      collider = 'dynamic',
       gravity = gamePhysics.gravity,
       friction = gamePhysics.friction,
       speed = 0,
@@ -100,9 +104,9 @@ export class GameObject {
     this.#boundingBoxWidth = boundingBoxWidth
     this.#boundingBoxHeight = boundingBoxHeight
 
+    this.collider = collider
     this.persist = persist
     this.sprite = sprite
-    this.solid = solid
     this.x = x
     this.y = y
     this.acceleration = acceleration

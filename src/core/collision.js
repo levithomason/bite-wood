@@ -18,6 +18,7 @@ export const collisionPointRectangle = (x, y, x1, y1, x2, y2) => {
 }
 
 /**
+ * TODO: these need to take classes, not instances.
  * Checks if the top side of an object is colliding with some other object.
  * @param {GameObject} self
  * @param {GameObject} other
@@ -30,6 +31,7 @@ export const onTop = (self, other) => {
   )
 }
 /**
+ * TODO: these need to take classes, not instances.
  * Checks if the bottom side of an object is colliding with some other object.
  * @param {GameObject} self
  * @param {GameObject} other
@@ -42,6 +44,7 @@ export const onBottom = (self, other) => {
   )
 }
 /**
+ * TODO: these need to take classes, not instances.
  * Checks if the left side of an object is colliding with some other object.
  * @param {GameObject} self
  * @param {GameObject} other
@@ -54,6 +57,7 @@ export const onLeft = (self, other) => {
   )
 }
 /**
+ * TODO: these need to take classes, not instances.
  * Checks if the right side of an object is colliding with some other object.
  * @param {GameObject} self
  * @param {GameObject} other
@@ -105,10 +109,14 @@ export const handleCollisions = (objects) => {
     })
   })
 
-  // TODO: resolve dynamic to static
-  // TODO: resolve dynamic to dynamic
-
   _activeCollisions.forEach(([objectA, objectB]) => {
+    // TODO: resolve dynamic to static
+    // TODO: resolve dynamic to dynamic
+
+    console.debug(
+      `TODO: resolve "${objectA.collider}" vs "${objectB.collider}" collision`,
+    )
+
     // call user code for collisions
     objectA.onCollision(objectB)
     objectB.onCollision(objectA)

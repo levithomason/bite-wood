@@ -410,7 +410,7 @@ class Tree extends GameObject {
     super(
       (() => {
         const trunkWidth = random(20, 40)
-        const trunkHeight = random(trunkWidth * 6, trunkWidth * 8)
+        const trunkHeight = random(trunkWidth * 4, trunkWidth * 6)
 
         return {
           trunkWidth,

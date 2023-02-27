@@ -27,7 +27,7 @@ class Platform extends GameObject {
   constructor() {
     super({
       sprite: sprPlatform,
-      solid: true,
+      collider: 'dynamic',
     })
   }
 }

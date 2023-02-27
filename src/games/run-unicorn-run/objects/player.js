@@ -89,6 +89,8 @@ class Player extends GameObject {
 
         keyDown: {
           W(self) {
+            // TODO: Should be "collision at point with object or with solid."
+            //       The API below doesn't exist.
             if (onBottom(self, 'solid')) {
               self.motionAdd(gamePhysics.DIRECTION_UP, self.jump)
             }

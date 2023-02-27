@@ -7,8 +7,8 @@ import {
 } from '../../core/index.js'
 
 class Block extends GameObject {
-  static width = 90
-  static height = 90
+  static width = 200
+  static height = 200
   constructor() {
     super({
       boundingBoxTop: -Block.height / 2,
@@ -50,10 +50,10 @@ class Room extends GameRoom {
       this.height / 2,
     )
 
-    blockA.hspeed = Block.width
+    blockA.hspeed = 90
     blockA.color = '#0000ff44'
     blockA.strokeColor = '#00008888'
-    blockB.hspeed = -Block.width
+    blockB.hspeed = -90
     blockB.color = '#ff000044'
     blockB.strokeColor = '#88000088'
   }
@@ -62,5 +62,5 @@ class Room extends GameRoom {
 gameRooms.addRoom(new Room())
 
 const game = new Game({ stepsPerSecond: 0.25 })
-gameState.debug = false
+gameState.debug = true
 game.start()
