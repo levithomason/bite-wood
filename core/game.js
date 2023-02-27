@@ -118,13 +118,9 @@ export class Game {
 
     this.draw()
 
-    // TODO: seems the typing should have a tick as well
-    //       the game loop shouldn't know what gameKeyboard needs to do
     // Key up/down and mouse up/down should only fire once per tick, clear their values
-    gameKeyboard.down = {}
-    gameKeyboard.up = {}
-    gameMouse.down = {}
-    gameMouse.up = {}
+    gameKeyboard.step()
+    gameMouse.step()
 
     _raf = requestAnimationFrame(this.tick)
   }

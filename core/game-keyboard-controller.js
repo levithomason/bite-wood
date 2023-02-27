@@ -52,6 +52,18 @@ class GameKeyboard {
     const key = getKey(e)
     this.up[key] = true
   }
+
+  step() {
+    // clear active keys that are in up state
+    for (const key in this.active) {
+      if (this.up[key]) {
+        delete this.active[key]
+      }
+    }
+
+    this.down = {}
+    this.up = {}
+  }
 }
 
 export const gameKeyboard = new GameKeyboard()
