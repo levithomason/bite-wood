@@ -53,7 +53,11 @@ export class Game {
   start() {
     if (_isRunning) return
 
+    // draw the initial state immediately
+    this.draw()
+
     _isRunning = true
+
     this.tick()
   }
 
@@ -62,13 +66,6 @@ export class Game {
   }
 
   tick(timestamp) {
-    // First tick has no timestamp, but we still want to draw the initial state
-    if (timestamp === undefined) {
-      this.draw()
-      _raf = requestAnimationFrame(this.tick)
-      return
-    }
-
     // First tick should have timeSinceTick of 0.
     // _lastTickTimestamp is null on the first tick.
     // Set it to the current timestamp so that we have a starting point.
@@ -194,12 +191,12 @@ export class Game {
         // so that the object's debug info is translated by the camera.
         // We're also already iterating over the objects here.
         if (gameState.debug) {
-          gameDrawing.objectDebug(object)
+          object.drawDebug(gameDrawing)
         }
       })
 
       if (gameState.debug) {
-        gameDrawing.cameraDebug()
+        gameCamera.drawDebug(gameDrawing)
       }
     }
 
@@ -210,7 +207,7 @@ export class Game {
     // debug drawings
     if (gameState.debug) {
       gameDrawing.fpsDebug(avg(this.#fps))
-      gameDrawing.mouseDebug()
+      gameMouse.drawDebug(gameDrawing)
     }
 
     // paused - overlay

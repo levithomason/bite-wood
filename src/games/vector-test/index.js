@@ -58,7 +58,7 @@ class Room extends GameRoom {
       this.vector.y = gameMouse.y - y
     }
 
-    drawing.vectorDebug(x, y, this.vector, '#fff')
+    this.vector.drawDebug(drawing, x, y, '#fff')
 
     // draw instructions for changing the vector's magnitude by pressing +/-
     drawing

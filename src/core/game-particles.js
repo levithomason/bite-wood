@@ -213,7 +213,23 @@ export class GameParticles extends GameObject {
     })
 
     if (gameState.debug) {
-      drawing.particlesDebug(this)
+      this.drawDebug(drawing)
     }
+  }
+
+  /**
+   * Draws a debug view of the particles.
+   * @param {GameDrawing} drawing
+   */
+  drawDebug(drawing) {
+    // TODO: move to game loop, put particles on a separate layer
+    //       don't extend GameObject for GameParticles
+    //       otherwise, GameParticles get GameObject treatment (like debug drawing)
+    drawing.saveSettings()
+    drawing.setLineWidth(1)
+    drawing.setFillColor('transparent')
+    drawing.setStrokeColor('#ff0')
+    drawing.rectangle(this.x, this.y, this.width, this.height)
+    drawing.loadSettings()
   }
 }

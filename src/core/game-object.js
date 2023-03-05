@@ -422,6 +422,93 @@ export class GameObject {
     }
   }
 
+  /**
+   * Draws a debug view of the object.
+   * @param {GameDrawing} drawing
+   */
+  drawDebug(drawing) {
+    const {
+      name,
+      sprite,
+      state,
+      x,
+      y,
+      hspeed,
+      vspeed,
+      speed,
+      direction,
+      gravity,
+      friction,
+      boundingBoxTop,
+      boundingBoxLeft,
+      boundingBoxWidth,
+      boundingBoxHeight,
+    } = this
+
+    drawing.saveSettings()
+
+    drawing.setLineWidth(1)
+    drawing.setFillColor('transparent')
+
+    // sprite frame
+    if (this.sprite) {
+      drawing.setStrokeColor('rgba(0, 0, 0, 0.2)')
+      drawing.rectangle(
+        this.spriteLeft,
+        this.spriteTop,
+        sprite.width,
+        sprite.height,
+      )
+    }
+
+    // bounding box
+    if (this.hasCollision.onAnySide) {
+      drawing.setStrokeColor('#F80')
+    } else {
+      drawing.setStrokeColor('#08F')
+    }
+    drawing.rectangle(
+      boundingBoxLeft,
+      boundingBoxTop,
+      boundingBoxWidth,
+      boundingBoxHeight,
+    )
+
+    // insertion point
+    drawing.setStrokeColor('#F00')
+    drawing.cross(x, y, 6, 6)
+
+    // vector
+    if (speed) {
+      drawing.setStrokeColor('#0D0')
+      drawing.arrow(x, y, x + hspeed * 4, y + vspeed * 4, 4)
+    }
+
+    // text values
+    drawing.setFontSize(12)
+    drawing.setFontFamily('monospace')
+    drawing.setTextAlign('left')
+    const fixed = (n) => n.toFixed(2)
+    const lines = [
+      `${name}`,
+      // TODO: make state a required abstraction of game objects
+      state && `state     ${state.name}`,
+      `x         ${fixed(x)}`,
+      `y         ${fixed(y)}`,
+      `direction ${fixed(direction)}`,
+      `speed     ${fixed(speed)} (${fixed(hspeed)}, ${fixed(vspeed)})`,
+      gravity && `gravity   ${fixed(gravity.magnitude)}`,
+      friction && `friction  ${fixed(friction)}`,
+    ].filter(Boolean)
+    lines.reverse().forEach((line, i) => {
+      const x = this.spriteLeft
+      const y = this.spriteTop - (i + 1) * 14
+      drawing.setFillColor('#000')
+      drawing.text(line, x, y)
+    })
+    drawing.loadSettings()
+  }
+
   // TODO: this (like step collision check) needs bounding box apart from the sprite
   //       see step physics regarding staying outside solid objects
   isOutsideRoom() {

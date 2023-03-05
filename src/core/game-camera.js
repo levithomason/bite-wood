@@ -83,4 +83,19 @@ export class GameCamera {
     const y = clamp(this.y + yChange, 0, yMax)
     this.moveTo(x, y)
   }
+
+  /**
+   * Draws a debug view of the camera.
+   * @param {GameDrawing} drawing
+   */
+  drawDebug(drawing) {
+    drawing.saveSettings()
+
+    drawing.setLineWidth(1)
+    drawing.setFillColor('transparent')
+    drawing.setStrokeColor('#00ffff88')
+    drawing.rectangle(this.x + 8, this.y + 8, this.width - 16, this.height - 16)
+
+    drawing.loadSettings()
+  }
 }

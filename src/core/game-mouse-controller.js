@@ -106,6 +106,63 @@ class GameMouse {
     this.down = {}
     this.up = {}
   }
+
+  /**
+   * Draws a debug view of the mouse.
+   * @param {GameDrawing} drawing
+   */
+  drawDebug(drawing) {
+    const height = 15
+    const offsetBottom = 24
+
+    const padX = 60
+
+    let x = this.x - gameCamera.x
+
+    if (this.x < gameCamera.left + padX) {
+      x = gameCamera.left + padX - gameCamera.x
+    } else if (this.x > gameCamera.right - padX) {
+      x = gameCamera.right - padX - gameCamera.x
+    }
+
+    let y = this.y + offsetBottom - gameCamera.y
+
+    if (this.y < gameCamera.top) {
+      y = offsetBottom - gameCamera.y
+    } else if (this.y > gameCamera.bottom - height) {
+      y = gameCamera.bottom - offsetBottom - height - gameCamera.y
+    } else if (this.y > gameCamera.bottom - offsetBottom - height) {
+      y = this.y - offsetBottom - gameCamera.y
+    }
+
+    const text = `(${this.x}, ${this.y})`
+
+    drawing.saveSettings()
+
+    drawing.setFontSize(10)
+    drawing.setFontFamily('monospace')
+    drawing.setTextAlign('center')
+    drawing.setTextBaseline('top')
+
+    // text background
+    const textWidth = drawing.measureText(text)
+    const textPadX = 4
+    drawing.setStrokeColor('transparent')
+    drawing.setFillColor('rgba(0, 0, 0, 0.25)')
+    drawing.rectangle(
+      x - textWidth / 2 - textPadX,
+      y - 2,
+      textWidth + textPadX * 2,
+      height,
+    )
+
+    // text
+    drawing.setLineWidth(1)
+    drawing.setFillColor('#fff')
+    drawing.text(text, x, y)
+
+    drawing.loadSettings()
+  }
 }
 
 export const gameMouse = new GameMouse()

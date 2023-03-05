@@ -185,4 +185,66 @@ export class Vector {
     this.x += offsetX(0, magnitude, direction)
     this.y += offsetY(0, magnitude, direction)
   }
+
+  /**
+   * Draws a debug view of a Vector.
+   * @param {GameDrawing} drawing
+   * @param {number} x - The x position of the vector's origin.
+   * @param {number} y - The y position of the vector's origin.
+   * @param {string} [color='black'] - A CSS color for the debug lines.
+   */
+  drawDebug(drawing, x, y, color = 'black') {
+    drawing.saveSettings()
+    const mainColor = 'magenta'
+
+    drawing.setStrokeColor(color)
+    drawing.setFillColor('transparent')
+
+    // adjacent
+    drawing.line(x, y, x + this.x, y)
+    // opposite
+    drawing.line(x + this.x, y, x + this.x, y + this.y)
+    // hypotenuse
+    drawing.setStrokeColor(mainColor)
+    drawing.arrow(x, y, x + this.x, y + this.y)
+
+    // 90° box
+    drawing.setStrokeColor(color)
+    drawing.rectangle(
+      x + this.x + 10 * -Math.sign(this.x),
+      y,
+      10 * Math.sign(this.x),
+      10 * Math.sign(this.y),
+    )
+
+    // labels: x, y, angle, magnitude
+    const fontSize = 12
+    drawing.setFontSize(fontSize)
+    drawing.setTextAlign('center')
+    drawing.setFillColor(mainColor)
+    drawing.text(
+      Math.round(this.magnitude),
+      x + this.x / 2 - 20 * Math.sign(this.x),
+      y + this.y / 2 + fontSize * 1.2 * Math.sign(this.y),
+    )
+
+    drawing.setFillColor(color)
+    drawing.text(
+      'x ' + Math.round(this.x),
+      x + this.x / 2,
+      y + 15 * -Math.sign(this.y),
+    )
+    drawing.text(
+      'y ' + Math.round(this.y),
+      x + this.x + 30 * Math.sign(this.x),
+      y + this.y / 2,
+    )
+    drawing.text(
+      Math.round(this.direction) + '°',
+      x + this.x / 4,
+      y + this.y / 10 + 4,
+    )
+
+    drawing.loadSettings()
+  }
 }

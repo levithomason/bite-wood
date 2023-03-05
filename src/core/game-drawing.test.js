@@ -1,6 +1,4 @@
-import { Vector } from './math.js'
 import { GameDrawing } from './game-drawing.js'
-import { GameObject } from './game-object.js'
 import { GameSprite } from './game-sprite.js'
 import { GameImage } from './game-image.js'
 
@@ -177,25 +175,8 @@ describe('GameDrawing', () => {
       expect(drawing.text() === drawing).toBe(true)
     })
 
-    it('cameraDebug() returns this', () => {
-      expect(drawing.cameraDebug() === drawing).toBe(true)
-    })
-
     it('fpsDebug() returns this', () => {
       expect(drawing.fpsDebug(60) === drawing).toBe(true)
-    })
-
-    it('mouseDebug() returns this', () => {
-      expect(drawing.mouseDebug() === drawing).toBe(true)
-    })
-
-    it('objectDebug() returns this', () => {
-      expect(drawing.objectDebug(new GameObject()) === drawing).toBe(true)
-    })
-
-    it('vectorDebug() returns this', () => {
-      const vector = new Vector()
-      expect(drawing.vectorDebug(0, 0, vector) === drawing).toBe(true)
     })
 
     it('measureText() returns a number', () => {
