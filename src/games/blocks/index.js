@@ -1,10 +1,11 @@
 import { Game, GameObject, GameRoom, gameRooms } from '../../core/index.js'
 import { direction, random, randomChoice } from '../../core/math.js'
+import { moveOutside } from '../../core/collision.js'
 
 const WIDTH = 800
 const HEIGHT = 600
 
-const BLOCK_INITIAL_COUNT = 20
+const BLOCK_INITIAL_COUNT = 0
 const BLOCK_SPAWN_INTERVAL = (1000 / 60) * 16
 
 const BLOCK_SPEED_SPAWN_MIN = 0.5
@@ -17,27 +18,6 @@ const BLOCK_SIZE_SPAWN_MIN = 16
 const BLOCK_SIZE_SPAWN_MAX = 32
 const BLOCK_SIZE_MIN = 2
 const BLOCK_SIZE_MAX = 48
-
-/**
- * @param {GameObject} a
- * @param {GameObject} b
- */
-const bounceObjects = (a, b) => {
-  const massA = Math.abs(a.size * a.size)
-  const massB = Math.abs(b.size * b.size)
-
-  const aHSpeed = a.hspeed
-  const aVSpeed = a.vspeed
-
-  const bHSpeed = b.hspeed
-  const bVSpeed = b.vspeed
-
-  a.hspeed = (aHSpeed * (massA - massB) + 2 * massB * bHSpeed) / (massA + massB)
-  a.vspeed = (aVSpeed * (massA - massB) + 2 * massB * bVSpeed) / (massA + massB)
-
-  b.hspeed = (bHSpeed * (massB - massA) + 2 * massA * aHSpeed) / (massA + massB)
-  b.vspeed = (bVSpeed * (massB - massA) + 2 * massA * aVSpeed) / (massA + massB)
-}
 
 class Block extends GameObject {
   constructor() {
@@ -107,7 +87,9 @@ class Block extends GameObject {
     }
 
     // TODO: implement moving outside once collision line is done
-    bounceObjects(this, other)
+    // debugger
+    moveOutside(this, other)
+    // bounceObjects(this, other)
 
     // apply friction after collision
     this.speed *= BLOCK_COLLISION_FRICTION

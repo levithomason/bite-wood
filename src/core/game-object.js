@@ -11,18 +11,20 @@ import { gameRooms } from './game-rooms.js'
 
 /**
  * @typedef {Object} GameObjectConfig
+ * @property {string} [name=this.constructor.name] - A recognizable name for the object. Read-only after the object is created.
  * @property {number} [boundingBoxTop=0] - The bounding box's distance away from the object's y position.
  * @property {number} [boundingBoxLeft=0] - The bounding box's distance away from the object's x position.
  * @property {number} [boundingBoxWidth=0] - How wide the bounding box starting from boundingBoxLeft.
  * @property {number} [boundingBoxHeight=0] - How tall the bounding box starting from boundingBoxTop.
  * @property {boolean} [persist=false] - Determines whether this object should still exist when the room changes.
  * @property {GameSprite|undefined} [sprite]
- * @property {GameObjectCollider} [collider='dynamic']
  * @property {number} [x=0]
  * @property {number} [y=0]
  * @property {number} [acceleration=0]
+ * @property {GameObjectCollider} [collider='dynamic']
  * @property {Vector} [gravity=gamePhysics.gravity]
  * @property {number} [friction=gamePhysics.friction]
+ * @property {number} [mass=50]
  * @property {number} [speed=0]
  * @property {number} [direction=0]
  * @property {GameObjectEvents} [events={}]
@@ -67,6 +69,14 @@ export class GameObject {
   /** @type {Vector} */
   #vector
 
+  #name
+
+  /** @type {number} */
+  #xPrevious
+
+  /** @type {number} */
+  #yPrevious
+
   /**
    * An array of all instantiated game objects.
    * @type {GameObject[]}
@@ -81,6 +91,7 @@ export class GameObject {
    */
   constructor(config = {}) {
     const {
+      name = this.constructor.name,
       boundingBoxTop = 0,
       boundingBoxLeft = 0,
       boundingBoxWidth = 0,
@@ -93,11 +104,16 @@ export class GameObject {
       collider = 'dynamic',
       gravity = gamePhysics.gravity,
       friction = gamePhysics.friction,
+      mass = 50,
       speed = 0,
       direction = 0,
       events = {},
       ...properties
     } = config
+
+    this.#name = name
+
+    this.collision = null
 
     this.#boundingBoxTop = boundingBoxTop
     this.#boundingBoxLeft = boundingBoxLeft
@@ -139,7 +155,25 @@ export class GameObject {
   }
 
   get name() {
-    return this.constructor.name
+    return this.#name
+  }
+
+  /**
+   * The x position of the object in the previous frame.
+   * In the first frame, this will be the same as x.
+   * @return {number|number}
+   */
+  get xPrevious() {
+    return this.#xPrevious || this.x
+  }
+
+  /**
+   * The y position of the object in the previous frame.
+   * In the first frame, this will be the same as y.
+   * @return {number|number}
+   */
+  get yPrevious() {
+    return this.#yPrevious || this.y
   }
 
   get speed() {
@@ -339,6 +373,9 @@ export class GameObject {
    * Do not draw in this method. Called on every tick of the loop.
    */
   step() {
+    this.#xPrevious = this.x
+    this.#yPrevious = this.y
+
     //
     // Invoke Events
     //
@@ -408,6 +445,10 @@ export class GameObject {
     this.move(this.direction, this.speed)
   }
 
+  postStep() {
+    this.collision = null
+  }
+
   /**
    * This method should draw the object. Called on every tick of the loop.
    * @param {GameDrawing} drawing
@@ -462,7 +503,7 @@ export class GameObject {
     }
 
     // bounding box
-    if (this.hasCollision.onAnySide) {
+    if (this.collision) {
       drawing.setStrokeColor('#F80')
     } else {
       drawing.setStrokeColor('#08F')
@@ -481,7 +522,7 @@ export class GameObject {
     // vector
     if (speed) {
       drawing.setStrokeColor('#0D0')
-      drawing.arrow(x, y, x + hspeed * 4, y + vspeed * 4, 4)
+      drawing.arrow(x, y, x + hspeed, y + vspeed, 4)
     }
 
     // text values

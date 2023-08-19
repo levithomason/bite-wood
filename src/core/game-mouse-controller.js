@@ -53,18 +53,7 @@ class GameMouse {
 
   /** @param {MouseEvent} e */
   #setMousePosition = (e) => {
-    // TODO: this doesn't let the mouse work outside of the canvas
-    // In order to track the mouse position outside of the canvas, we'd need to add the
-    // offset position of the canvas to the pageX/Y.  The canvas can be placed anywhere
-    // on the screen with CSS.  We would have to query for the canvas and add the offset.
-    // However, we don't want state to have a dependency on the canvas, since there may
-    // be multiple canvases (such as in a sprite editor).  It would also be a perf hit.
-    //
-    // By using the layerX/Y of any canvas, we get the added benefit of a proper mouse
-    // position on any canvas.
-
     // This tracks the mouse position anywhere in the document, including outside the canvas.
-
     this.x = e.pageX - gameDrawing.canvas.offsetLeft + gameCamera.x
     this.y = e.pageY - gameDrawing.canvas.offsetTop + gameCamera.y
   }
@@ -95,7 +84,7 @@ class GameMouse {
     this.up[button] = true
   }
 
-  step() {
+  postStep() {
     // clear active buttons that are in up state
     for (const button in this.active) {
       if (this.up[button]) {

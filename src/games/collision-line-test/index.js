@@ -175,7 +175,7 @@ class MouseLine extends GameObject {
 
       this.drawIntersects(drawing, object, pointsInFront)
 
-      const isPointInRectangle = pointsOnBox.some((point) => {
+      const isSomePointInRectangle = pointsOnBox.some((point) => {
         return collisionPointRectangle(
           point.x,
           point.y,
@@ -209,7 +209,8 @@ class MouseLine extends GameObject {
         : null
 
       const isColliding =
-        isOriginInRectangle || (pointsOnBox.length >= 1 && isPointInRectangle)
+        isOriginInRectangle ||
+        (pointsOnBox.length >= 1 && isSomePointInRectangle)
 
       if (nearestPoint && nearestPoint.ratio > 0) {
         // show where nearest point would collide if the line were extended

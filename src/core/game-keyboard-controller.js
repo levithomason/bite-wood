@@ -53,7 +53,7 @@ class GameKeyboard {
     this.up[key] = true
   }
 
-  step() {
+  postStep() {
     // clear active keys that are in up state
     for (const key in this.active) {
       if (this.up[key]) {

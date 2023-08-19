@@ -38,8 +38,6 @@ export class Game {
     this.start = this.start.bind(this)
     this.stop = this.stop.bind(this)
     this.tick = this.tick.bind(this)
-
-    this.stepObjects = this.stepObjects.bind(this)
     this.draw = this.draw.bind(this)
 
     this.stepsPerSecond = stepsPerSecond
@@ -107,33 +105,29 @@ export class Game {
       gameState.debug = !gameState.debug
     }
 
+    //
+    // LOOP
+    //
+
     // Objects may need to step multiple times if the game is running slowly
     while (steps) {
-      this.stepObjects()
+      if (!gameState.isPlaying) return
+      if (!gameRooms.currentRoom) return
+
+      this.step()
+      this.collide()
       steps--
     }
 
     this.draw()
+    this.postStep()
 
-    // Key up/down and mouse up/down should only fire once per tick, clear their values
-    gameKeyboard.step()
-    gameMouse.step()
-
+    // console.groupEnd()
     _raf = requestAnimationFrame(this.tick)
   }
 
-  stepObjects() {
-    if (!gameState.isPlaying) return
-    if (!gameRooms.currentRoom) return
-
-    //
-    // Collisions
-    //
-    handleCollisions(gameRooms.currentRoom.objects)
-
-    //
-    // Step - user code should "win", call step after collisions
-    //
+  step() {
+    // console.group('STEP _____________________________________________')
     gameRooms.currentRoom.objects.forEach((object) => {
       try {
         object.step?.(object)
@@ -141,6 +135,24 @@ export class Game {
         console.error('Failed to step object:', err)
       }
     })
+    // console.groupEnd()
+  }
+
+  postStep() {
+    // console.group('POST STEP ________________________________________')
+    gameKeyboard.postStep()
+    gameMouse.postStep()
+
+    gameRooms.currentRoom.objects.forEach((object) => {
+      object.postStep()
+    })
+    // console.groupEnd()
+  }
+
+  collide() {
+    // console.group('COLLIDE __________________________________________')
+    handleCollisions(gameRooms.currentRoom.objects)
+    // console.groupEnd()
   }
 
   draw() {

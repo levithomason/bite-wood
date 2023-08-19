@@ -6,17 +6,18 @@ import {
   gameState,
 } from '../../core/index.js'
 import { random } from '../../core/math.js'
+import { moveOutside } from '../../core/collision.js'
 
-const OBJECT_SIZE_MIN = 10
-const OBJECT_SIZE_MAX = 80
-const OBJECT_COUNT = 20
+const BOX_SIZE_MIN = 10
+const BOX_SIZE_MAX = 80
+const BOX_COUNT = 20
 
-class Object extends GameObject {
+class Box extends GameObject {
   constructor() {
     super(
       (() => {
-        let w = random(OBJECT_SIZE_MAX, OBJECT_SIZE_MIN)
-        let h = random(OBJECT_SIZE_MAX, OBJECT_SIZE_MIN)
+        let w = random(BOX_SIZE_MAX, BOX_SIZE_MIN)
+        let h = random(BOX_SIZE_MAX, BOX_SIZE_MIN)
 
         return {
           speed: random(0.25, 1),
@@ -41,27 +42,72 @@ class Object extends GameObject {
     super.step()
     this.keepInRoom(1)
   }
+
+  onCollision(other) {
+    super.onCollision(other)
+
+    moveOutside(this, other)
+  }
+
+  draw(drawing) {
+    super.draw(drawing)
+
+    const color = this.collision ? '#f00' : '#fff'
+    drawing.setStrokeColor(color)
+    drawing.setFillColor('transparent')
+    drawing.rectangle(
+      this.boundingBoxLeft,
+      this.boundingBoxTop,
+      this.boundingBoxWidth,
+      this.boundingBoxHeight,
+    )
+
+    drawing.setLineWidth(1)
+    drawing.setStrokeColor(color)
+    drawing.arrow(this.xPrevious, this.yPrevious, this.x, this.y, 3)
+
+    if (this.xPrevious !== this.x || this.yPrevious !== this.y) {
+      const ghostColor = this.collision ? '#ff000044' : '#ffffff44'
+      drawing.setLineWidth(1)
+      drawing.setStrokeColor(ghostColor)
+      drawing.rectangle(
+        this.boundingBoxLeft + (this.xPrevious - this.x),
+        this.boundingBoxTop + (this.yPrevious - this.y),
+        this.boundingBoxWidth,
+        this.boundingBoxHeight,
+      )
+
+      if (this.collision) {
+        drawing.setLineWidth(1)
+        drawing.setStrokeColor('#ff0')
+        drawing.circle(this.collision.x, this.collision.y, 3)
+      }
+    }
+  }
 }
 
 class Room extends GameRoom {
   constructor() {
     super({ width: 800, height: 600 })
     this.backgroundColor = '#234'
+
+    this.stationaryBox = this.instanceCreate(Box, 400, 300)
+    this.stationaryBox.speed = 0
   }
 }
 
 const room = new Room()
-for (let i = 0; i < OBJECT_COUNT; i += 1) {
+for (let i = 0; i < BOX_COUNT; i += 1) {
   room.instanceCreate(
-    Object,
-    room.randomXPosition(OBJECT_SIZE_MAX, OBJECT_SIZE_MAX),
-    room.randomYPosition(OBJECT_SIZE_MAX, OBJECT_SIZE_MAX),
+    Box,
+    room.randomXPosition(BOX_SIZE_MAX, BOX_SIZE_MAX),
+    room.randomYPosition(BOX_SIZE_MAX, BOX_SIZE_MAX),
   )
 }
 
 gameRooms.addRoom(room)
 
-gameState.debug = true
+gameState.debug = false
 
-const game = new Game()
+const game = new Game({ stepsPerSecond: 60 })
 game.start()

@@ -99,17 +99,24 @@ export class GameRoom {
     })
   }
 
+  addObject(object) {
+    this.objects.push(object)
+    object.create()
+  }
+
   /**
    * @param {number} [x=room.randomXPosition()]
    * @param {number} [y=room.randomYPosition()]
    * @param {typeof GameObject} GameObject
+   * @param {object} [config={}] - Properties to set on the object.
    */
   instanceCreate(
     GameObject,
     x = this.randomXPosition(),
     y = this.randomYPosition(),
+    config,
   ) {
-    const object = new GameObject()
+    const object = new GameObject(config)
     object.x = x
     object.y = y
 

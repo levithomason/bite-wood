@@ -117,6 +117,17 @@ export const offsetY = (startY, distance, direction) => {
 }
 
 /**
+ * Returns a new value based on a start and end value and a percent across the range.
+ * @param {number} start
+ * @param {number} end
+ * @param {number} percent - A value between 0 and 1.
+ * @return {number}
+ */
+export const lerp = (start, end, percent) => {
+  return start + (end - start) * percent
+}
+
+/**
  * Returns true if `val` is greater than or equal to `lower` and less than `upper`.
  * @param {number} val
  * @param {number} lower
