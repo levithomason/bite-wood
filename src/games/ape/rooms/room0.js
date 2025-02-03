@@ -56,6 +56,4 @@ class Room0 extends GameRoom {
   }
 }
 
-// TODO: game.addRoom() should take the GameRoom class so we don't need to
-//       pre-create all rooms like this. defer creation until the room is needed.
 export const room0 = new Room0()
