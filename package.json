@@ -5,7 +5,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "start": "live-server --port=4321 src",
+    "start": "live-server --port=4321 --mount=/node_modules:./node_modules src",
     "test": "yarn node --experimental-vm-modules --no-warnings $(yarn bin jest)",
     "test:watch": "yarn test --watch",
     "deploy": "gh-pages --dist src"
@@ -23,7 +23,11 @@
       }
     ]
   },
-  "dependencies": {},
+  "dependencies": {
+    "lit-html": "^3.2.1",
+    "normalize.css": "^8.0.1",
+    "tinycolor2": "^1.6.0"
+  },
   "devDependencies": {
     "@jest/globals": "^29.3.1",
     "gh-pages": "^5.0.0",

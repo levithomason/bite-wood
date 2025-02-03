@@ -1,8 +1,8 @@
 const importmap = {
   imports: {
-    'lit-html': 'https://unpkg.com/lit-html@1',
-    'lit-html/': 'https://unpkg.com/lit-html@1/',
-    tinycolor2: 'https://unpkg.com/tinycolor2@1',
+    'lit-html': '/node_modules/lit-html/lit-html.js',
+    'lit-html/': '/node_modules/lit-html/',
+    tinycolor2: '/node_modules/tinycolor2/dist/tinycolor-min.js',
   },
 }
 

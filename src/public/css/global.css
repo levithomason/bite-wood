@@ -1,4 +1,4 @@
-@import url(https://unpkg.com/normalize.css);
+@import url(../../../node_modules/normalize.css/normalize.css);
 @import url(../fonts/Pixellari/web/stylesheet.css);
 @import url(slider.css);
 @import url(button.css);
