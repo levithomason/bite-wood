@@ -1,0 +1,12 @@
+{
+  "name": "sprite-editor",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "lit-html": "^3.2.1",
+    "tinycolor2": "^1.6.0"
+  }
+}

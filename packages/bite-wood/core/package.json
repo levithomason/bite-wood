@@ -1,0 +1,22 @@
+{
+  "name": "@bite-wood/core",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "yarn clean && yarn build:bundle && yarn build:types",
+    "build:bundle": "esbuild src/index.ts --bundle --outfile=dist/index.js",
+    "build:types": "tsc --declaration --emitDeclarationOnly --declarationMap --project tsconfig.build.json",
+    "test": "vitest --no-watch --config vitest.config.ts",
+    "test:watch": "vitest --watch --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@vitest/browser": "^3.0.5"
+  },
+  "devDependencies": {
+    "playwright": "^1.50.1",
+    "vitest": "^3.0.5"
+  }
+}

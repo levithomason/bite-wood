@@ -1,0 +1,14 @@
+{
+  "name": "@bite-wood/particles-example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "zsh ./../../../scripts/build.zsh",
+    "start": "zsh ./../../../scripts/start.zsh"
+  },
+  "dependencies": {
+    "@bite-wood/core": "^1.0.0"
+  }
+}

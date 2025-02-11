@@ -1,6 +1,0 @@
-@import 'public/css/global.css';
-
-html,
-body {
-  padding: var(--macro-space-inside);
-}

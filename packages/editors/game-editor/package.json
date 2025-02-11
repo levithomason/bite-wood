@@ -1,0 +1,10 @@
+{
+  "name": "game-editor",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "lit-html": "^3.2.1"
+  }
+}

@@ -1,3 +1,0 @@
-describe('game-object', () => {
-  it('', () => {})
-})

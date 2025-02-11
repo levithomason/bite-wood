@@ -1,0 +1,9 @@
+const SETTINGS = {
+  DEFAULT_WIDTH: 8,
+  DEFAULT_HEIGHT: 8,
+  MAX_UNDOS: 100,
+  MAX_ZOOM: 32,
+  MIN_ZOOM: 1,
+}
+
+export default SETTINGS
